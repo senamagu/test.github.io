@@ -3,32 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Alight JSON → Pixi Player</title>
+  <title>Template Player (Slots + Texture Swap)</title>
   <style>
     html,body { margin:0; height:100%; background:#111; color:#ddd; font-family:system-ui; }
-    #ui { position:fixed; top:10px; left:10px; display:flex; gap:8px; align-items:center; z-index:10; }
-    button,input { padding:6px 10px; }
+    #ui {
+      position:fixed; top:10px; left:10px; right:10px;
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+      z-index:10; background:rgba(0,0,0,.35); padding:10px; border-radius:10px;
+      backdrop-filter: blur(6px);
+    }
+    button,input,select { padding:6px 10px; }
     #stage { width:100vw; height:100vh; }
+    .label { opacity:.8; font-size:12px; }
   </style>
 </head>
 <body>
   <div id="ui">
-    <input id="jsonFile" type="file" accept="application/json" />
+    <div>
+      <div class="label">テンプレJSON</div>
+      <input id="jsonFile" type="file" accept="application/json" />
+    </div>
+
+    <div>
+      <div class="label">差し替え先スロット</div>
+      <select id="slotSelect"></select>
+    </div>
+
+    <div>
+      <div class="label">画像(PNG/WebP/JPG)</div>
+      <input id="imgFile" type="file" accept="image/*" />
+    </div>
+
+    <button id="applyImg">差し替え</button>
+    <button id="resetSlot">このスロットをリセット</button>
+
+    <span style="flex:1"></span>
+
     <button id="play">Play</button>
     <button id="pause">Pause</button>
     <button id="restart">Restart</button>
   </div>
+
   <div id="stage"></div>
 
-  <!-- PixiJS -->
   <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
-
   <script>
     // ---- Helpers ----
     const clamp01 = (x) => Math.max(0, Math.min(1, x));
+    const toRad = (deg) => deg * Math.PI / 180;
 
     function hexToRgba(hex) {
-      // supports #AARRGGBB or #RRGGBB or #ARGB (not used here)
       if (typeof hex !== "string" || !hex.startsWith("#")) return { r:255, g:255, b:255, a:1 };
       const h = hex.slice(1);
       if (h.length === 8) {
@@ -46,106 +70,86 @@
       }
       return { r:255, g:255, b:255, a:1 };
     }
+    const rgbToTint = (r,g,b) => (r<<16) | (g<<8) | b;
 
-    function rgbToTint(r,g,b) {
-      return (r<<16) | (g<<8) | b;
-    }
-
-    // ---- Easing ----
-    // cubicBezier(x1,y1,x2,y2) → tをyにマップする近似（xを解いてyを得る）
+    // ---- Cubic Bezier easing (minimal) ----
     function makeCubicBezier(x1, y1, x2, y2) {
-      // from https://github.com/gre/bezier-easing の考え方に近い簡易版
-      // 速度優先。十分“それっぽく”なる。
-      const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
-      const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+      const cx = 3*x1, bx = 3*(x2-x1)-cx, ax = 1-cx-bx;
+      const cy = 3*y1, by = 3*(y2-y1)-cy, ay = 1-cy-by;
+      const sampleX = (t)=>((ax*t+bx)*t+cx)*t;
+      const sampleY = (t)=>((ay*t+by)*t+cy)*t;
+      const derivX  = (t)=>(3*ax*t+2*bx)*t+cx;
 
-      function sampleCurveX(t) { return ((ax*t + bx)*t + cx)*t; }
-      function sampleCurveY(t) { return ((ay*t + by)*t + cy)*t; }
-      function sampleDerivX(t) { return (3*ax*t + 2*bx)*t + cx; }
-
-      function solveCurveX(x) {
-        // Newton-Raphson
+      function solveX(x) {
         let t = x;
-        for (let i=0; i<6; i++) {
-          const x2 = sampleCurveX(t) - x;
-          const d2 = sampleDerivX(t);
-          if (Math.abs(x2) < 1e-6) return t;
-          if (Math.abs(d2) < 1e-6) break;
-          t = t - x2 / d2;
+        for (let i=0;i<6;i++){
+          const dx = sampleX(t)-x;
+          const d  = derivX(t);
+          if (Math.abs(dx) < 1e-6) return t;
+          if (Math.abs(d)  < 1e-6) break;
+          t = t - dx/d;
         }
-        // fallback bisection
-        let t0 = 0, t1 = 1;
-        t = x;
-        while (t0 < t1) {
-          const x2 = sampleCurveX(t);
-          if (Math.abs(x2 - x) < 1e-6) return t;
-          if (x > x2) t0 = t; else t1 = t;
-          t = (t1 - t0) * 0.5 + t0;
-          if (Math.abs(t1 - t0) < 1e-6) break;
+        let t0=0,t1=1; t=x;
+        for (let i=0;i<20;i++){
+          const dx = sampleX(t)-x;
+          if (Math.abs(dx) < 1e-6) return t;
+          if (dx > 0) t1=t; else t0=t;
+          t = (t0+t1)/2;
         }
         return t;
       }
-
-      return function (x) {
+      return (x)=>{
         x = clamp01(x);
-        const t = solveCurveX(x);
-        return clamp01(sampleCurveY(t));
+        const t = solveX(x);
+        return clamp01(sampleY(t));
       };
     }
-
-    function parseEase(easeStr) {
-      if (!easeStr) return null;
-      const m = String(easeStr).match(/^cubicBezier\(([-\d.]+),([-\d.]+),([-\d.]+),([-\d.]+)\)$/);
+    function parseEase(e) {
+      if (!e) return null;
+      const m = String(e).match(/^cubicBezier\(([-\d.]+),([-\d.]+),([-\d.]+),([-\d.]+)\)$/);
       if (!m) return null;
-      return makeCubicBezier(parseFloat(m[1]),parseFloat(m[2]),parseFloat(m[3]),parseFloat(m[4]));
+      return makeCubicBezier(+m[1],+m[2],+m[3],+m[4]);
     }
 
     // ---- Keyframe sampling ----
     function sampleTrack(track, t) {
-      // track: [{t: number, v: ... , ease?: string}]
       if (!track || track.length === 0) return null;
       if (t <= track[0].t) return track[0].v;
       if (t >= track[track.length-1].t) return track[track.length-1].v;
 
-      let i = 0;
-      for (; i < track.length-1; i++) {
+      let i=0;
+      for (; i<track.length-1; i++){
         if (t >= track[i].t && t <= track[i+1].t) break;
       }
       const k0 = track[i], k1 = track[i+1];
       const span = (k1.t - k0.t) || 1e-6;
       let u = (t - k0.t) / span;
 
-      // easeは「次のkfに付く」場合もあるけど、まずはk1優先で解釈
+      // cubicBezierのみ対応。local系は無視＝linear
       const easeFn = parseEase(k1.ease) || parseEase(k0.ease);
       if (easeFn) u = easeFn(u);
 
       const v0 = k0.v, v1 = k1.v;
 
-      // number
-      if (typeof v0 === "number" && typeof v1 === "number") {
+      if (typeof v0 === "number" && typeof v1 === "number")
         return v0 + (v1 - v0) * u;
-      }
-      // array
+
       if (Array.isArray(v0) && Array.isArray(v1)) {
-        const out = [];
         const n = Math.min(v0.length, v1.length);
-        for (let j=0; j<n; j++) out.push(v0[j] + (v1[j] - v0[j]) * u);
+        const out = new Array(n);
+        for (let j=0; j<n; j++) out[j] = v0[j] + (v1[j] - v0[j]) * u;
         return out;
       }
-      // color string (#AARRGGBB) - 補間は一旦しない（近い方を採用）
-      if (typeof v0 === "string" && typeof v1 === "string") {
+
+      if (typeof v0 === "string" && typeof v1 === "string")
         return (u < 0.5) ? v0 : v1;
-      }
+
       return v0;
     }
 
     // ---- Pixi setup ----
     const app = new PIXI.Application();
-    await app.init({
-      resizeTo: window,
-      backgroundAlpha: 0,
-      antialias: true,
-    });
+    await app.init({ resizeTo: window, backgroundAlpha: 0, antialias: true });
     document.getElementById("stage").appendChild(app.canvas);
 
     // ---- Player state ----
@@ -153,11 +157,41 @@
     let playing = true;
     let timeSec = 0;
     let durationSec = 2;
-    const nodes = new Map(); // slotId -> DisplayObject
+
+    // slotId -> { container, placeholderGraphics, sprite|null }
+    const slotNodes = new Map();
 
     function clearScene() {
       app.stage.removeChildren();
-      nodes.clear();
+      slotNodes.clear();
+      document.getElementById("slotSelect").innerHTML = "";
+    }
+
+    function addSlotOption(slotId, label) {
+      const sel = document.getElementById("slotSelect");
+      const opt = document.createElement("option");
+      opt.value = slotId;
+      opt.textContent = label ? `${label} (${slotId})` : slotId;
+      sel.appendChild(opt);
+    }
+
+    function buildPlaceholder(slotId, slot, tracks) {
+      const g = new PIXI.Graphics();
+
+      // プレースホルダサイズ（後でslotにサイズを入れたらここを反映）
+      const w = 220, h = 140;
+
+      const fc = (tracks.fillColor && tracks.fillColor[0]) ? tracks.fillColor[0].v : slot.fillColor;
+      const rgba = hexToRgba(fc || "#FFFFFFFF");
+
+      g.clear();
+      g.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
+
+      if (slot.type === ".circle") g.drawCircle(0, 0, 100);
+      else g.drawRect(-w/2, -h/2, w, h);
+
+      g.endFill();
+      return g;
     }
 
     function buildSceneFromTemplate(tpl) {
@@ -167,81 +201,100 @@
 
       const slots = tpl.slots || {};
       for (const [slotId, slot] of Object.entries(slots)) {
-        const g = new PIXI.Graphics();
-
-        // 仮のサイズ（後でslotにwidth/height入れるならここで反映）
-        const w = 220, h = 140;
-
-        // 初期色
         const tracks = tpl.tracks?.[slotId] || {};
-        const fc = (tracks.fillColor && tracks.fillColor[0]) ? tracks.fillColor[0].v : slot.fillColor;
-        const rgba = hexToRgba(fc || "#FFFFFFFF");
 
-        g.clear();
-        g.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
+        // containerでまとめる（後で入れ替えしやすい）
+        const c = new PIXI.Container();
 
-        if (slot.type === ".circle") {
-          g.drawCircle(0, 0, 100);
-        } else {
-          // rect
-          // pivotを考慮したいので、基本は中心原点で描く（ここがWeb側の都合）
-          g.drawRect(-w/2, -h/2, w, h);
-        }
-        g.endFill();
+        // まずプレースホルダ
+        const placeholder = buildPlaceholder(slotId, slot, tracks);
+        c.addChild(placeholder);
 
-        // pivot: Alightのpivotは「レイヤー基準点のオフセット」っぽい。
-        // Web側では一旦 "anchorのずれ" として扱ってみる（後で微調整する前提）
-        if (slot.pivot && Array.isArray(slot.pivot)) {
-          // Pixi Graphics の pivot はローカル座標。
-          // 今は「描画の原点が中心」なので、pivotをそのまま入れると大きくズレる可能性あり。
-          // まずはそのまま突っ込む（動作確認用）。
-          g.pivot.set(slot.pivot[0], slot.pivot[1]);
-        }
+        // anchor/pivotは「まず中心」固定（ズレる問題は後で詰める）
+        // Spriteにした時も anchor=0.5,0.5 で中心合わせにする
 
-        app.stage.addChild(g);
-        nodes.set(slotId, g);
+        app.stage.addChild(c);
+        slotNodes.set(slotId, { container: c, placeholder, sprite: null });
+
+        addSlotOption(slotId, slot.label || slotId);
       }
+
+      // 初期適用
+      timeSec = 0;
+      applyAtTime(0);
+    }
+
+    function setSlotTexture(slotId, texture) {
+      const entry = slotNodes.get(slotId);
+      if (!entry) return;
+
+      // 既存sprite削除
+      if (entry.sprite) {
+        entry.container.removeChild(entry.sprite);
+        entry.sprite.destroy({ children: true });
+        entry.sprite = null;
+      }
+
+      // placeholderを隠す
+      entry.placeholder.visible = false;
+
+      const sp = new PIXI.Sprite(texture);
+      sp.anchor.set(0.5, 0.5); // 中心基準
+      entry.container.addChild(sp);
+      entry.sprite = sp;
+    }
+
+    function resetSlot(slotId) {
+      const entry = slotNodes.get(slotId);
+      if (!entry) return;
+      if (entry.sprite) {
+        entry.container.removeChild(entry.sprite);
+        entry.sprite.destroy({ children: true });
+        entry.sprite = null;
+      }
+      entry.placeholder.visible = true;
     }
 
     function applyAtTime(t) {
       if (!template) return;
-      for (const [slotId, obj] of nodes.entries()) {
+
+      for (const [slotId, entry] of slotNodes.entries()) {
+        const c = entry.container;
         const tr = template.tracks?.[slotId] || {};
 
         const pos = sampleTrack(tr.position, t);
-        if (pos) obj.position.set(pos[0], pos[1]);
+        if (pos) c.position.set(pos[0], pos[1]);
 
         const sc = sampleTrack(tr.scale, t);
-        if (sc) obj.scale.set(sc[0], sc[1]);
+        if (sc) c.scale.set(sc[0], sc[1]);
 
         const rot = sampleTrack(tr.rotation, t);
-        if (rot != null) obj.rotation = (rot * Math.PI) / 180;
+        if (rot != null) c.rotation = toRad(rot);
 
         const op = sampleTrack(tr.opacity, t);
-        if (op != null) obj.alpha = op;
+        if (op != null) c.alpha = op;
 
-        const col = sampleTrack(tr.fillColor, t);
-        if (col) {
-          const rgba = hexToRgba(col);
-          // Graphicsのtintは効きにくいケースがあるので、描き直す
-          if (obj instanceof PIXI.Graphics) {
+        const sk = sampleTrack(tr.skew, t);
+        if (sk) c.skew.set(sk[0], sk[1]);
+
+        // fillColor変化：spriteが無いスロットだけプレースホルダ塗り直し
+        if (!entry.sprite) {
+          const col = sampleTrack(tr.fillColor, t);
+          if (col) {
+            const rgba = hexToRgba(col);
             const slot = template.slots[slotId];
             const w = 220, h = 140;
-            obj.clear();
-            obj.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
-            if (slot?.type === ".circle") obj.drawCircle(0, 0, 100);
-            else obj.drawRect(-w/2, -h/2, w, h);
-            obj.endFill();
+            entry.placeholder.clear();
+            entry.placeholder.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
+            if (slot?.type === ".circle") entry.placeholder.drawCircle(0, 0, 100);
+            else entry.placeholder.drawRect(-w/2, -h/2, w, h);
+            entry.placeholder.endFill();
           }
         }
-
-        // skewは今回入ってるけど、Graphicsのskewはできる
-        const sk = sampleTrack(tr.skew, t);
-        if (sk) obj.skew.set(sk[0], sk[1]);
       }
     }
 
-    // ---- Main loop ----
+    // ---- Loop ----
     let last = performance.now();
     app.ticker.add(() => {
       const now = performance.now();
@@ -250,7 +303,7 @@
 
       if (playing && template) {
         timeSec += dt;
-        if (timeSec > durationSec) timeSec = timeSec % durationSec;
+        if (durationSec > 0 && timeSec > durationSec) timeSec = timeSec % durationSec;
         applyAtTime(timeSec);
       }
     });
@@ -263,16 +316,35 @@
     document.getElementById("jsonFile").addEventListener("change", async (ev) => {
       const file = ev.target.files?.[0];
       if (!file) return;
-      const text = await file.text();
-      const tpl = JSON.parse(text);
+      const tpl = JSON.parse(await file.text());
       buildSceneFromTemplate(tpl);
-      timeSec = 0;
-      applyAtTime(0);
     });
 
-    // ---- Quick: サンプルjsonをここに直貼りして即確認したいなら ----
-    // buildSceneFromTemplate(SAMPLE);
-    // applyAtTime(0);
+    let lastImageFile = null;
+    document.getElementById("imgFile").addEventListener("change", (ev) => {
+      lastImageFile = ev.target.files?.[0] || null;
+    });
+
+    document.getElementById("applyImg").onclick = async () => {
+      if (!template) return alert("先にテンプレJSONを読み込んで");
+      const slotId = document.getElementById("slotSelect").value;
+      if (!slotId) return alert("スロット選んで");
+      if (!lastImageFile) return alert("画像ファイル選んで");
+
+      const url = URL.createObjectURL(lastImageFile);
+      const tex = await PIXI.Assets.load(url);
+      setSlotTexture(slotId, tex);
+
+      // すぐ反映
+      applyAtTime(timeSec);
+    };
+
+    document.getElementById("resetSlot").onclick = () => {
+      const slotId = document.getElementById("slotSelect").value;
+      if (!slotId) return;
+      resetSlot(slotId);
+      applyAtTime(timeSec);
+    };
   </script>
 </body>
 </html>
