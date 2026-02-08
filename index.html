@@ -30,6 +30,12 @@
     </div>
 
     <div>
+  <div class="label">パーツフォルダ一括読み込み</div>
+  <input id="folder" type="file" webkitdirectory multiple />
+</div>
+<button id="applyFolder">フォルダを全部反映</button>
+
+    <div>
       <div class="label">画像(PNG/WebP/JPG)</div>
       <input id="imgFile" type="file" accept="image/*" />
     </div>
@@ -199,6 +205,8 @@
       template = tpl;
       durationSec = tpl?.meta?.duration ?? 2;
 
+      slotNodes.set(slotId, { container: c, placeholder, sprite: null });
+      
       const slots = tpl.slots || {};
       for (const [slotId, slot] of Object.entries(slots)) {
         const tracks = tpl.tracks?.[slotId] || {};
@@ -215,7 +223,6 @@
 
         app.stage.sortableChildren = true;
         app.stage.addChild(c);
-        slotNodes.set(slotId, { container: c, placeholder, sprite: null });
         c.zIndex = slot.z ?? 0;
 
         addSlotOption(slotId, slot.label || slotId);
@@ -254,7 +261,6 @@ function setSlotTexture(slotId, texture) {
   if (!entry) return;
 
   const slot = template?.slots?.[slotId] || {};
-  const tr = template?.tracks?.[slotId] || {};
 
   // 既存sprite削除
   if (entry.sprite) {
@@ -266,24 +272,19 @@ function setSlotTexture(slotId, texture) {
   // placeholderを隠す
   entry.placeholder.visible = false;
 
+  // Sprite作成
   const sp = new PIXI.Sprite(texture);
   sp.anchor.set(0.5, 0.5); // 中心
 
-  // ★ここが肝：スロット基準サイズにフィット
-  const baseSize = slot.baseSize || null;
-  const fit = slot.fit || "contain";
-  fitSpriteToBaseSize(sp, baseSize, fit);
+  // ★ここが肝：スロット基準サイズにフィット（デフォ1024）
+  fitSpriteToBaseSize(
+    sp,
+    slot.baseSize || { w: 1024, h: 1024 },
+    slot.fit || "contain"
+  );
 
   entry.container.addChild(sp);
   entry.sprite = sp;
-
-  const slot = template?.slots?.[slotId] || {};
-  const sp = new PIXI.Sprite(texture);
-  sp.anchor.set(0.5, 0.5);
-  fitSpriteToBaseSize(sp, slot.baseSize || {w:1024,h:1024}, slot.fit || "contain");
-
-  
-  // fillColorなどの影響はSpriteには当てない（必要なら後でフィルタ等）
 }
     
     function resetSlot(slotId) {
@@ -296,6 +297,45 @@ function setSlotTexture(slotId, texture) {
       }
       entry.placeholder.visible = true;
     }
+
+    function slotIdFromFile(file) {
+  const rel = file.webkitRelativePath || file.name;
+  const p = rel.replace(/\\/g, "/");
+  const afterRoot = p.includes("/") ? p.slice(p.indexOf("/") + 1) : p;
+  return afterRoot.replace(/\.[^.]+$/, "");
+}
+
+async function loadTextureFromFile(file) {
+  const url = URL.createObjectURL(file);
+  const tex = await PIXI.Assets.load(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return tex;
+}
+
+document.getElementById("applyFolder").onclick = async () => {
+  if (!template) return alert("先にテンプレJSONを読み込んで");
+  const input = document.getElementById("folder");
+  const files = Array.from(input.files || []);
+  if (!files.length) return alert("フォルダ選んで");
+
+  const existingSlots = new Set(Object.keys(template.slots || {}));
+  const imgFiles = files.filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f.name));
+
+  let applied = 0;
+  for (const f of imgFiles) {
+    const slotId = slotIdFromFile(f);
+    if (!existingSlots.has(slotId)) {
+      console.warn("No slot:", slotId, "from", f.webkitRelativePath || f.name);
+      continue;
+    }
+    const tex = await loadTextureFromFile(f);
+    setSlotTexture(slotId, tex);
+    applied++;
+  }
+
+  applyAtTime(timeSec);
+  alert(`反映: ${applied} / ${imgFiles.length}`);
+};
 
     function applyAtTime(t) {
       if (!template) return;
