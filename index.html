@@ -213,8 +213,10 @@
         // anchor/pivotは「まず中心」固定（ズレる問題は後で詰める）
         // Spriteにした時も anchor=0.5,0.5 で中心合わせにする
 
+        app.stage.sortableChildren = true;
         app.stage.addChild(c);
         slotNodes.set(slotId, { container: c, placeholder, sprite: null });
+        c.zIndex = slot.z ?? 0;
 
         addSlotOption(slotId, slot.label || slotId);
       }
@@ -224,26 +226,60 @@
       applyAtTime(0);
     }
 
-    function setSlotTexture(slotId, texture) {
-      const entry = slotNodes.get(slotId);
-      if (!entry) return;
+function fitSpriteToBaseSize(sprite, baseSize, fit = "contain") {
+  if (!baseSize || !baseSize.w || !baseSize.h) return;
 
-      // 既存sprite削除
-      if (entry.sprite) {
-        entry.container.removeChild(entry.sprite);
-        entry.sprite.destroy({ children: true });
-        entry.sprite = null;
-      }
+  // テクスチャ本来のサイズ
+  const tw = sprite.texture.width;
+  const th = sprite.texture.height;
+  if (!tw || !th) return;
 
-      // placeholderを隠す
-      entry.placeholder.visible = false;
+  const sx = baseSize.w / tw;
+  const sy = baseSize.h / th;
 
-      const sp = new PIXI.Sprite(texture);
-      sp.anchor.set(0.5, 0.5); // 中心基準
-      entry.container.addChild(sp);
-      entry.sprite = sp;
-    }
+  let s = 1;
+  if (fit === "cover") s = Math.max(sx, sy);
+  else if (fit === "stretch") {
+    sprite.scale.set(sx, sy);
+    return;
+  } else {
+    // contain（デフォ）
+    s = Math.min(sx, sy);
+  }
+  sprite.scale.set(s, s);
+}
+    
+function setSlotTexture(slotId, texture) {
+  const entry = slotNodes.get(slotId);
+  if (!entry) return;
 
+  const slot = template?.slots?.[slotId] || {};
+  const tr = template?.tracks?.[slotId] || {};
+
+  // 既存sprite削除
+  if (entry.sprite) {
+    entry.container.removeChild(entry.sprite);
+    entry.sprite.destroy({ children: true });
+    entry.sprite = null;
+  }
+
+  // placeholderを隠す
+  entry.placeholder.visible = false;
+
+  const sp = new PIXI.Sprite(texture);
+  sp.anchor.set(0.5, 0.5); // 中心
+
+  // ★ここが肝：スロット基準サイズにフィット
+  const baseSize = slot.baseSize || null;
+  const fit = slot.fit || "contain";
+  fitSpriteToBaseSize(sp, baseSize, fit);
+
+  entry.container.addChild(sp);
+  entry.sprite = sp;
+
+  // fillColorなどの影響はSpriteには当てない（必要なら後でフィルタ等）
+}
+    
     function resetSlot(slotId) {
       const entry = slotNodes.get(slotId);
       if (!entry) return;
