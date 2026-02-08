@@ -25,10 +25,11 @@
     </div>
 
     <div>
-  <div class="label">内蔵テンプレ</div>
-  <select id="builtinSelect"></select>
-</div>
-<button id="exportTemplate">今のテンプレを書き出し</button>
+      <div class="label">内蔵テンプレ（選んだ瞬間に適用）</div>
+      <select id="builtinSelect"></select>
+    </div>
+
+    <button id="exportTemplate">今のテンプレを書き出し</button>
 
     <div>
       <div class="label">差し替え先スロット</div>
@@ -36,10 +37,10 @@
     </div>
 
     <div>
-  <div class="label">パーツフォルダ一括読み込み</div>
-  <input id="folder" type="file" webkitdirectory multiple />
-</div>
-<button id="applyFolder">フォルダを全部反映</button>
+      <div class="label">パーツフォルダ一括読み込み</div>
+      <input id="folder" type="file" webkitdirectory multiple />
+    </div>
+    <button id="applyFolder">フォルダを全部反映</button>
 
     <div>
       <div class="label">画像(PNG/WebP/JPG)</div>
@@ -59,7 +60,9 @@
   <div id="stage"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
-  <script>
+
+  <!-- ★重要：top-level await を使うので module -->
+  <script type="module">
     // ---- Helpers ----
     const clamp01 = (x) => Math.max(0, Math.min(1, x));
     const toRad = (deg) => deg * Math.PI / 180;
@@ -137,7 +140,6 @@
       const span = (k1.t - k0.t) || 1e-6;
       let u = (t - k0.t) / span;
 
-      // cubicBezierのみ対応。local系は無視＝linear
       const easeFn = parseEase(k1.ease) || parseEase(k0.ease);
       if (easeFn) u = easeFn(u);
 
@@ -164,123 +166,124 @@
     await app.init({ resizeTo: window, backgroundAlpha: 0, antialias: true });
     document.getElementById("stage").appendChild(app.canvas);
 
-const BUILTIN_TEMPLATES = [
-  {
-    id: "static_base",
-    name: "素体（静止）",
-    data: {
-      meta: { title: "Chibi Template", fps: 12, duration: 2, loop: true },
-      slots: {
-        "effect/exclamation": { label: "！マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 1000 },
-        "effect/question": { label: "？マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 999 },
-        "effect/heart": { label: "ハート", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 998 },
-        "effect/star": { label: "スター", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 997 },
-        "effect/impact": { label: "衝撃", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 996 },
-        "effect/notice": { label: "気付き", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 995 },
+    // ---- Builtin templates ----
+    const BUILTIN_TEMPLATES = [
+      {
+        id: "static_base",
+        name: "素体（静止）",
+        data: {
+          meta: { title: "Chibi Template", fps: 12, duration: 2, loop: true },
+          slots: {
+            "effect/exclamation": { label: "！マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 1000 },
+            "effect/question":    { label: "？マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 999 },
+            "effect/heart":       { label: "ハート",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 998 },
+            "effect/star":        { label: "スター",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 997 },
+            "effect/impact":      { label: "衝撃",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 996 },
+            "effect/notice":      { label: "気付き",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 995 },
 
-        "outer/head/catyusha": { label: "カチューシャ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 981 },
-        "outer/head/headphone": { label: "ヘッドホン", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 980 },
-        "outer/face/square": { label: "四角", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 979 },
-        "outer/face/glasses": { label: "眼鏡", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 978 },
-        "outer/body/muffler": { label: "マフラー", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 977 },
+            "outer/head/catyusha": { label: "カチューシャ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 981 },
+            "outer/head/headphone":{ label: "ヘッドホン",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 980 },
+            "outer/face/square":   { label: "四角",         baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 979 },
+            "outer/face/glasses":  { label: "眼鏡",         baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 978 },
+            "outer/body/muffler":  { label: "マフラー",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 977 },
 
-        "outer/right_hand/hand": { label: "右手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 970 },
-        "outer/right_hand/stick": { label: "右手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 969 },
-        "outer/right_hand/ball": { label: "右手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 968 },
+            "outer/right_hand/hand":  { label: "右手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 970 },
+            "outer/right_hand/stick": { label: "右手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 969 },
+            "outer/right_hand/ball":  { label: "右手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 968 },
 
-        "outer/left_hand/hand": { label: "左手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 967 },
-        "outer/left_hand/stick": { label: "左手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 966 },
-        "outer/left_hand/ball": { label: "左手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 965 },
+            "outer/left_hand/hand":  { label: "左手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 967 },
+            "outer/left_hand/stick": { label: "左手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 966 },
+            "outer/left_hand/ball":  { label: "左手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 965 },
 
-        "emotion/angry": { label: "怒", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 930 },
-        "emotion/doubt": { label: "疑", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 929 },
-        "emotion/blush": { label: "赤面", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 928 },
-        "emotion/ear_blush": { label: "耳赤", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 927 },
-        "emotion/cheek": { label: "ほっぺ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 926 },
-        "emotion/sweat/3": { label: "汗 3段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 925 },
-        "emotion/sweat/2": { label: "汗 2段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 924 },
-        "emotion/sweat/1": { label: "汗 1段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 923 },
-        "emotion/tears": { label: "涙", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 922 },
+            "emotion/angry":     { label: "怒",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 930 },
+            "emotion/doubt":     { label: "疑",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 929 },
+            "emotion/blush":     { label: "赤面", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 928 },
+            "emotion/ear_blush": { label: "耳赤", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 927 },
+            "emotion/cheek":     { label: "ほっぺ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 926 },
+            "emotion/sweat/3":   { label: "汗 3段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 925 },
+            "emotion/sweat/2":   { label: "汗 2段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 924 },
+            "emotion/sweat/1":   { label: "汗 1段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 923 },
+            "emotion/tears":     { label: "涙", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 922 },
 
-        "mouth/oo": { label: "おお", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 900 },
-        "mouth/o": { label: "お", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 899 },
-        "mouth/e": { label: "え", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 898 },
-        "mouth/u": { label: "う", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 897 },
-        "mouth/yu": { label: "ゆ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 896 },
-        "mouth/ni": { label: "に", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 895 },
-        "mouth/i": { label: "い", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 894 },
-        "mouth/a": { label: "あ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 893 },
-        "mouth/n_smile": { label: "んぃ🙂", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 892 },
-        "mouth/n_frown": { label: "んぅ🙁", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 891 },
-        "mouth/n_neutral": { label: "ん😶", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 890 },
+            "mouth/oo":        { label: "おお", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 900 },
+            "mouth/o":         { label: "お",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 899 },
+            "mouth/e":         { label: "え",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 898 },
+            "mouth/u":         { label: "う",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 897 },
+            "mouth/yu":        { label: "ゆ",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 896 },
+            "mouth/ni":        { label: "に",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 895 },
+            "mouth/i":         { label: "い",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 894 },
+            "mouth/a":         { label: "あ",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 893 },
+            "mouth/n_smile":   { label: "んぃ🙂", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 892 },
+            "mouth/n_frown":   { label: "んぅ🙁", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 891 },
+            "mouth/n_neutral": { label: "ん😶",  baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 890 },
 
-        "eye/right/upper_close": { label: "目 右 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 880 },
-        "eye/right/lower_close": { label: "目 右 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 879 },
-        "eye/right/normal": { label: "目 右 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 878 },
-        "eye/right/surprise": { label: "目 右 驚", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 877 },
-        "eye/right/thin": { label: "目 右 細", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 876 },
+            "eye/right/upper_close": { label: "目 右 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 880 },
+            "eye/right/lower_close": { label: "目 右 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 879 },
+            "eye/right/normal":      { label: "目 右 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 878 },
+            "eye/right/surprise":    { label: "目 右 驚",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 877 },
+            "eye/right/thin":        { label: "目 右 細",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 876 },
 
-        "eye/left/upper_close": { label: "目 左 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 875 },
-        "eye/left/lower_close": { label: "目 左 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 874 },
-        "eye/left/normal": { label: "目 左 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 873 },
-        "eye/left/surprise": { label: "目 左 驚", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 872 },
-        "eye/left/thin": { label: "目 左 細", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 871 },
+            "eye/left/upper_close":  { label: "目 左 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 875 },
+            "eye/left/lower_close":  { label: "目 左 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 874 },
+            "eye/left/normal":       { label: "目 左 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 873 },
+            "eye/left/surprise":     { label: "目 左 驚",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 872 },
+            "eye/left/thin":         { label: "目 左 細",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 871 },
 
-        "brow/right/kiri": { label: "眉 右 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 860 },
-        "brow/right/komari": { label: "眉 右 困", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 859 },
-        "brow/right/normal": { label: "眉 右 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 858 },
-        "brow/right/parallel": { label: "眉 右 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 857 },
+            "brow/right/kiri":     { label: "眉 右 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 860 },
+            "brow/right/komari":   { label: "眉 右 困",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 859 },
+            "brow/right/normal":   { label: "眉 右 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 858 },
+            "brow/right/parallel": { label: "眉 右 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 857 },
 
-        "brow/left/kiri": { label: "眉 左 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 856 },
-        "brow/left/komari": { label: "眉 左 困", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 855 },
-        "brow/left/normal": { label: "眉 左 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 854 },
-        "brow/left/parallel": { label: "眉 左 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 853 },
+            "brow/left/kiri":      { label: "眉 左 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 856 },
+            "brow/left/komari":    { label: "眉 左 困",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 855 },
+            "brow/left/normal":    { label: "眉 左 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 854 },
+            "brow/left/parallel":  { label: "眉 左 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 853 },
 
-        "hair/front_center": { label: "前髪センター", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 820 },
-        "hair/front_side": { label: "前髪サイド", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 819 },
-        "hair/side_1": { label: "横髪1", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 818 },
-        "hair/side_2": { label: "横髪2", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 817 },
+            "hair/front_center": { label: "前髪センター", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 820 },
+            "hair/front_side":   { label: "前髪サイド",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 819 },
+            "hair/side_1":       { label: "横髪1",        baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 818 },
+            "hair/side_2":       { label: "横髪2",        baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 817 },
 
-        "facecolor/shadow": { label: "影", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 780 },
-        "facecolor/pale": { label: "青ざめ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 779 },
-        "facecolor/blush": { label: "赤面", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 778 },
-        "facecolor/red": { label: "赤み", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 777 },
-        "facecolor/none": { label: "無", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 776 },
+            "facecolor/shadow": { label: "影",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 780 },
+            "facecolor/pale":   { label: "青ざめ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 779 },
+            "facecolor/blush":  { label: "赤面",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 778 },
+            "facecolor/red":    { label: "赤み",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 777 },
+            "facecolor/none":   { label: "無",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 776 },
 
-        "face/face": { label: "顔", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 740 },
+            "face/face": { label: "顔", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 740 },
 
-        "hair2/back": { label: "後ろ髪", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 700 },
+            "hair2/back": { label: "後ろ髪", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 700 },
 
-        "body/jacket": { label: "上着", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 650 },
-        "body/clothes": { label: "服", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 649 }
+            "body/jacket":  { label: "上着", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 650 },
+            "body/clothes": { label: "服",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 649 }
+          },
+          tracks: {}
+        }
       },
-      tracks: {}
-    }
-  },
 
-  {
-    id: "bounce_simple",
-    name: "テスト：ふわっと拡大（口）",
-    data: {
-      meta: { title: "Bounce Test", fps: 12, duration: 2, loop: true },
-      slots: {
-        "mouth/o": { label:"お", baseSize:{w:1024,h:1024}, fit:"contain", z:899 },
-        "face/face": { label:"顔", baseSize:{w:1024,h:1024}, fit:"contain", z:740 }
-      },
-      tracks: {
-        "mouth/o": {
-          position: [{ t:0, v:[540, 620] }],
-          scale: [
-            { t:0.0, v:[1.0, 1.0] },
-            { t:0.5, v:[1.15, 1.15], ease:"cubicBezier(0,0,0,1)" },
-            { t:1.0, v:[1.0, 1.0], ease:"cubicBezier(0,0,0,1)" }
-          ]
-        },
-        "face/face": { position: [{ t:0, v:[540, 540] }] }
+      {
+        id: "bounce_simple",
+        name: "テスト：ふわっと拡大（口）",
+        data: {
+          meta: { title: "Bounce Test", fps: 12, duration: 2, loop: true },
+          slots: {
+            "mouth/o":  { label:"お",  baseSize:{w:1024,h:1024}, fit:"contain", z:899 },
+            "face/face":{ label:"顔", baseSize:{w:1024,h:1024}, fit:"contain", z:740 }
+          },
+          tracks: {
+            "mouth/o": {
+              position: [{ t:0, v:[540, 620] }],
+              scale: [
+                { t:0.0, v:[1.0, 1.0] },
+                { t:0.5, v:[1.15, 1.15], ease:"cubicBezier(0,0,0,1)" },
+                { t:1.0, v:[1.0, 1.0], ease:"cubicBezier(0,0,0,1)" }
+              ]
+            },
+            "face/face": { position: [{ t:0, v:[540, 540] }] }
+          }
+        }
       }
-    }
-  }
-];
+    ];
 
     // ---- Player state ----
     let template = null;
@@ -288,7 +291,7 @@ const BUILTIN_TEMPLATES = [
     let timeSec = 0;
     let durationSec = 2;
 
-    // slotId -> { container, placeholderGraphics, sprite|null }
+    // slotId -> { container, placeholder, sprite|null }
     const slotNodes = new Map();
 
     function clearScene() {
@@ -307,8 +310,6 @@ const BUILTIN_TEMPLATES = [
 
     function buildPlaceholder(slotId, slot, tracks) {
       const g = new PIXI.Graphics();
-
-      // プレースホルダサイズ（後でslotにサイズを入れたらここを反映）
       const w = 220, h = 140;
 
       const fc = (tracks.fillColor && tracks.fillColor[0]) ? tracks.fillColor[0].v : slot.fillColor;
@@ -316,94 +317,89 @@ const BUILTIN_TEMPLATES = [
 
       g.clear();
       g.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
-
-      if (slot.type === ".circle") g.drawCircle(0, 0, 100);
-      else g.drawRect(-w/2, -h/2, w, h);
-
+      g.drawRect(-w/2, -h/2, w, h);
       g.endFill();
+
       return g;
     }
 
-function buildSceneFromTemplate(tpl) {
-  clearScene();
-  template = tpl;
-  durationSec = tpl?.meta?.duration ?? 2;
+    function buildSceneFromTemplate(tpl) {
+      clearScene();
+      template = tpl;
+      durationSec = tpl?.meta?.duration ?? 2;
 
-  app.stage.sortableChildren = true;
+      app.stage.sortableChildren = true;
 
-  const slots = tpl.slots || {};
-  for (const [slotId, slot] of Object.entries(slots)) {
-    const tracks = tpl.tracks?.[slotId] || {};
-    const c = new PIXI.Container();
-    const placeholder = buildPlaceholder(slotId, slot, tracks);
-    c.addChild(placeholder);
+      const slots = tpl.slots || {};
+      const cx = app.screen.width / 2;
+      const cy = app.screen.height / 2;
 
-    app.stage.addChild(c);
-    c.zIndex = slot.z ?? 0;
+      for (const [slotId, slot] of Object.entries(slots)) {
+        const tracks = tpl.tracks?.[slotId] || {};
+        const c = new PIXI.Container();
 
-    slotNodes.set(slotId, { container: c, placeholder, sprite: null });
+        // 初期は中央に置いとく（positionトラックがあるなら後で上書き）
+        c.position.set(cx, cy);
 
-    addSlotOption(slotId, slot.label || slotId);
-  }
+        const placeholder = buildPlaceholder(slotId, slot, tracks);
+        c.addChild(placeholder);
 
-  timeSec = 0;
-  applyAtTime(0);
-}
+        c.zIndex = slot.z ?? 0;
+        app.stage.addChild(c);
 
-function fitSpriteToBaseSize(sprite, baseSize, fit = "contain") {
-  if (!baseSize || !baseSize.w || !baseSize.h) return;
+        slotNodes.set(slotId, { container: c, placeholder, sprite: null });
+        addSlotOption(slotId, slot.label || slotId);
+      }
 
-  // テクスチャ本来のサイズ
-  const tw = sprite.texture.width;
-  const th = sprite.texture.height;
-  if (!tw || !th) return;
+      timeSec = 0;
+      applyAtTime(0);
+    }
 
-  const sx = baseSize.w / tw;
-  const sy = baseSize.h / th;
+    function fitSpriteToBaseSize(sprite, baseSize, fit = "contain") {
+      if (!baseSize || !baseSize.w || !baseSize.h) return;
 
-  let s = 1;
-  if (fit === "cover") s = Math.max(sx, sy);
-  else if (fit === "stretch") {
-    sprite.scale.set(sx, sy);
-    return;
-  } else {
-    // contain（デフォ）
-    s = Math.min(sx, sy);
-  }
-  sprite.scale.set(s, s);
-}
-    
-function setSlotTexture(slotId, texture) {
-  const entry = slotNodes.get(slotId);
-  if (!entry) return;
+      const tw = sprite.texture.width;
+      const th = sprite.texture.height;
+      if (!tw || !th) return;
 
-  const slot = template?.slots?.[slotId] || {};
+      const sx = baseSize.w / tw;
+      const sy = baseSize.h / th;
 
-  // 既存sprite削除
-  if (entry.sprite) {
-    entry.container.removeChild(entry.sprite);
-    entry.sprite.destroy({ children: true });
-    entry.sprite = null;
-  }
+      if (fit === "stretch") {
+        sprite.scale.set(sx, sy);
+        return;
+      }
+      const s = (fit === "cover") ? Math.max(sx, sy) : Math.min(sx, sy);
+      sprite.scale.set(s, s);
+    }
 
-  // placeholderを隠す
-  entry.placeholder.visible = false;
+    function setSlotTexture(slotId, texture) {
+      const entry = slotNodes.get(slotId);
+      if (!entry) return;
 
-  // Sprite作成
-  const sp = new PIXI.Sprite(texture);
-  sp.anchor.set(0.5, 0.5); // 中心
+      const slot = template?.slots?.[slotId] || {};
 
-  // ★ここが肝：スロット基準サイズにフィット（デフォ1024）
-  fitSpriteToBaseSize(
-    sp,
-    slot.baseSize || { w: 1024, h: 1024 },
-    slot.fit || "contain"
-  );
+      if (entry.sprite) {
+        entry.container.removeChild(entry.sprite);
+        entry.sprite.destroy({ children: true });
+        entry.sprite = null;
+      }
 
-  entry.container.addChild(sp);
-  entry.sprite = sp;
-}
-    
+      entry.placeholder.visible = false;
+
+      const sp = new PIXI.Sprite(texture);
+      sp.anchor.set(0.5, 0.5);
+
+      fitSpriteToBaseSize(
+        sp,
+        slot.baseSize || { w: 1024, h: 1024 },
+        slot.fit || "contain"
+      );
+
+      entry.container.addChild(sp);
+      entry.sprite = sp;
+    }
+
     function resetSlot(slotId) {
       const entry = slotNodes.get(slotId);
       if (!entry) return;
@@ -414,45 +410,6 @@ function setSlotTexture(slotId, texture) {
       }
       entry.placeholder.visible = true;
     }
-
-    function slotIdFromFile(file) {
-  const rel = file.webkitRelativePath || file.name;
-  const p = rel.replace(/\\/g, "/");
-  const afterRoot = p.includes("/") ? p.slice(p.indexOf("/") + 1) : p;
-  return afterRoot.replace(/\.[^.]+$/, "");
-}
-
-async function loadTextureFromFile(file) {
-  const url = URL.createObjectURL(file);
-  const tex = await PIXI.Assets.load(url);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  return tex;
-}
-
-document.getElementById("applyFolder").onclick = async () => {
-  if (!template) return alert("先にテンプレJSONを読み込んで");
-  const input = document.getElementById("folder");
-  const files = Array.from(input.files || []);
-  if (!files.length) return alert("フォルダ選んで");
-
-  const existingSlots = new Set(Object.keys(template.slots || {}));
-  const imgFiles = files.filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f.name));
-
-  let applied = 0;
-  for (const f of imgFiles) {
-    const slotId = slotIdFromFile(f);
-    if (!existingSlots.has(slotId)) {
-      console.warn("No slot:", slotId, "from", f.webkitRelativePath || f.name);
-      continue;
-    }
-    const tex = await loadTextureFromFile(f);
-    setSlotTexture(slotId, tex);
-    applied++;
-  }
-
-  applyAtTime(timeSec);
-  alert(`反映: ${applied} / ${imgFiles.length}`);
-};
 
     function applyAtTime(t) {
       if (!template) return;
@@ -476,21 +433,34 @@ document.getElementById("applyFolder").onclick = async () => {
         const sk = sampleTrack(tr.skew, t);
         if (sk) c.skew.set(sk[0], sk[1]);
 
-        // fillColor変化：spriteが無いスロットだけプレースホルダ塗り直し
+        // spriteが無いときだけ placeholder を色変化させる（任意）
         if (!entry.sprite) {
           const col = sampleTrack(tr.fillColor, t);
           if (col) {
             const rgba = hexToRgba(col);
-            const slot = template.slots[slotId];
             const w = 220, h = 140;
             entry.placeholder.clear();
             entry.placeholder.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
-            if (slot?.type === ".circle") entry.placeholder.drawCircle(0, 0, 100);
-            else entry.placeholder.drawRect(-w/2, -h/2, w, h);
+            entry.placeholder.drawRect(-w/2, -h/2, w, h);
             entry.placeholder.endFill();
           }
         }
       }
+    }
+
+    // ---- Folder mapping ----
+    function slotIdFromFile(file) {
+      const rel = file.webkitRelativePath || file.name;
+      const p = rel.replace(/\\/g, "/");
+      const afterRoot = p.includes("/") ? p.slice(p.indexOf("/") + 1) : p;
+      return afterRoot.replace(/\.[^.]+$/, "");
+    }
+
+    async function loadTextureFromFile(file) {
+      const url = URL.createObjectURL(file);
+      const tex = await PIXI.Assets.load(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return tex;
     }
 
     // ---- Loop ----
@@ -512,59 +482,32 @@ document.getElementById("applyFolder").onclick = async () => {
     document.getElementById("pause").onclick = () => playing = false;
     document.getElementById("restart").onclick = () => { timeSec = 0; applyAtTime(0); };
 
-function initBuiltinList() {
-  const sel = document.getElementById("builtinSelect");
-  sel.innerHTML = "";
-  for (const t of BUILTIN_TEMPLATES) {
-    const opt = document.createElement("option");
-    opt.value = t.id;
-    opt.textContent = t.name;
-    sel.appendChild(opt);
-  }
+    // 内蔵テンプレ：選んだ瞬間に適用
+    function initBuiltinList() {
+      const sel = document.getElementById("builtinSelect");
+      sel.innerHTML = "";
+      for (const t of BUILTIN_TEMPLATES) {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+      }
 
-  // 初期選択を即適用
-  if (BUILTIN_TEMPLATES.length) {
-    sel.value = BUILTIN_TEMPLATES[0].id;
-    buildSceneFromTemplate(structuredClone(BUILTIN_TEMPLATES[0].data));
-  }
+      if (BUILTIN_TEMPLATES.length) {
+        sel.value = BUILTIN_TEMPLATES[0].id;
+        buildSceneFromTemplate(structuredClone(BUILTIN_TEMPLATES[0].data));
+      }
 
-  // ★選んだ瞬間に適用
-  sel.addEventListener("change", () => {
-    const id = sel.value;
-    const t = BUILTIN_TEMPLATES.find(x => x.id === id);
-    if (!t) return;
-    buildSceneFromTemplate(structuredClone(t.data));
-  });
-}
+      sel.addEventListener("change", () => {
+        const id = sel.value;
+        const t = BUILTIN_TEMPLATES.find(x => x.id === id);
+        if (!t) return;
+        buildSceneFromTemplate(structuredClone(t.data));
+      });
+    }
+    initBuiltinList();
 
-initBuiltinList();
-
-
-function getBuiltinById(id) {
-  return BUILTIN_TEMPLATES.find(t => t.id === id) || null;
-}
-
-document.getElementById("loadBuiltin").onclick = () => {
-  const id = document.getElementById("builtinSelect").value;
-  const t = getBuiltinById(id);
-  if (!t) return;
-  buildSceneFromTemplate(structuredClone(t.data)); // 破壊防止
-};
-
-document.getElementById("exportTemplate").onclick = () => {
-  if (!template) return alert("テンプレが無い");
-  const blob = new Blob([JSON.stringify(template, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = (template.meta?.title || "template") + ".json";
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-};
-
-// 起動時に1回呼ぶ
-initBuiltinList();
-
+    // 外部JSON読み込み
     document.getElementById("jsonFile").addEventListener("change", async (ev) => {
       const file = ev.target.files?.[0];
       if (!file) return;
@@ -572,6 +515,7 @@ initBuiltinList();
       buildSceneFromTemplate(tpl);
     });
 
+    // 単品差し替え
     let lastImageFile = null;
     document.getElementById("imgFile").addEventListener("change", (ev) => {
       lastImageFile = ev.target.files?.[0] || null;
@@ -586,8 +530,7 @@ initBuiltinList();
       const url = URL.createObjectURL(lastImageFile);
       const tex = await PIXI.Assets.load(url);
       setSlotTexture(slotId, tex);
-
-      // すぐ反映
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       applyAtTime(timeSec);
     };
 
@@ -596,6 +539,44 @@ initBuiltinList();
       if (!slotId) return;
       resetSlot(slotId);
       applyAtTime(timeSec);
+    };
+
+    // フォルダ一括
+    document.getElementById("applyFolder").onclick = async () => {
+      if (!template) return alert("先にテンプレJSONを読み込んで（or 内蔵選んで）");
+      const input = document.getElementById("folder");
+      const files = Array.from(input.files || []);
+      if (!files.length) return alert("フォルダ選んで");
+
+      const existingSlots = new Set(Object.keys(template.slots || {}));
+      const imgFiles = files.filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f.name));
+
+      let applied = 0;
+      for (const f of imgFiles) {
+        const slotId = slotIdFromFile(f);
+        if (!existingSlots.has(slotId)) {
+          console.warn("No slot:", slotId, "from", f.webkitRelativePath || f.name);
+          continue;
+        }
+        const tex = await loadTextureFromFile(f);
+        setSlotTexture(slotId, tex);
+        applied++;
+      }
+
+      applyAtTime(timeSec);
+      alert(`反映: ${applied} / ${imgFiles.length}`);
+    };
+
+    // 書き出し
+    document.getElementById("exportTemplate").onclick = () => {
+      if (!template) return alert("テンプレが無い");
+      const blob = new Blob([JSON.stringify(template, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = (template.meta?.title || "template") + ".json";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
   </script>
 </body>
