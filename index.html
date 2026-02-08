@@ -28,7 +28,6 @@
   <div class="label">内蔵テンプレ</div>
   <select id="builtinSelect"></select>
 </div>
-<button id="loadBuiltin">内蔵テンプレ適用</button>
 <button id="exportTemplate">今のテンプレを書き出し</button>
 
     <div>
@@ -165,634 +164,98 @@
     await app.init({ resizeTo: window, backgroundAlpha: 0, antialias: true });
     document.getElementById("stage").appendChild(app.canvas);
 
-    const BUILTIN_TEMPLATES = [
+const BUILTIN_TEMPLATES = [
   {
     id: "static_base",
     name: "素体（静止）",
     data: {
-      {
-  "meta": {
-    "title": "Chibi Template",
-    "fps": 12,
-    "duration": 2,
-    "loop": true
-  },
-  "slots": {
-    "effect/exclamation": {
-      "label": "！マーク",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 1000
-    },
-    "effect/question": {
-      "label": "？マーク",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 999
-    },
-    "effect/heart": {
-      "label": "ハート",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 998
-    },
-    "effect/star": {
-      "label": "スター",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 997
-    },
-    "effect/impact": {
-      "label": "衝撃",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 996
-    },
-    "effect/notice": {
-      "label": "気付き",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 995
-    },
-    "outer/head/catyusha": {
-      "label": "カチューシャ",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 981
-    },
-    "outer/head/headphone": {
-      "label": "ヘッドホン",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 980
-    },
-    "outer/face/square": {
-      "label": "四角",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 979
-    },
-    "outer/face/glasses": {
-      "label": "眼鏡",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 978
-    },
-    "outer/body/muffler": {
-      "label": "マフラー",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 977
-    },
-    "outer/right_hand/hand": {
-      "label": "右手 手",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 970
-    },
-    "outer/right_hand/stick": {
-      "label": "右手 スティック",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 969
-    },
-    "outer/right_hand/ball": {
-      "label": "右手 ボール",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 968
-    },
-    "outer/left_hand/hand": {
-      "label": "左手 手",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 967
-    },
-    "outer/left_hand/stick": {
-      "label": "左手 スティック",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 966
-    },
-    "outer/left_hand/ball": {
-      "label": "左手 ボール",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 965
-    },
-    "emotion/angry": {
-      "label": "怒",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 930
-    },
-    "emotion/doubt": {
-      "label": "疑",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 929
-    },
-    "emotion/blush": {
-      "label": "赤面",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 928
-    },
-    "emotion/ear_blush": {
-      "label": "耳赤",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 927
-    },
-    "emotion/cheek": {
-      "label": "ほっぺ",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 926
-    },
-    "emotion/sweat/3": {
-      "label": "汗 3段階",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 925
-    },
-    "emotion/sweat/2": {
-      "label": "汗 2段階",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 924
-    },
-    "emotion/sweat/1": {
-      "label": "汗 1段階",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 923
-    },
-    "emotion/tears": {
-      "label": "涙",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 922
-    },
-    "mouth/oo": {
-      "label": "おお",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 900
-    },
-    "mouth/o": {
-      "label": "お",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 899
-    },
-    "mouth/e": {
-      "label": "え",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 898
-    },
-    "mouth/u": {
-      "label": "う",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 897
-    },
-    "mouth/yu": {
-      "label": "ゆ",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 896
-    },
-    "mouth/ni": {
-      "label": "に",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 895
-    },
-    "mouth/i": {
-      "label": "い",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 894
-    },
-    "mouth/a": {
-      "label": "あ",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 893
-    },
-    "mouth/n_smile": {
-      "label": "んぃ🙂",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 892
-    },
-    "mouth/n_frown": {
-      "label": "んぅ🙁",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 891
-    },
-    "mouth/n_neutral": {
-      "label": "ん😶",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 890
-    },
-    "eye/right/upper_close": {
-      "label": "目 右 上閉",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 880
-    },
-    "eye/right/lower_close": {
-      "label": "目 右 下閉",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 879
-    },
-    "eye/right/normal": {
-      "label": "目 右 普",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 878
-    },
-    "eye/right/surprise": {
-      "label": "目 右 驚",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 877
-    },
-    "eye/right/thin": {
-      "label": "目 右 細",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 876
-    },
-    "eye/left/upper_close": {
-      "label": "目 左 上閉",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 875
-    },
-    "eye/left/lower_close": {
-      "label": "目 左 下閉",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 874
-    },
-    "eye/left/normal": {
-      "label": "目 左 普",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 873
-    },
-    "eye/left/surprise": {
-      "label": "目 左 驚",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 872
-    },
-    "eye/left/thin": {
-      "label": "目 左 細",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 871
-    },
-    "brow/right/kiri": {
-      "label": "眉 右 キリ",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 860
-    },
-    "brow/right/komari": {
-      "label": "眉 右 困",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 859
-    },
-    "brow/right/normal": {
-      "label": "眉 右 普",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 858
-    },
-    "brow/right/parallel": {
-      "label": "眉 右 平行",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 857
-    },
-    "brow/left/kiri": {
-      "label": "眉 左 キリ",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 856
-    },
-    "brow/left/komari": {
-      "label": "眉 左 困",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 855
-    },
-    "brow/left/normal": {
-      "label": "眉 左 普",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 854
-    },
-    "brow/left/parallel": {
-      "label": "眉 左 平行",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 853
-    },
-    "hair/front_center": {
-      "label": "前髪センター",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 820
-    },
-    "hair/front_side": {
-      "label": "前髪サイド",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 819
-    },
-    "hair/side_1": {
-      "label": "横髪1",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 818
-    },
-    "hair/side_2": {
-      "label": "横髪2",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 817
-    },
-    "facecolor/shadow": {
-      "label": "影",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 780
-    },
-    "facecolor/pale": {
-      "label": "青ざめ",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 779
-    },
-    "facecolor/blush": {
-      "label": "赤面",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 778
-    },
-    "facecolor/red": {
-      "label": "赤み",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 777
-    },
-    "facecolor/none": {
-      "label": "無",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 776
-    },
-    "face/face": {
-      "label": "顔",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 740
-    },
-    "hair2/back": {
-      "label": "後ろ髪",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 700
-    },
-    "body/jacket": {
-      "label": "上着",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 650
-    },
-    "body/clothes": {
-      "label": "服",
-      "baseSize": {
-        "w": 1024,
-        "h": 1024
-      },
-      "fit": "contain",
-      "z": 649
+      meta: { title: "Chibi Template", fps: 12, duration: 2, loop: true },
+      slots: {
+        "effect/exclamation": { label: "！マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 1000 },
+        "effect/question": { label: "？マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 999 },
+        "effect/heart": { label: "ハート", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 998 },
+        "effect/star": { label: "スター", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 997 },
+        "effect/impact": { label: "衝撃", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 996 },
+        "effect/notice": { label: "気付き", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 995 },
+
+        "outer/head/catyusha": { label: "カチューシャ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 981 },
+        "outer/head/headphone": { label: "ヘッドホン", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 980 },
+        "outer/face/square": { label: "四角", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 979 },
+        "outer/face/glasses": { label: "眼鏡", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 978 },
+        "outer/body/muffler": { label: "マフラー", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 977 },
+
+        "outer/right_hand/hand": { label: "右手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 970 },
+        "outer/right_hand/stick": { label: "右手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 969 },
+        "outer/right_hand/ball": { label: "右手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 968 },
+
+        "outer/left_hand/hand": { label: "左手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 967 },
+        "outer/left_hand/stick": { label: "左手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 966 },
+        "outer/left_hand/ball": { label: "左手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 965 },
+
+        "emotion/angry": { label: "怒", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 930 },
+        "emotion/doubt": { label: "疑", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 929 },
+        "emotion/blush": { label: "赤面", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 928 },
+        "emotion/ear_blush": { label: "耳赤", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 927 },
+        "emotion/cheek": { label: "ほっぺ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 926 },
+        "emotion/sweat/3": { label: "汗 3段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 925 },
+        "emotion/sweat/2": { label: "汗 2段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 924 },
+        "emotion/sweat/1": { label: "汗 1段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 923 },
+        "emotion/tears": { label: "涙", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 922 },
+
+        "mouth/oo": { label: "おお", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 900 },
+        "mouth/o": { label: "お", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 899 },
+        "mouth/e": { label: "え", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 898 },
+        "mouth/u": { label: "う", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 897 },
+        "mouth/yu": { label: "ゆ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 896 },
+        "mouth/ni": { label: "に", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 895 },
+        "mouth/i": { label: "い", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 894 },
+        "mouth/a": { label: "あ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 893 },
+        "mouth/n_smile": { label: "んぃ🙂", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 892 },
+        "mouth/n_frown": { label: "んぅ🙁", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 891 },
+        "mouth/n_neutral": { label: "ん😶", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 890 },
+
+        "eye/right/upper_close": { label: "目 右 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 880 },
+        "eye/right/lower_close": { label: "目 右 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 879 },
+        "eye/right/normal": { label: "目 右 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 878 },
+        "eye/right/surprise": { label: "目 右 驚", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 877 },
+        "eye/right/thin": { label: "目 右 細", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 876 },
+
+        "eye/left/upper_close": { label: "目 左 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 875 },
+        "eye/left/lower_close": { label: "目 左 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 874 },
+        "eye/left/normal": { label: "目 左 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 873 },
+        "eye/left/surprise": { label: "目 左 驚", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 872 },
+        "eye/left/thin": { label: "目 左 細", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 871 },
+
+        "brow/right/kiri": { label: "眉 右 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 860 },
+        "brow/right/komari": { label: "眉 右 困", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 859 },
+        "brow/right/normal": { label: "眉 右 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 858 },
+        "brow/right/parallel": { label: "眉 右 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 857 },
+
+        "brow/left/kiri": { label: "眉 左 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 856 },
+        "brow/left/komari": { label: "眉 左 困", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 855 },
+        "brow/left/normal": { label: "眉 左 普", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 854 },
+        "brow/left/parallel": { label: "眉 左 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 853 },
+
+        "hair/front_center": { label: "前髪センター", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 820 },
+        "hair/front_side": { label: "前髪サイド", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 819 },
+        "hair/side_1": { label: "横髪1", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 818 },
+        "hair/side_2": { label: "横髪2", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 817 },
+
+        "facecolor/shadow": { label: "影", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 780 },
+        "facecolor/pale": { label: "青ざめ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 779 },
+        "facecolor/blush": { label: "赤面", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 778 },
+        "facecolor/red": { label: "赤み", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 777 },
+        "facecolor/none": { label: "無", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 776 },
+
+        "face/face": { label: "顔", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 740 },
+
+        "hair2/back": { label: "後ろ髪", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 700 },
+
+        "body/jacket": { label: "上着", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 650 },
+        "body/clothes": { label: "服", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 649 }
+      },
+      tracks: {}
     }
-  },
-  "tracks": {}
-}
   },
 
   {
@@ -801,7 +264,7 @@
     data: {
       meta: { title: "Bounce Test", fps: 12, duration: 2, loop: true },
       slots: {
-        "mouth/o": { label:"口 お", baseSize:{w:1024,h:1024}, fit:"contain", z:899 },
+        "mouth/o": { label:"お", baseSize:{w:1024,h:1024}, fit:"contain", z:899 },
         "face/face": { label:"顔", baseSize:{w:1024,h:1024}, fit:"contain", z:740 }
       },
       tracks: {
@@ -813,9 +276,7 @@
             { t:1.0, v:[1.0, 1.0], ease:"cubicBezier(0,0,0,1)" }
           ]
         },
-        "face/face": {
-          position: [{ t:0, v:[540, 540] }]
-        }
+        "face/face": { position: [{ t:0, v:[540, 540] }] }
       }
     }
   }
@@ -863,38 +324,31 @@
       return g;
     }
 
-    function buildSceneFromTemplate(tpl) {
-      clearScene();
-      template = tpl;
-      durationSec = tpl?.meta?.duration ?? 2;
+function buildSceneFromTemplate(tpl) {
+  clearScene();
+  template = tpl;
+  durationSec = tpl?.meta?.duration ?? 2;
 
-      slotNodes.set(slotId, { container: c, placeholder, sprite: null });
-      
-      const slots = tpl.slots || {};
-      for (const [slotId, slot] of Object.entries(slots)) {
-        const tracks = tpl.tracks?.[slotId] || {};
+  app.stage.sortableChildren = true;
 
-        // containerでまとめる（後で入れ替えしやすい）
-        const c = new PIXI.Container();
+  const slots = tpl.slots || {};
+  for (const [slotId, slot] of Object.entries(slots)) {
+    const tracks = tpl.tracks?.[slotId] || {};
+    const c = new PIXI.Container();
+    const placeholder = buildPlaceholder(slotId, slot, tracks);
+    c.addChild(placeholder);
 
-        // まずプレースホルダ
-        const placeholder = buildPlaceholder(slotId, slot, tracks);
-        c.addChild(placeholder);
+    app.stage.addChild(c);
+    c.zIndex = slot.z ?? 0;
 
-        // anchor/pivotは「まず中心」固定（ズレる問題は後で詰める）
-        // Spriteにした時も anchor=0.5,0.5 で中心合わせにする
+    slotNodes.set(slotId, { container: c, placeholder, sprite: null });
 
-        app.stage.sortableChildren = true;
-        app.stage.addChild(c);
-        c.zIndex = slot.z ?? 0;
+    addSlotOption(slotId, slot.label || slotId);
+  }
 
-        addSlotOption(slotId, slot.label || slotId);
-      }
-
-      // 初期適用
-      timeSec = 0;
-      applyAtTime(0);
-    }
+  timeSec = 0;
+  applyAtTime(0);
+}
 
 function fitSpriteToBaseSize(sprite, baseSize, fit = "contain") {
   if (!baseSize || !baseSize.w || !baseSize.h) return;
@@ -1058,7 +512,7 @@ document.getElementById("applyFolder").onclick = async () => {
     document.getElementById("pause").onclick = () => playing = false;
     document.getElementById("restart").onclick = () => { timeSec = 0; applyAtTime(0); };
 
-    function initBuiltinList() {
+function initBuiltinList() {
   const sel = document.getElementById("builtinSelect");
   sel.innerHTML = "";
   for (const t of BUILTIN_TEMPLATES) {
@@ -1067,7 +521,24 @@ document.getElementById("applyFolder").onclick = async () => {
     opt.textContent = t.name;
     sel.appendChild(opt);
   }
+
+  // 初期選択を即適用
+  if (BUILTIN_TEMPLATES.length) {
+    sel.value = BUILTIN_TEMPLATES[0].id;
+    buildSceneFromTemplate(structuredClone(BUILTIN_TEMPLATES[0].data));
+  }
+
+  // ★選んだ瞬間に適用
+  sel.addEventListener("change", () => {
+    const id = sel.value;
+    const t = BUILTIN_TEMPLATES.find(x => x.id === id);
+    if (!t) return;
+    buildSceneFromTemplate(structuredClone(t.data));
+  });
 }
+
+initBuiltinList();
+
 
 function getBuiltinById(id) {
   return BUILTIN_TEMPLATES.find(t => t.id === id) || null;
