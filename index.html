@@ -25,6 +25,13 @@
     </div>
 
     <div>
+  <div class="label">内蔵テンプレ</div>
+  <select id="builtinSelect"></select>
+</div>
+<button id="loadBuiltin">内蔵テンプレ適用</button>
+<button id="exportTemplate">今のテンプレを書き出し</button>
+
+    <div>
       <div class="label">差し替え先スロット</div>
       <select id="slotSelect"></select>
     </div>
@@ -157,6 +164,58 @@
     const app = new PIXI.Application();
     await app.init({ resizeTo: window, backgroundAlpha: 0, antialias: true });
     document.getElementById("stage").appendChild(app.canvas);
+
+    const BUILTIN_TEMPLATES = [
+  {
+    id: "static_base",
+    name: "素体（静止）",
+    data: {
+      meta: { title: "Static Base", fps: 12, duration: 2, loop: true },
+      slots: {
+        "face/face": { label:"顔", baseSize:{w:1024,h:1024}, fit:"contain", z:740 },
+        "hair/front_center": { label:"前髪センター", baseSize:{w:1024,h:1024}, fit:"contain", z:820 },
+        "hair/front_side": { label:"前髪サイド", baseSize:{w:1024,h:1024}, fit:"contain", z:819 },
+        "hair/side_1": { label:"横髪1", baseSize:{w:1024,h:1024}, fit:"contain", z:818 },
+        "hair/side_2": { label:"横髪2", baseSize:{w:1024,h:1024}, fit:"contain", z:817 },
+        "hair2/back": { label:"後ろ髪", baseSize:{w:1024,h:1024}, fit:"contain", z:700 },
+        "eye/right/normal": { label:"目 右 普", baseSize:{w:1024,h:1024}, fit:"contain", z:878 },
+        "eye/left/normal": { label:"目 左 普", baseSize:{w:1024,h:1024}, fit:"contain", z:873 },
+        "brow/right/normal": { label:"眉 右 普", baseSize:{w:1024,h:1024}, fit:"contain", z:858 },
+        "brow/left/normal": { label:"眉 左 普", baseSize:{w:1024,h:1024}, fit:"contain", z:854 },
+        "mouth/o": { label:"口 お", baseSize:{w:1024,h:1024}, fit:"contain", z:899 },
+        "body/clothes": { label:"服", baseSize:{w:1024,h:1024}, fit:"contain", z:649 },
+        "body/jacket": { label:"上着", baseSize:{w:1024,h:1024}, fit:"contain", z:650 },
+        "effect/exclamation": { label:"！", baseSize:{w:1024,h:1024}, fit:"contain", z:1000 }
+      },
+      tracks: {}
+    }
+  },
+
+  {
+    id: "bounce_simple",
+    name: "テスト：ふわっと拡大（口）",
+    data: {
+      meta: { title: "Bounce Test", fps: 12, duration: 2, loop: true },
+      slots: {
+        "mouth/o": { label:"口 お", baseSize:{w:1024,h:1024}, fit:"contain", z:899 },
+        "face/face": { label:"顔", baseSize:{w:1024,h:1024}, fit:"contain", z:740 }
+      },
+      tracks: {
+        "mouth/o": {
+          position: [{ t:0, v:[540, 620] }],
+          scale: [
+            { t:0.0, v:[1.0, 1.0] },
+            { t:0.5, v:[1.15, 1.15], ease:"cubicBezier(0,0,0,1)" },
+            { t:1.0, v:[1.0, 1.0], ease:"cubicBezier(0,0,0,1)" }
+          ]
+        },
+        "face/face": {
+          position: [{ t:0, v:[540, 540] }]
+        }
+      }
+    }
+  }
+];
 
     // ---- Player state ----
     let template = null;
@@ -394,6 +453,42 @@ document.getElementById("applyFolder").onclick = async () => {
     document.getElementById("play").onclick = () => playing = true;
     document.getElementById("pause").onclick = () => playing = false;
     document.getElementById("restart").onclick = () => { timeSec = 0; applyAtTime(0); };
+
+    function initBuiltinList() {
+  const sel = document.getElementById("builtinSelect");
+  sel.innerHTML = "";
+  for (const t of BUILTIN_TEMPLATES) {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.name;
+    sel.appendChild(opt);
+  }
+}
+
+function getBuiltinById(id) {
+  return BUILTIN_TEMPLATES.find(t => t.id === id) || null;
+}
+
+document.getElementById("loadBuiltin").onclick = () => {
+  const id = document.getElementById("builtinSelect").value;
+  const t = getBuiltinById(id);
+  if (!t) return;
+  buildSceneFromTemplate(structuredClone(t.data)); // 破壊防止
+};
+
+document.getElementById("exportTemplate").onclick = () => {
+  if (!template) return alert("テンプレが無い");
+  const blob = new Blob([JSON.stringify(template, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = (template.meta?.title || "template") + ".json";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+// 起動時に1回呼ぶ
+initBuiltinList();
 
     document.getElementById("jsonFile").addEventListener("change", async (ev) => {
       const file = ev.target.files?.[0];
