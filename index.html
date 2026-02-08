@@ -277,6 +277,12 @@ function setSlotTexture(slotId, texture) {
   entry.container.addChild(sp);
   entry.sprite = sp;
 
+  const slot = template?.slots?.[slotId] || {};
+  const sp = new PIXI.Sprite(texture);
+  sp.anchor.set(0.5, 0.5);
+  fitSpriteToBaseSize(sp, slot.baseSize || {w:1024,h:1024}, slot.fit || "contain");
+
+  
   // fillColorなどの影響はSpriteには当てない（必要なら後でフィルタ等）
 }
     
