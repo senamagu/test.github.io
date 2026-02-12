@@ -4,101 +4,183 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CSBM-TRPG キャラシ&チャパレ出力</title>
-  <style>/* ===== theme + layout fix patch (Refined) ===== */
+  <style>
+/* ===== 修正版：丸み＆カラー統一パッチ ===== */
 :root {
   /* Colors */
-  --bg: #4A5C52;           /* 全体背景：深いグリーン */
-  --panel: #13969F;        /* 大きな枠組み (Box)：鮮やかなティール */
-  --text: #FFF8F3;         /* 基本情報・得意分野などのテキスト：オフホワイト */
-  --para: #B0C58B;         /* 説明文などの補助：柔らかな黄緑 */
-  --btn: #F5B329;          /* Button：イエロー */
-  --btnText: #13969F;      /* Button text：ボタン内の文字 */
+  --bg: #4A5C52;           /* 全体背景 */
+  --panel: #13969F;        /* 大きな枠組み (Box) */
+  --text: #FFF8F3;         /* メインテキスト */
+  --para: #B0C58B;         /* 補助テキスト */
+  --btn: #F5B329;          /* Button背景 */
+  --btnText: #13969F;      /* Button文字 */
   
   /* 透過・調整用 */
   --line: rgba(255, 248, 243, 0.2);
-  --input-bg: rgba(0, 0, 0, 0.15); 
+  --input-bg: rgba(0, 0, 0, 0.2); 
 }
 
 /* --- 基本スタイル --- */
+* { box-sizing: border-box; }
+
 body {
+  margin: 0;
   background: var(--bg);
-  color: var(--text); /* 基本テキストはすべて指定のオフホワイトに */
+  color: var(--text);
+  /* フォントをサンセリフ体で固定 */
+  font-family: "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "Meiryo", "メイリオ", sans-serif;
+  line-height: 1.5;
 }
 
-/* --- mainレイアウト --- */
+/* 入力要素すべてにフォントを継承させる */
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 14px;
+  border-radius: 12px; /* 丸みを持たせる */
+  outline: none;
+}
+
+header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(0,0,0,0.1);
+}
+h1 { font-size: 18px; margin: 0; }
+.sub { color: var(--para); font-size: 12px; }
+
+/* --- メインレイアウト --- */
 main {
-  padding: 20px 18px;
+  padding: 20px;
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* --- card (これが指定の大きな枠組み/Boxになります) --- */
+/* --- card (大きな枠組み) --- */
 .card {
-  background: var(--panel); /* ここを #13969F に */
-  border-radius: 16px;
-  padding: 24px;
-  border: none;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  background: var(--panel);
+  border-radius: 20px; /* さらに丸くして可愛く */
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* 枠組み(Box)の中の見出し */
 .card h2 {
-  font-size: 18px;
-  color: var(--text); /* テキストは #FFF8F3 */
-  border-bottom: 2px solid rgba(255, 248, 243, 0.3);
-  padding-bottom: 8px;
-  margin-bottom: 16px;
+  font-size: 16px;
+  margin: 0 0 16px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* --- フォーム・入力系 --- */
+/* --- フォーム要素 --- */
 label {
-  color: var(--text); /* ラベルも読みやすくオフホワイトに */
-  font-weight: 600;
+  display: block;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-weight: bold;
   opacity: 0.9;
 }
 
 input, select, textarea {
+  width: 100%;
+  padding: 10px 12px;
   background: var(--input-bg);
-  border: 1px solid rgba(255, 248, 243, 0.2);
+  border: 1px solid var(--line);
   color: var(--text);
-  /* Box(#13969F)の上で見やすくなるよう調整 */
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+input:focus {
+  border-color: var(--btn);
+  background: rgba(0,0,0,0.3);
 }
 
 /* --- ボタン --- */
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+button {
+  cursor: pointer;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 button.primary {
   background: var(--btn);
-  color: var(--btnText); /* ボタン文字は #13969F */
+  color: var(--btnText);
   border: none;
-  font-weight: 800;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
 }
 
-/* --- KPI / 補助情報 --- */
+button.primary:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+button.danger {
+  background: rgba(255, 100, 100, 0.2);
+  color: #ff9999;
+  border-color: rgba(255, 100, 100, 0.3);
+}
+
+/* --- 特徴・リスト要素（JS側への対応） --- */
+.list .item {
+  background: rgba(0,0,0,0.15);
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+}
+
+/* JSで直書きされているスタイルへの対策 */
+[style*="background: #0f1219"] {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 16px !important;
+}
+
+/* --- KPI / Pill --- */
+.pill {
+  background: rgba(255, 248, 243, 0.2);
+  color: var(--text);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: normal;
+}
+
+.kpi { display: grid; gap: 10px; grid-template-columns: repeat(3, 1fr); margin-top: 15px; }
 .kpi .box {
-  background: rgba(255, 248, 243, 0.1); /* Boxの中の小要素は少し明るく */
-  border: 1px solid rgba(255, 248, 243, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
 }
+.kpi .v { color: var(--btn); font-size: 24px; font-weight: 900; }
+.kpi .name { font-size: 11px; opacity: 0.8; }
+.kpi .desc { font-size: 9px; opacity: 0.6; }
 
-.kpi .v {
-  color: var(--btn); /* 数字は目立つようにボタン色の黄色に */
-}
+/* --- その他 --- */
+.full { grid-column: 1 / -1; }
+textarea.mono { font-family: ui-monospace, monospace; }
 
-.mini, .hint {
-  color: var(--para); /* 補足説明だけ少し色を変えてメリハリを */
-}
-
-/* スマホ最適化 */
-@media (max-width: 560px) {
-  .item { grid-template-columns: 1fr; }
-}
-
-/* details */
-details{
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:8px 10px;
-  background: color-mix(in srgb, var(--bg) 78%, #000 22%);
+details {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.1);
 }
 summary{ cursor:pointer; user-select:none; color:var(--muted); }
 summary { list-style: none; }
