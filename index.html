@@ -104,11 +104,17 @@
       </div>
     </div>
 
+    <!-- ★ここ：閉じタグ修正＆misc追加 -->
     <div class="row2">
       <div>
         <label>誕生日（m/d）</label>
-        <input id="birthday_md" />
+        <input id="birthday_md" placeholder="例: 2/12" />
       </div>
+      <div>
+        <label>その他</label>
+        <input id="misc" placeholder="例: 利き手/出身/口調など" />
+      </div>
+    </div>
 
     <div class="btns" style="margin-top:12px;">
       <button class="primary" id="btnRandomProfile">プロフィールランダム</button>
@@ -148,10 +154,8 @@
         <div class="desc">MV = 身体 + 運</div>
       </div>
     </div>
-    
   </section>
 
-  <!-- 以下：前のまま（特徴/分野/所持品/関係/メモ/チャパレ/JSON） -->
   <!-- 特徴 -->
   <section class="card">
     <h2>特徴</h2>
@@ -352,7 +356,7 @@ function renderGoods(){
     row.className = "item";
     row.innerHTML = `
       <div><span class="mono">${escAttr(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
-      <div class="mini">+2pt</div>
+      <div class="mini">+1pt</div>
       <div class="mini"></div>
       <div class="del"><button class="danger" data-del-good="${idx}">削除</button></div>
     `;
@@ -369,7 +373,7 @@ function renderBads(){
     row.className = "item";
     row.innerHTML = `
       <div><span class="mono">${escAttr(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
-      <div class="mini">-2pt</div>
+      <div class="mini">-1pt</div>
       <div class="mini"></div>
       <div class="del"><button class="danger" data-del-bad="${idx}">削除</button></div>
     `;
@@ -432,7 +436,7 @@ function renderTraits(){
     wrap.innerHTML = `
       <div style="display:grid; gap:10px; grid-template-columns: 1fr 180px;">
         <div>
-          <span class=" ${t.type==="desc" ? "desc" : ""}">${t.type==="belief" ? "信条 +1d6" : "欠陥 -1d6"}</span>
+          <span>${t.type==="belief" ? "信条 +1d6" : "欠陥 -1d6"}</span>
           <input data-trait-text="${idx}" value="${escAttr(t.text)}" style="width:100%; margin-top:6px;" />
         </div>
         <div>
@@ -578,6 +582,7 @@ function makePalette(){
   const sex = ($("sex").value||"").trim();
   const h   = $("height").value ? String($("height").value) : "";
   const bd  = ($("birthday_md").value||"").trim();
+  const misc = ($("misc").value||"").trim();
 
   const lines = [];
   lines.push(`// CSBM-TRPG チャパレ${nm ? "：" + nm : ""}`);
@@ -588,7 +593,8 @@ function makePalette(){
   if(sex) a.push(sex);
   if(h) a.push(h+"cm");
   if(bd) a.push("BD:"+bd);
-  if(a.length) profileBits.push(a.join(" "));
+  if(misc) a.push(misc);
+  if(a.length) profileBits.push(a.join(" / "));
   if(profileBits.length) lines.push(`// ${profileBits.join(" / ")}`);
 
   lines.push(`// HP:${d.hp} DB:${d.db>=0?"+":""}${d.db} MV:${d.mv}`);
@@ -651,11 +657,8 @@ function randomProfile(){
   const sexes = ["男","女","その他"];
   const sex = sexes[randInt(0, sexes.length-1)];
   const month = randInt(1,12);
-  const dayMax = new Date(2024, month, 0).getDate(); // うるう年固定でOK（誕生日は雰囲気）
+  const dayMax = new Date(2024, month, 0).getDate();
   const day = randInt(1, dayMax);
-  const yyyy = 2000; // 年は固定でdate入力を壊さない（欲しけりゃここ変える）
-  const mm = String(month).padStart(2,"0");
-  const dd = String(day).padStart(2,"0");
   const birthday_md = `${month}/${day}`;
   return { age, height, sex, birthday_md };
 }
@@ -665,8 +668,7 @@ function tryAddItem({name, cat, pt}){
   const n = (name||"").trim();
   if(!n) return false;
 
-  const currentCount = state.items.length;
-  if(currentCount >= 3){
+  if(state.items.length >= 3){
     alert("所持品は最大3枠");
     return false;
   }
@@ -714,7 +716,6 @@ $("btnCopy").onclick = async ()=>{
   try{ await navigator.clipboard.writeText($("palette").value); alert("コピーした"); }
   catch(e){ alert("コピー失敗"); }
 };
-$("btnRecalc").onclick = recalcAll;
 
 $("btnRandomStats").onclick = ()=>{
   const [b,i,s,sp,l] = randomStatsSum15();
@@ -735,7 +736,7 @@ $("btnRandomProfile").onclick = ()=>{
   recalcAll();
 };
 
-["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","birthday_md","memo"]
+["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","birthday_md","misc","memo"]
   .forEach(id=> $(id).addEventListener("input", recalcAll));
 
 $("btnSave").onclick = makeJsonOut;
