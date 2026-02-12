@@ -56,7 +56,9 @@
 
     details{ border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#0f1219; }
     summary{ cursor:pointer; user-select:none; }
+    summary { list-style: none; }
     summary::-webkit-details-marker{ display:none; }
+    summary::marker { content: ""; }
     summary::before{ content:"▶"; display:inline-block; margin-right:8px; color:var(--muted); transform: translateY(-1px); }
     details[open] summary::before{ content:"▼"; }
   </style>
@@ -110,12 +112,10 @@
         <label>誕生日（m/d）</label>
         <input id="birthday_md" placeholder="例: 2/12" />
       </div>
-      <div>
-        <label>その他</label>
-        <input id="misc" placeholder="例: 利き手/出身/口調など" />
-      </div>
+      <div></div>
     </div>
 
+      
     <div class="btns" style="margin-top:12px;">
       <button class="primary" id="btnRandomProfile">プロフィールランダム</button>
     </div>
@@ -582,7 +582,6 @@ function makePalette(){
   const sex = ($("sex").value||"").trim();
   const h   = $("height").value ? String($("height").value) : "";
   const bd  = ($("birthday_md").value||"").trim();
-  const misc = ($("misc").value||"").trim();
 
   const lines = [];
   lines.push(`// CSBM-TRPG チャパレ${nm ? "：" + nm : ""}`);
@@ -593,7 +592,6 @@ function makePalette(){
   if(sex) a.push(sex);
   if(h) a.push(h+"cm");
   if(bd) a.push("BD:"+bd);
-  if(misc) a.push(misc);
   if(a.length) profileBits.push(a.join(" / "));
   if(profileBits.length) lines.push(`// ${profileBits.join(" / ")}`);
 
@@ -626,7 +624,6 @@ function makeJsonOut(){
     sex: $("sex").value||"",
     height: $("height").value ? Number($("height").value) : null,
     birthday_md: $("birthday_md").value||"",
-    misc: $("misc").value||"",
     memo: $("memo").value||"",
     stats: getStats(),
     env_fixed: Number($("env_fixed").value||0),
@@ -736,7 +733,7 @@ $("btnRandomProfile").onclick = ()=>{
   recalcAll();
 };
 
-["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","birthday_md","misc","memo"]
+["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","birthday_md","memo"]
   .forEach(id=> $(id).addEventListener("input", recalcAll));
 
 $("btnSave").onclick = makeJsonOut;
@@ -749,7 +746,6 @@ $("btnLoad").onclick = ()=>{
     $("sex").value = data.sex ?? "";
     $("height").value = (data.height ?? "") === null ? "" : (data.height ?? "");
     $("birthday_md").value = data.birthday_md ?? "";
-    $("misc").value = data.misc ?? "";
     $("memo").value = data.memo ?? "";
 
     const st = data.stats ?? {};
