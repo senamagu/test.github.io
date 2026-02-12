@@ -900,11 +900,11 @@ function makeDiceExpr(){
   const tAction   = traitDieFor("action");
   const tAbility  = traitDieFor("ability");
 
-  const research = `2d6+1d${stats.intel}${dieK}${envStr}${tResearch}`;
-  const socialEx = `2d6+1d${stats.soc}${dieS}${envStr}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
-  const support  = `2d6+1d${stats.intel}${dieSu}${envStr}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
-  const attack   = `2d6+1d${stats.body}${dieC}${envStr}${tAttack}`;
-  const action   = `2d6+1d${computeDerived(stats).mv}${dieA}${envStr}${tAction}`;
+  const research = `2d6+1d${stats.intel}${dieK}${tResearch}`;
+  const socialEx = `2d6+1d${stats.soc}${dieS}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
+  const support  = `2d6+1d${stats.intel}${dieSu}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
+  const attack   = `2d6+1d${stats.body}${dieC}${tAttack}`;
+  const action   = `2d6+1d${computeDerived(stats).mv}${dieA}${tAction}`;
   const ability  = `2d6+1d${stats.intel}${tAbility}`;
 
   return { research, socialEx, support, attack, action, ability, relTarget, rel };
@@ -977,7 +977,7 @@ function makePalette(){
 
   lines.push(`// HP変動`);
   lines.push(`1d3${d.db? (d.db>0?`+${d.db}`:`${d.db}`):""} 【ダメージ】`);
-  lines.push(`1d4${healBonus ? (healBonus>0?`+${healBonus}`:`${healBonus} 【回復】`) : ""}`);
+  lines.push(`1d4${healBonus ? (healBonus>0?`+${healBonus}`:`${healBonus}`) : ""} 【回復値】`);
 
   $("palette").value = lines.join("\n");
 }
@@ -1145,8 +1145,6 @@ $("btnLoad").onclick = ()=>{
     $("stat_soc").value  = st.soc ?? 3;
     $("stat_spi").value  = st.spi ?? 3;
     $("stat_luk").value  = st.luk ?? 3;
-
-    $("env_fixed").value = data.env_fixed ?? 0;
 
     state.goods = Array.isArray(data.goods) ? data.goods : [];
     state.bads  = Array.isArray(data.bads)  ? data.bads  : [];
