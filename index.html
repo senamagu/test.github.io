@@ -791,7 +791,7 @@ function renderTraits(){
   const box = $("traitList"); box.innerHTML = "";
 
   state.traits.forEach((t, idx)=>{
-    const title = (t.type==="belief") ? "信条" : "欠陥";
+    const title = (t.type==="belief") ? "特徴" : "特徴";
     const badge = (t.type==="belief") ? "+1d6" : "-1d6";
 
     const wrap = document.createElement("details");
@@ -811,7 +811,7 @@ function renderTraits(){
         </div>
 
         <div>
-          <label>対象</label>
+          <label>ジャンル</label>
           <select data-trait-target="${idx}">
             ${["research","social","support","attack","action","ability"].map(k=>`
               <option value="${k}" ${t.target===k?"selected":""}>${traitTargetLabel(k)}</option>
