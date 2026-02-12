@@ -519,6 +519,81 @@ details {
 </main>
 
 <script>
+// ===== autosave =====
+const STORAGE_KEY = "csbm_trpg_charsheet_v1";
+let autosaveTimer = null;
+
+function getSaveData(){
+  return {
+    name: $("name").value||"",
+    role: $("role").value||"",
+    age: $("age").value ? Number($("age").value) : null,
+    sex: $("sex").value||"",
+    height: $("height").value ? Number($("height").value) : null,
+    birthday_md: $("birthday_md").value||"",
+    memo: $("memo").value||"",
+    stats: getStats(),
+    env_fixed: Number($("env_fixed").value||0),
+    goods: state.goods,
+    bads: state.bads,
+    items: state.items,
+    rels: state.rels,
+    traits: state.traits
+  };
+}
+
+function applySaveData(data){
+  $("name").value = data.name ?? "";
+  $("role").value = data.role ?? "";
+  $("age").value = (data.age ?? null) === null ? "" : (data.age ?? "");
+  $("sex").value = data.sex ?? "";
+  $("height").value = (data.height ?? null) === null ? "" : (data.height ?? "");
+  $("birthday_md").value = data.birthday_md ?? "";
+  $("memo").value = data.memo ?? "";
+
+  const st = data.stats ?? {};
+  $("stat_body").value = st.body ?? 3;
+  $("stat_int").value  = st.intel ?? 3;
+  $("stat_soc").value  = st.soc ?? 3;
+  $("stat_spi").value  = st.spi ?? 3;
+  $("stat_luk").value  = st.luk ?? 3;
+
+  $("env_fixed").value = data.env_fixed ?? 0;
+
+  state.goods = Array.isArray(data.goods) ? data.goods : [];
+  state.bads  = Array.isArray(data.bads)  ? data.bads  : [];
+  state.items = Array.isArray(data.items) ? data.items : [];
+  state.rels  = Array.isArray(data.rels)  ? data.rels  : [];
+  state.traits= Array.isArray(data.traits)? data.traits: [];
+
+  ensureDefaultTraits();
+}
+
+function saveToLocal(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getSaveData()));
+  }catch(e){
+    // 容量超過/プライベートブラウズ等
+  }
+}
+
+function scheduleAutosave(){
+  if(autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveToLocal, 250);
+}
+
+function loadFromLocal(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    applySaveData(data);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
 /** helpers **/
 const $ = (id)=>document.getElementById(id);
 const clamp = (n,min,max)=>Math.max(min, Math.min(max, n));
@@ -786,6 +861,8 @@ function recalcAll(){
 
   makePalette();
   makeJsonOut();
+
+  scheduleAutosave();
 }
 
 function makePalette(){
@@ -988,7 +1065,10 @@ $("btnLoad").onclick = ()=>{
 
 // init
 ensureDefaultTraits();
+loadFromLocal();
 recalcAll();
+
+window.addEventListener("beforeunload", saveToLocal);
 </script>
 </body>
 </html>
