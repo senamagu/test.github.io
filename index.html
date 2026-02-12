@@ -5,62 +5,183 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CSBM-TRPG キャラシ&チャパレ出力</title>
   <style>
-    :root { --bg:#0f1115; --panel:#171a21; --text:#e7e9ee; --muted:#a9b0bf; --line:#2a3040; --acc:#7aa2ff; }
-    body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui, -apple-system, "Segoe UI", sans-serif; }
-    header{ padding:16px 18px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(15,17,21,.92); backdrop-filter: blur(8px); z-index:10;}
-    h1{ font-size:16px; margin:0 0 6px; }
-    .sub{ color:var(--muted); font-size:12px; }
-    main{ padding:16px 18px; max-width:1100px; margin:0 auto; display:grid; gap:14px; grid-template-columns: 1fr 1fr; }
-    .card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px; }
-    .card h2{ font-size:14px; margin:0 0 10px; }
-    label{ display:block; font-size:12px; color:var(--muted); margin:8px 0 4px; }
-    input, select, textarea, button{
-      font:inherit; color:var(--text);
-      background:#0f1219; border:1px solid var(--line);
-      border-radius:10px; padding:9px 10px;
-      outline:none;
-    }
-    textarea{ width:100%; min-height:140px; resize:vertical; }
-    input[type="number"]{ width:100%; }
-    .row{ display:grid; gap:10px; grid-template-columns: repeat(5, 1fr); }
-    .row2{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
-    .row3{ display:grid; gap:10px; grid-template-columns: 1fr 1fr 1fr; }
-    .row4{ display:grid; gap:10px; grid-template-columns: 2fr 1fr 1fr 1fr; }
-    .btns{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    button{ cursor:pointer; }
-    button.primary{ border-color:rgba(122,162,255,.45); background:rgba(122,162,255,.12); }
-    button.danger{ border-color:rgba(255,90,90,.35); background:rgba(255,90,90,.10); }
-    .mini{ font-size:12px; color:var(--muted); }
-    .hint{ color:var(--muted); font-size:12px; line-height:1.5; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .list{ display:grid; gap:8px; margin-top:10px; }
-    .item{ display:grid; gap:8px; grid-template-columns: 1.6fr 1fr 1fr .8fr; align-items:center; }
-    .item .del{ justify-self:end; }
+/* ===== theme + layout fix patch ===== */
+:root{
+  /* Colors (指定) */
+  --bg:#4A5C52;          /* Background */
+  --panel: rgba(255,248,243,.10); /* card 背景は自然に薄く */
+  --text:#FFF8F3;        /* Headline / main text */
+  --muted: rgba(255,248,243,.75); /* Paragraphの代わりに“説明”は薄め */
+  --para:#13969F;        /* Paragraph */
+  --btn:#F5B329;         /* Button */
+  --btnText:#4A5C52;     /* Button text */
+  --line: rgba(255,248,243,.22);
+  --acc:#F5B329;         /* アクセントはボタン色に寄せる */
+}
 
-    .kpi{ display:grid; gap:10px; grid-template-columns: repeat(3, 1fr); margin-top:12px; }
-    .kpi .box{ background:#0f1219; border:1px solid var(--line); border-radius:10px; padding:12px; }
-    .kpi .name{ font-size:16px; font-weight:800; letter-spacing:.5px; }
-    .kpi .v{ font-size:26px; font-weight:900; margin-top:6px; }
-    .kpi .desc{ font-size:11px; color:var(--muted); margin-top:6px; line-height:1.4; }
+/* ガタつき防止の基本セット */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height:1.45;
+}
 
-    .full{ grid-column: 1 / -1; }
-    @media (max-width: 960px){
-      main{ grid-template-columns: 1fr; }
-      .row{ grid-template-columns: repeat(2,1fr); }
-      .kpi{ grid-template-columns: 1fr; }
-      .item{ grid-template-columns: 1fr 1fr; }
-      .item .del{ justify-self:start; }
-      .row4{ grid-template-columns: 1fr 1fr; }
-    }
-    .pill{ display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:11px; margin-left:6px; }
+/* stickyヘッダーを“自然”に */
+header{
+  padding:16px 18px;
+  border-bottom:1px solid var(--line);
+  position:sticky; top:0;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  z-index:10;
+}
+h1{ font-size:16px; margin:0 0 6px; }
+.sub{ color:var(--para); font-size:12px; }
 
-    details{ border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#0f1219; }
-    summary{ cursor:pointer; user-select:none; }
-    summary { list-style: none; }
-    summary::-webkit-details-marker{ display:none; }
-    summary::marker { content: ""; }
-    summary::before{ content:"▶"; display:inline-block; margin-right:8px; color:var(--muted); transform: translateY(-1px); }
-    details[open] summary::before{ content:"▼"; }
+/* mainの2カラム固定をやめる：画面幅に合わせて自動段組み */
+main{
+  padding:16px 18px;
+  max-width:1100px;
+  margin:0 auto;
+  display:grid;
+  gap:14px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items:start;
+}
+
+/* card */
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px;
+}
+.card h2{ font-size:14px; margin:0 0 10px; color:var(--text); }
+
+/* ラベル */
+label{
+  display:block;
+  font-size:12px;
+  color:var(--para);
+  margin:8px 0 4px;
+}
+
+/* 入力系：幅100%固定でガタつき終了 */
+input, select, textarea, button{
+  font:inherit;
+  border-radius:10px;
+  outline:none;
+}
+input, select, textarea{
+  width:100%;
+  color:var(--text);
+  background: color-mix(in srgb, var(--bg) 78%, #000 22%);
+  border:1px solid var(--line);
+  padding:10px 10px;
+}
+textarea{ min-height:140px; resize:vertical; }
+input[type="number"]{ width:100%; }
+
+/* row系：固定列をやめて、勝手に折り返す */
+.row, .row2, .row3, .row4{
+  display:grid;
+  gap:10px;
+}
+.row  { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.row2 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.row3 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.row4 { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+
+/* ボタン */
+.btns{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+button{
+  cursor:pointer;
+  border:1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 65%, #000 35%);
+  color:var(--text);
+  padding:10px 12px;
+}
+button.primary{
+  border-color: color-mix(in srgb, var(--btn) 65%, var(--line));
+  background: var(--btn);
+  color: var(--btnText);
+  font-weight:700;
+}
+button.danger{
+  border-color: rgba(255,90,90,.55);
+  background: rgba(255,90,90,.22);
+  color: var(--text);
+}
+button:active{ transform: translateY(1px); }
+
+/* 補助テキスト */
+.mini{ font-size:12px; color:var(--muted); }
+.hint{ color:var(--muted); font-size:12px; line-height:1.5; }
+.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+/* pill */
+.pill{
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-size:11px;
+  margin-left:6px;
+}
+
+/* itemリスト：スマホで崩れやすい所を安定化 */
+.list{ display:grid; gap:8px; margin-top:10px; }
+.item{
+  display:grid;
+  gap:8px;
+  grid-template-columns: minmax(0, 1.6fr) 110px minmax(0, 1fr) 84px;
+  align-items:center;
+}
+.item .del{ justify-self:end; }
+@media (max-width: 560px){
+  .item{ grid-template-columns: 1fr; }
+  .item .del{ justify-self:start; }
+}
+
+/* KPIもauto-fitにして崩れ防止 */
+.kpi{
+  display:grid;
+  gap:10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top:12px;
+}
+.kpi .box{
+  background: color-mix(in srgb, var(--bg) 78%, #000 22%);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px;
+}
+.kpi .name{ font-size:16px; font-weight:800; letter-spacing:.5px; color:var(--text); }
+.kpi .v{ font-size:26px; font-weight:900; margin-top:6px; color:var(--btn); }
+.kpi .desc{ font-size:11px; color:var(--muted); margin-top:6px; line-height:1.4; }
+
+/* details */
+details{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px 10px;
+  background: color-mix(in srgb, var(--bg) 78%, #000 22%);
+}
+summary{ cursor:pointer; user-select:none; color:var(--muted); }
+summary { list-style: none; }
+summary::-webkit-details-marker{ display:none; }
+summary::marker { content: ""; }
+summary::before{ content:"▶"; display:inline-block; margin-right:8px; color:var(--muted); transform: translateY(-1px); }
+details[open] summary::before{ content:"▼"; }
+
+/* full */
+.full{ grid-column: 1 / -1; }
+
   </style>
 </head>
 <body>
