@@ -922,11 +922,12 @@ function relFixedForTargetName(name){
   const r = state.rels.find(x=>x.name === name);
   return r ? Number(r.val||0) : 0;
 }
-function abilityExpr(statKey, catKey){
+function abilityExpr(stats, statKey, catKey){
   const base = stats[statKey];
   const pt = bonusPtsForCategory(catKey);
   const die = fmtDie(ptsToDieSize(pt));
-  return `2d6+1d${base}${die}`;
+  // ルール：能力ダイス = 2d6 + 2d{能力値} + 補正
+  return `2d6+2d${base}${die}`;
 }
 function makeDiceExpr({ useRel } = { useRel:false }){
   const stats = getStats();
@@ -963,14 +964,18 @@ function makeDiceExpr({ useRel } = { useRel:false }){
   const mvHalf = Math.floor(mv / 2);
   const action = `2d6+1d${mvHalf}${dieA}${tAction}`;
 
-  const abilityBody = abilityExpr("body", "ability_body");
-  const abilityInt  = abilityExpr("intel","ability_int");
-  const abilitySoc  = abilityExpr("soc",  "ability_soc");
-  const abilitySpi  = abilityExpr("spi",  "ability_spi");
-  const abilityLuk  = abilityExpr("luk",  "ability_luk");
+  // 能力ダイス（ルール通り 2d{能力値}）
+  const abilityBody = `${abilityExpr(stats,"body", "ability_body")}${tAbility}`;
+  const abilityInt  = `${abilityExpr(stats,"intel","ability_int")}${tAbility}`;
+  const abilitySoc  = `${abilityExpr(stats,"soc",  "ability_soc")}${tAbility}`;
+  const abilitySpi  = `${abilityExpr(stats,"spi",  "ability_spi")}${tAbility}`;
+  const abilityLuk  = `${abilityExpr(stats,"luk",  "ability_luk")}${tAbility}`;
 
-
-  return { research, socialEx, support, attack, action, ability, relTarget, rel };
+  return {
+    research, socialEx, support, attack, action,
+    abilityBody, abilityInt, abilitySoc, abilitySpi, abilityLuk,
+    relTarget, rel
+  };
 }
   
 function recalcAll(){
@@ -1040,11 +1045,12 @@ function makePaletteBase(){
   lines.push(`${ex.action}+{環境補正} 【行動ダイス】`);
 
   lines.push(`// 能力ダイス`);
-  lines.push(`${abilityBody}+{環境補正} 【能力ダイス(身体)】`);
-  lines.push(`${abilityInt}+{環境補正} 【能力ダイス(知性)】`);
-  lines.push(`${abilitySoc}+{環境補正} 【能力ダイス(社交)】`);
-  lines.push(`${abilitySpi}+{環境補正} 【能力ダイス(精神)】`);
-  lines.push(`${abilityLuk}+{環境補正} 【能力ダイス(運)】`);
+  lines.push(`${ex.abilityBody}+{環境補正} 【能力ダイス(身体)】`);
+  lines.push(`${ex.abilityInt}+{環境補正} 【能力ダイス(知性)】`);
+  lines.push(`${ex.abilitySoc}+{環境補正} 【能力ダイス(社交)】`);
+  lines.push(`${ex.abilitySpi}+{環境補正} 【能力ダイス(精神)】`);
+  lines.push(`${ex.abilityLuk}+{環境補正} 【能力ダイス(運)】`);
+
   lines.push(`// 戦闘`);
   lines.push(`${ex.attack}>=9 【攻撃】`);
   lines.push(`${ex.action}>=n 【回避】`);
@@ -1057,7 +1063,6 @@ function makePaletteBase(){
 
   $("palette_base").value = lines.join("\n");
 }
-
 function makePaletteRel(){
   const ex = makeDiceExpr({ useRel:true });
 
