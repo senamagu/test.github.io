@@ -791,7 +791,7 @@ function renderTraits(){
   const box = $("traitList"); box.innerHTML = "";
 
   state.traits.forEach((t, idx)=>{
-    const title = (t.type==="belief") ? "特徴" : "特徴";
+    const title = (t.type==="belief") ? "信条" : "欠陥";
     const badge = (t.type==="belief") ? "+1d6" : "-1d6";
 
     const wrap = document.createElement("details");
