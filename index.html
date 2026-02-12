@@ -24,31 +24,38 @@
     input[type="number"]{ width:100%; }
     .row{ display:grid; gap:10px; grid-template-columns: repeat(5, 1fr); }
     .row2{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+    .row3{ display:grid; gap:10px; grid-template-columns: 1fr 1fr 1fr; }
     .row4{ display:grid; gap:10px; grid-template-columns: 2fr 1fr 1fr 1fr; }
     .btns{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
     button{ cursor:pointer; }
     button.primary{ border-color:rgba(122,162,255,.45); background:rgba(122,162,255,.12); }
     button.danger{ border-color:rgba(255,90,90,.35); background:rgba(255,90,90,.10); }
     .mini{ font-size:12px; color:var(--muted); }
+    .hint{ color:var(--muted); font-size:12px; line-height:1.5; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .list{ display:grid; gap:8px; margin-top:10px; }
     .item{ display:grid; gap:8px; grid-template-columns: 1.6fr 1fr 1fr .8fr; align-items:center; }
     .item .del{ justify-self:end; }
-    .kpi{ display:grid; gap:8px; grid-template-columns: repeat(4, 1fr); }
-    .kpi div{ background:#0f1219; border:1px solid var(--line); border-radius:10px; padding:10px; }
-    .kpi .v{ font-size:18px; font-weight:700; }
-    .kpi .k{ font-size:11px; color:var(--muted); }
+
+    /* KPI: 名前を大きく・分かりやすく */
+    .kpi{ display:grid; gap:10px; grid-template-columns: repeat(3, 1fr); }
+    .kpi .box{ background:#0f1219; border:1px solid var(--line); border-radius:10px; padding:12px; }
+    .kpi .name{ font-size:16px; font-weight:800; letter-spacing:.5px; }
+    .kpi .v{ font-size:26px; font-weight:900; margin-top:6px; }
+    .kpi .desc{ font-size:11px; color:var(--muted); margin-top:6px; line-height:1.4; }
+
     .full{ grid-column: 1 / -1; }
     @media (max-width: 960px){
       main{ grid-template-columns: 1fr; }
       .row{ grid-template-columns: repeat(2,1fr); }
-      .kpi{ grid-template-columns: repeat(2,1fr); }
+      .kpi{ grid-template-columns: 1fr; }
       .item{ grid-template-columns: 1fr 1fr; }
       .item .del{ justify-self:start; }
+      .row4{ grid-template-columns: 1fr 1fr; }
     }
     .pill{ display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:11px; margin-left:6px; }
-    .hint{ color:var(--muted); font-size:12px; line-height:1.5; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
+    /* details */
     details{ border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#0f1219; }
     summary{ cursor:pointer; user-select:none; }
     summary::-webkit-details-marker{ display:none; }
@@ -60,31 +67,71 @@
       transform: translateY(-1px);
     }
     details[open] summary::before{ content:"▼"; }
+
+    /* section separators inside cards */
+    .subcard{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:#0f1219;
+      margin-top:10px;
+    }
+    .subcard h3{
+      margin:0 0 8px;
+      font-size:13px;
+    }
+    .caps{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-top:8px;
+    }
+    .caps .mini{ margin:0; }
   </style>
 </head>
 <body>
 <header>
   <h1>CSBM-TRPG キャラシ & ココフォリアチャパレ出力</h1>
-  <div class="sub">MVP：入力→自動計算→チャパレ→JSON保存/読込 / 能力値ランダム（合計15・各1〜5）</div>
+  <div class="sub">入力→自動計算→チャパレ→JSON保存/読込 / ランダム（能力値合計15・各1〜5）</div>
 </header>
 
 <main>
   <!-- 基本情報 -->
   <section class="card">
     <h2>基本情報</h2>
+
     <div class="row2">
       <div>
         <label>キャラ名</label>
-        <input id="name" placeholder="例：霧島レン" />
+        <input id="name" />
       </div>
       <div>
         <label>概念 / 職業</label>
-        <input id="role" placeholder="例：調査員 / 学生 / 傭兵" />
+        <input id="role" />
       </div>
     </div>
 
-    <label>一言タグ</label>
-    <input id="tagline" placeholder="例：真実中毒 / 仲間最優先" />
+    <div class="row3">
+      <div>
+        <label>年齢</label>
+        <input id="age" type="number" min="0" step="1" />
+      </div>
+      <div>
+        <label>性別</label>
+        <select id="sex">
+          <option value=""></option>
+          <option value="男">男</option>
+          <option value="女">女</option>
+          <option value="その他">その他</option>
+          <option value="不明">不明</option>
+        </select>
+      </div>
+      <div>
+        <label>身長（cm）</label>
+        <input id="height" type="number" min="0" step="1" />
+      </div>
+    </div>
 
     <h2 style="margin-top:12px;">能力値 <span class="pill">1〜5</span></h2>
     <div class="row">
@@ -97,22 +144,32 @@
 
     <!-- ボタンは能力値の下 -->
     <div class="btns" style="margin-top:12px;">
-      <button class="primary" id="btnRandom">能力値ランダム</button>
+      <button class="primary" id="btnRandom">ランダム（能力値+年齢/性別/身長）</button>
       <button id="btnRecalc">再計算</button>
     </div>
 
     <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
 
     <div class="kpi">
-      <div><div class="v" id="kpi_hp">-</div><div class="k">HP = 身体 + 精神 + 5</div></div>
-      <div><div class="v" id="kpi_db">-</div><div class="k">DB = 身体 - 3</div></div>
-      <div><div class="v" id="kpi_mv">-</div><div class="k">MV = 身体 + 運</div></div>
-      <div><div class="v" id="kpi_mp">-</div><div class="k">MP = 知性 + 精神 + 5（拡張）</div></div>
+      <div class="box">
+        <div class="name">HP</div>
+        <div class="v" id="kpi_hp">-</div>
+        <div class="desc">HP = 身体 + 精神 + 5</div>
+      </div>
+      <div class="box">
+        <div class="name">DB</div>
+        <div class="v" id="kpi_db">-</div>
+        <div class="desc">DB = 身体 - 3</div>
+      </div>
+      <div class="box">
+        <div class="name">MV</div>
+        <div class="v" id="kpi_mv">-</div>
+        <div class="desc">MV = 身体 + 運</div>
+      </div>
     </div>
 
     <p class="hint" style="margin-top:12px;">
-      補正ダイス変換：<span class="mono">合計ポイント → 0:無し / 1-2:d2 / 3-4:d4 / 5+:d6</span>（最大d6）<br>
-      ※この変換は後で好きに調整できる。今はMVPの“動く形”を優先。
+      補正ダイス変換：<span class="mono">合計pt → 0:無し / 1-2:d2 / 3-4:d4 / 5+:d6</span>（最大d6）
     </p>
   </section>
 
@@ -123,19 +180,19 @@
     <div class="list" id="traitList"></div>
   </section>
 
-  <!-- 分野 -->
+  <!-- 分野：得意 -->
   <section class="card">
-    <h2>分野（得意/苦手）</h2>
-    <div class="hint">各3つ想定。ジャンル：知識 / 社交 / 支援 / 戦闘 / 行動。得意:+2pt / 苦手:-2pt を合算して補正ダイス化。</div>
+    <h2>得意分野</h2>
+    <div class="hint">得意は <b>+2pt</b>。ジャンル：知識 / 社交 / 支援 / 戦闘 / 行動。</div>
 
     <div class="row4">
       <div>
         <label>名称</label>
-        <input id="skill_name" placeholder="例：潜入 / 化学 / 交渉" />
+        <input id="good_name" />
       </div>
       <div>
         <label>ジャンル</label>
-        <select id="skill_cat">
+        <select id="good_cat">
           <option value="knowledge">知識</option>
           <option value="social">社交</option>
           <option value="support">支援</option>
@@ -144,29 +201,66 @@
         </select>
       </div>
       <div>
-        <label>種別</label>
-        <select id="skill_kind">
-          <option value="good">得意 (+2pt)</option>
-          <option value="bad">苦手 (-2pt)</option>
-        </select>
+        <label>pt</label>
+        <input value="+2" disabled />
       </div>
       <div style="align-self:end;">
-        <button class="primary" id="btnAddSkill" style="width:100%;">追加</button>
+        <button class="primary" id="btnAddGood" style="width:100%;">追加</button>
       </div>
     </div>
 
-    <div class="list" id="skillList"></div>
+    <div class="caps">
+      <div class="mini" id="goodCapInfo"></div>
+    </div>
+
+    <div class="list" id="goodList"></div>
   </section>
 
-  <!-- 所持品 -->
+  <!-- 分野：苦手 -->
   <section class="card">
-    <h2>所持品（最大3枠 / 合計+3）</h2>
-    <div class="hint">所持品はジャンルに紐づけてpt加算（例：辞典+1→知識、拳銃+2→戦闘）。</div>
+    <h2>苦手分野</h2>
+    <div class="hint">苦手は <b>-2pt</b>。</div>
 
     <div class="row4">
       <div>
         <label>名称</label>
-        <input id="item_name" placeholder="例：救急箱 / 辞典 / 拳銃" />
+        <input id="bad_name" />
+      </div>
+      <div>
+        <label>ジャンル</label>
+        <select id="bad_cat">
+          <option value="knowledge">知識</option>
+          <option value="social">社交</option>
+          <option value="support">支援</option>
+          <option value="combat">戦闘</option>
+          <option value="action">行動</option>
+        </select>
+      </div>
+      <div>
+        <label>pt</label>
+        <input value="-2" disabled />
+      </div>
+      <div style="align-self:end;">
+        <button class="primary" id="btnAddBad" style="width:100%;">追加</button>
+      </div>
+    </div>
+
+    <div class="caps">
+      <div class="mini" id="badCapInfo"></div>
+    </div>
+
+    <div class="list" id="badList"></div>
+  </section>
+
+  <!-- 所持品 -->
+  <section class="card">
+    <h2>所持品 <span class="pill">最大3枠 / 合計+3</span></h2>
+    <div class="hint">追加時に上限を超える場合は <b>弾く</b>。</div>
+
+    <div class="row4">
+      <div>
+        <label>名称</label>
+        <input id="item_name" />
       </div>
       <div>
         <label>ジャンル</label>
@@ -196,19 +290,18 @@
     <div class="mini" id="itemCapInfo" style="margin-top:8px;"></div>
   </section>
 
-  <!-- 関係 + メモ -->
+  <!-- 関係 -->
   <section class="card">
     <h2>関係</h2>
-    <div class="hint">対象が関係リストにいる時のみ適用（社交/支援などに +数値）。</div>
 
     <div class="row4">
       <div>
         <label>名前</label>
-        <input id="rel_name" placeholder="例：相棒 / 母 / 上司" />
+        <input id="rel_name" />
       </div>
       <div>
         <label>内容</label>
-        <input id="rel_note" placeholder="例：信頼 / 嫌い / 借り" />
+        <input id="rel_note" />
       </div>
       <div>
         <label>重要度</label>
@@ -224,9 +317,12 @@
     </div>
 
     <div class="list" id="relList"></div>
+  </section>
 
-    <label style="margin-top:12px;">キャラメモ</label>
-    <textarea id="memo" class="mono" placeholder="性格/口調/見た目/経歴/やりたいこと/NGなど自由に"></textarea>
+  <!-- キャラメモ（別枠） -->
+  <section class="card">
+    <h2>キャラメモ</h2>
+    <textarea id="memo" class="mono"></textarea>
   </section>
 
   <!-- チャパレ -->
@@ -236,11 +332,9 @@
       <div>
         <label>環境補正（固定値）</label>
         <input id="env_fixed" type="number" value="0" min="-3" max="3" />
-        <div class="mini">例：暗闇 -1 / 応援 +1</div>
 
         <label>関係補正を適用する対象名（任意）</label>
-        <input id="rel_target" placeholder="例：相棒（この名前が関係にあれば加算）" />
-        <div class="mini">空なら関係補正はチャパレには付けず、GM判断で足す運用。</div>
+        <input id="rel_target" />
 
         <div class="btns">
           <button class="primary" id="btnMakePalette">チャパレ生成</button>
@@ -260,15 +354,15 @@
     <h2>JSON保存 / 読込</h2>
     <div class="row2">
       <div>
-        <label>保存（ここをコピーして保存）</label>
+        <label>保存</label>
         <textarea id="json_out" class="mono" readonly></textarea>
         <div class="btns">
           <button id="btnSave">JSON生成</button>
         </div>
       </div>
       <div>
-        <label>読込（ここに貼って読込）</label>
-        <textarea id="json_in" class="mono" placeholder='{"name":"..."}'></textarea>
+        <label>読込</label>
+        <textarea id="json_in" class="mono"></textarea>
         <div class="btns">
           <button class="primary" id="btnLoad">JSON読込</button>
         </div>
@@ -282,9 +376,7 @@
 const $ = (id)=>document.getElementById(id);
 const clamp = (n,min,max)=>Math.max(min, Math.min(max, n));
 const sign = (n)=> n>0?"+":(n<0?"-":"");
-const catLabel = (c)=>({
-  knowledge:"知識", social:"社交", support:"支援", combat:"戦闘", action:"行動"
-}[c] ?? c);
+const catLabel = (c)=>({ knowledge:"知識", social:"社交", support:"支援", combat:"戦闘", action:"行動" }[c] ?? c);
 
 function ptsToDieSize(pt){
   const neg = pt < 0;
@@ -299,31 +391,26 @@ function fmtDie(dieObj){
   return (dieObj.neg ? "-1d" : "+1d") + dieObj.die;
 }
 function sumBy(list, fn){ return list.reduce((acc,x)=>acc+fn(x),0); }
-function escapeAttr(s){
+function escAttr(s){
   return String(s ?? "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
-function escapeText(s){ return String(s ?? ""); }
 
 /** ---------- state ---------- **/
 const state = {
-  skills: [],
-  items: [],
-  rels: [],
-  traits: [] // fixed to 3 via ensureDefaultTraits
+  goods: [],  // {name, cat}
+  bads: [],   // {name, cat}
+  items: [],  // {name, cat, pt}
+  rels: [],   // {name, note, val}
+  traits: []  // {type, text, detail, target}
 };
 
 function ensureDefaultTraits(){
   if(!Array.isArray(state.traits)) state.traits = [];
-
   const beliefs = state.traits.filter(t=>t.type==="belief").slice(0,2);
   const flaws   = state.traits.filter(t=>t.type==="flaw").slice(0,1);
 
-  while(beliefs.length < 2){
-    beliefs.push({ type:"belief", text:"（信条）", detail:"", target:"action" });
-  }
-  while(flaws.length < 1){
-    flaws.push({ type:"flaw", text:"（欠陥）", detail:"", target:"action" });
-  }
+  while(beliefs.length < 2) beliefs.push({ type:"belief", text:"", detail:"", target:"action" });
+  while(flaws.length < 1)   flaws.push({ type:"flaw",   text:"", detail:"", target:"action" });
 
   state.traits = [...beliefs, ...flaws].map(t=>({
     type: t.type,
@@ -345,22 +432,43 @@ function traitTargetLabel(t){
 }
 
 /** ---------- rendering ---------- **/
-function renderSkills(){
-  const box = $("skillList");
+function renderGoods(){
+  $("goodCapInfo").textContent = `現在：${state.goods.length}`;
+  const box = $("goodList");
   box.innerHTML = "";
-  state.skills.forEach((s, idx)=>{
+  state.goods.forEach((s, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
     row.innerHTML = `
-      <div><span class="mono">${escapeAttr(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
-      <div class="mini">${s.kind==="good" ? "得意(+2pt)" : "苦手(-2pt)"}</div>
+      <div><span class="mono">${escAttr(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
+      <div class="mini">+2pt</div>
       <div class="mini"></div>
-      <div class="del"><button class="danger" data-del-skill="${idx}">削除</button></div>
+      <div class="del"><button class="danger" data-del-good="${idx}">削除</button></div>
     `;
     box.appendChild(row);
   });
-  box.querySelectorAll("[data-del-skill]").forEach(btn=>{
-    btn.onclick = ()=>{ state.skills.splice(Number(btn.dataset.delSkill),1); recalcAll(); };
+  box.querySelectorAll("[data-del-good]").forEach(btn=>{
+    btn.onclick = ()=>{ state.goods.splice(Number(btn.dataset.delGood),1); recalcAll(); };
+  });
+}
+
+function renderBads(){
+  $("badCapInfo").textContent = `現在：${state.bads.length}`;
+  const box = $("badList");
+  box.innerHTML = "";
+  state.bads.forEach((s, idx)=>{
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML = `
+      <div><span class="mono">${escAttr(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
+      <div class="mini">-2pt</div>
+      <div class="mini"></div>
+      <div class="del"><button class="danger" data-del-bad="${idx}">削除</button></div>
+    `;
+    box.appendChild(row);
+  });
+  box.querySelectorAll("[data-del-bad]").forEach(btn=>{
+    btn.onclick = ()=>{ state.bads.splice(Number(btn.dataset.delBad),1); recalcAll(); };
   });
 }
 
@@ -371,8 +479,8 @@ function renderItems(){
     const row = document.createElement("div");
     row.className = "item";
     row.innerHTML = `
-      <div><span class="mono">${escapeAttr(it.name)}</span> <span class="pill">${catLabel(it.cat)}</span></div>
-      <div class="mini">pt ${it.pt>=0?("+"+it.pt):it.pt}</div>
+      <div><span class="mono">${escAttr(it.name)}</span> <span class="pill">${catLabel(it.cat)}</span></div>
+      <div class="mini">pt ${Number(it.pt)>=0?("+"+it.pt):it.pt}</div>
       <div class="mini"></div>
       <div class="del"><button class="danger" data-del-item="${idx}">削除</button></div>
     `;
@@ -383,8 +491,8 @@ function renderItems(){
   });
 
   const totalPt = sumBy(state.items, x=>Number(x.pt||0));
-  const capOk = totalPt <= 3 && state.items.length <= 3;
-  $("itemCapInfo").textContent = `現在：枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3 ${capOk ? "" : "（上限超え）"}`;
+  const ok = totalPt <= 3 && state.items.length <= 3;
+  $("itemCapInfo").textContent = `現在：枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3 ${ok ? "" : "（上限超え）"}`;
 }
 
 function renderRels(){
@@ -394,7 +502,7 @@ function renderRels(){
     const row = document.createElement("div");
     row.className = "item";
     row.innerHTML = `
-      <div><span class="mono">${escapeAttr(r.name)}</span> <span class="pill">${escapeAttr(r.note||"関係")}</span></div>
+      <div><span class="mono">${escAttr(r.name)}</span> <span class="pill">${escAttr(r.note||"")}</span></div>
       <div class="mini">${Number(r.val)>=0?("+"+r.val):r.val}</div>
       <div class="mini"></div>
       <div class="del"><button class="danger" data-del-rel="${idx}">削除</button></div>
@@ -424,12 +532,7 @@ function renderTraits(){
       <div style="display:grid; gap:10px; grid-template-columns: 1fr 180px;">
         <div>
           <span class="pill">${t.type==="belief" ? "信条(+1d6)" : "欠陥(-1d6)"}</span>
-          <input
-            data-trait-text="${idx}"
-            value="${escapeAttr(t.text)}"
-            placeholder="${t.type==="belief" ? "信条（短文）" : "欠陥（短文）"}"
-            style="width:100%; margin-top:6px;"
-          />
+          <input data-trait-text="${idx}" value="${escAttr(t.text)}" style="width:100%; margin-top:6px;" />
         </div>
         <div>
           <label style="margin-top:0;">対象</label>
@@ -444,12 +547,7 @@ function renderTraits(){
       <details>
         <summary class="mini">詳細メモ（タップで開閉）</summary>
         <div style="margin-top:8px;">
-          <textarea
-            data-trait-detail="${idx}"
-            class="mono"
-            style="min-height:90px;"
-            placeholder="背景、口癖、発動条件、解釈メモなど"
-          >${escapeText(t.detail)}</textarea>
+          <textarea data-trait-detail="${idx}" class="mono" style="min-height:90px;">${t.detail ?? ""}</textarea>
         </div>
       </details>
     `;
@@ -463,16 +561,13 @@ function renderTraits(){
       recalcAll();
     };
   });
-
   box.querySelectorAll("[data-trait-text]").forEach(inp=>{
     inp.oninput = ()=>{
       const idx = Number(inp.dataset.traitText);
       state.traits[idx].text = inp.value;
-      makePalette();
-      makeJsonOut();
+      makePalette(); makeJsonOut();
     };
   });
-
   box.querySelectorAll("[data-trait-detail]").forEach(ta=>{
     ta.oninput = ()=>{
       const idx = Number(ta.dataset.traitDetail);
@@ -496,18 +591,17 @@ function computeDerived(stats){
   const hp = stats.body + stats.spi + 5;
   const db = stats.body - 3;
   const mv = stats.body + stats.luk;
-  const mp = stats.intel + stats.spi + 5;
-  return { hp, db, mv, mp };
+  return { hp, db, mv };
 }
 
 function bonusPtsForCategory(cat){
-  const spt = sumBy(state.skills.filter(s=>s.cat===cat), s=> s.kind==="good" ? 2 : -2);
-  const ipt = sumBy(state.items.filter(i=>i.cat===cat), i=> Number(i.pt||0));
-  return spt + ipt;
+  const goodPt = sumBy(state.goods.filter(s=>s.cat===cat), ()=> 2);
+  const badPt  = sumBy(state.bads.filter(s=>s.cat===cat),  ()=> -2);
+  const itemPt = sumBy(state.items.filter(i=>i.cat===cat),  i=> Number(i.pt||0));
+  return goodPt + badPt + itemPt;
 }
 
 function traitDieFor(targetKey){
-  // matching target: belief +1d6, flaw -1d6
   let die = 0;
   state.traits.forEach(t=>{
     if(t.target !== targetKey) return;
@@ -531,17 +625,17 @@ function makeDiceExpr(){
   const relTarget = ($("rel_target").value||"").trim();
   const rel = relFixedForTargetName(relTarget);
 
-  const ptsKnowledge = bonusPtsForCategory("knowledge");
-  const ptsSocial    = bonusPtsForCategory("social");
-  const ptsSupport   = bonusPtsForCategory("support");
-  const ptsCombat    = bonusPtsForCategory("combat");
-  const ptsAction    = bonusPtsForCategory("action");
+  const ptsK = bonusPtsForCategory("knowledge");
+  const ptsS = bonusPtsForCategory("social");
+  const ptsSu= bonusPtsForCategory("support");
+  const ptsC = bonusPtsForCategory("combat");
+  const ptsA = bonusPtsForCategory("action");
 
-  const dieK = fmtDie(ptsToDieSize(ptsKnowledge));
-  const dieS = fmtDie(ptsToDieSize(ptsSocial));
-  const dieSu= fmtDie(ptsToDieSize(ptsSupport));
-  const dieC = fmtDie(ptsToDieSize(ptsCombat));
-  const dieA = fmtDie(ptsToDieSize(ptsAction));
+  const dieK = fmtDie(ptsToDieSize(ptsK));
+  const dieS = fmtDie(ptsToDieSize(ptsS));
+  const dieSu= fmtDie(ptsToDieSize(ptsSu));
+  const dieC = fmtDie(ptsToDieSize(ptsC));
+  const dieA = fmtDie(ptsToDieSize(ptsA));
 
   const tResearch = traitDieFor("research");
   const tSocial   = traitDieFor("social");
@@ -550,28 +644,30 @@ function makeDiceExpr(){
   const tAction   = traitDieFor("action");
   const tAbility  = traitDieFor("ability");
 
-  const research = `2d6+1d${stats.intel}${dieK}${env?`${sign(env)}${Math.abs(env)}`:""}${tResearch}`;
-  const socialEx = `2d6+1d${stats.soc}${dieS}${env?`${sign(env)}${Math.abs(env)}`:""}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
-  const support  = `2d6+1d${stats.intel}${dieSu}${env?`${sign(env)}${Math.abs(env)}`:""}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
-  const attack   = `2d6+1d${stats.body}${dieC}${env?`${sign(env)}${Math.abs(env)}`:""}${tAttack}`;
-  const action   = `2d6+1d${computeDerived(stats).mv}${dieA}${env?`${sign(env)}${Math.abs(env)}`:""}${tAction}`;
-  const ability  = `2d6+1d${stats.intel}+${stats.intel}${env?`${sign(env)}${Math.abs(env)}`:""}${tAbility}`;
+  const envStr = env ? `${sign(env)}${Math.abs(env)}` : "";
+
+  const research = `2d6+1d${stats.intel}${dieK}${envStr}${tResearch}`;
+  const socialEx = `2d6+1d${stats.soc}${dieS}${envStr}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
+  const support  = `2d6+1d${stats.intel}${dieSu}${envStr}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
+  const attack   = `2d6+1d${stats.body}${dieC}${envStr}${tAttack}`;
+  const action   = `2d6+1d${computeDerived(stats).mv}${dieA}${envStr}${tAction}`;
+  const ability  = `2d6+1d${stats.intel}+${stats.intel}${envStr}${tAbility}`;
 
   return { research, socialEx, support, attack, action, ability, env, relTarget, rel };
 }
 
 function recalcAll(){
-  renderSkills();
+  renderTraits();
+  renderGoods();
+  renderBads();
   renderItems();
   renderRels();
-  renderTraits();
 
   const stats = getStats();
   const d = computeDerived(stats);
   $("kpi_hp").textContent = d.hp;
   $("kpi_db").textContent = (d.db>=0?("+"+d.db):String(d.db));
   $("kpi_mv").textContent = d.mv;
-  $("kpi_mp").textContent = d.mp;
 
   makePalette();
   makeJsonOut();
@@ -581,10 +677,18 @@ function makePalette(){
   const d = computeDerived(getStats());
   const ex = makeDiceExpr();
 
+  const nm = ($("name").value||"").trim();
+  const role = ($("role").value||"").trim();
+  const age = $("age").value ? String($("age").value) : "";
+  const sex = ($("sex").value||"").trim();
+  const h   = $("height").value ? String($("height").value) : "";
+
   const lines = [];
-  const nm = ($("name").value||"PC").trim() || "PC";
-  lines.push(`// CSBM-TRPG チャパレ：${nm}`);
-  lines.push(`// HP:${d.hp} DB:${d.db>=0?"+":""}${d.db} MV:${d.mv} MP:${d.mp}`);
+  lines.push(`// CSBM-TRPG チャパレ${nm ? "：" + nm : ""}`);
+  if(role || age || sex || h){
+    lines.push(`// ${role}${role && (age||sex||h) ? " / " : ""}${age?age+"歳":""}${sex?(" "+sex):""}${h?(" "+h+"cm"):""}`.trim());
+  }
+  lines.push(`// HP:${d.hp} DB:${d.db>=0?"+":""}${d.db} MV:${d.mv}`);
   if(ex.relTarget){
     lines.push(`// 関係補正対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
   }
@@ -610,15 +714,17 @@ function makePalette(){
 }
 
 function makeJsonOut(){
-  const stats = getStats();
   const data = {
     name: $("name").value||"",
     role: $("role").value||"",
-    tagline: $("tagline").value||"",
+    age: $("age").value ? Number($("age").value) : null,
+    sex: $("sex").value||"",
+    height: $("height").value ? Number($("height").value) : null,
     memo: $("memo").value||"",
-    stats,
+    stats: getStats(),
     env_fixed: Number($("env_fixed").value||0),
-    skills: state.skills,
+    goods: state.goods,
+    bads: state.bads,
     items: state.items,
     rels: state.rels,
     traits: state.traits
@@ -626,6 +732,7 @@ function makeJsonOut(){
   $("json_out").value = JSON.stringify(data, null, 2);
 }
 
+/** ---------- random ---------- **/
 function randomStatsSum15(){
   for(let tries=0; tries<20000; tries++){
     const arr = Array.from({length:5}, ()=> 1 + Math.floor(Math.random()*5));
@@ -635,21 +742,71 @@ function randomStatsSum15(){
   return [3,3,3,3,3];
 }
 
+function randInt(min, maxInclusive){
+  return min + Math.floor(Math.random() * (maxInclusive - min + 1));
+}
+
+function randomProfile(){
+  // ざっくり実用レンジ（必要なら後で設定可能にする）
+  const age = randInt(16, 60);
+  const height = randInt(140, 200);
+  const sexes = ["男","女","その他"];
+  const sex = sexes[randInt(0, sexes.length-1)];
+  return { age, height, sex };
+}
+
+/** ---------- add rules (hard block) ---------- **/
+function tryAddItem({name, cat, pt}){
+  const n = (name||"").trim();
+  if(!n) return false;
+
+  const currentCount = state.items.length;
+  if(currentCount >= 3){
+    alert("所持品は最大3枠");
+    return false;
+  }
+
+  const currentTotal = sumBy(state.items, x=>Number(x.pt||0));
+  const nextTotal = currentTotal + Number(pt||0);
+  if(nextTotal > 3){
+    alert("所持品pt合計は最大+3");
+    return false;
+  }
+
+  state.items.push({ name:n, cat, pt:Number(pt||0) });
+  return true;
+}
+
+function tryAddGood({name, cat}){
+  const n = (name||"").trim();
+  if(!n) return false;
+
+  state.goods.push({ name:n, cat });
+  return true;
+}
+
+function tryAddBad({name, cat}){
+  const n = (name||"").trim();
+  if(!n) return false;
+
+  state.bads.push({ name:n, cat });
+  return true;
+}
+
 /** ---------- events ---------- **/
-$("btnAddSkill").onclick = ()=>{
-  const name = ($("skill_name").value||"").trim();
-  if(!name) return;
-  state.skills.push({ name, cat:$("skill_cat").value, kind:$("skill_kind").value });
-  $("skill_name").value = "";
-  recalcAll();
+$("btnAddGood").onclick = ()=>{
+  const ok = tryAddGood({ name:$("good_name").value, cat:$("good_cat").value });
+  if(ok){ $("good_name").value=""; recalcAll(); }
+};
+
+$("btnAddBad").onclick = ()=>{
+  const ok = tryAddBad({ name:$("bad_name").value, cat:$("bad_cat").value });
+  if(ok){ $("bad_name").value=""; recalcAll(); }
 };
 
 $("btnAddItem").onclick = ()=>{
-  const name = ($("item_name").value||"").trim();
-  if(!name) return;
-  state.items.push({ name, cat:$("item_cat").value, pt:Number($("item_pt").value||0) });
-  $("item_name").value = "";
-  recalcAll();
+  const ok = tryAddItem({ name:$("item_name").value, cat:$("item_cat").value, pt:Number($("item_pt").value||0) });
+  if(ok){ $("item_name").value=""; recalcAll(); }
 };
 
 $("btnAddRel").onclick = ()=>{
@@ -680,22 +837,29 @@ $("btnRandom").onclick = ()=>{
   $("stat_soc").value  = s;
   $("stat_spi").value  = sp;
   $("stat_luk").value  = l;
+
+  const p = randomProfile();
+  $("age").value = p.age;
+  $("sex").value = p.sex;
+  $("height").value = p.height;
+
   recalcAll();
 };
 
-["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","tagline","memo"]
+["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","memo"]
   .forEach(id=> $(id).addEventListener("input", recalcAll));
 
 $("btnSave").onclick = makeJsonOut;
 
 $("btnLoad").onclick = ()=>{
   try{
-    const txt = $("json_in").value.trim();
-    const data = JSON.parse(txt);
+    const data = JSON.parse(($("json_in").value||"").trim());
 
     $("name").value = data.name ?? "";
     $("role").value = data.role ?? "";
-    $("tagline").value = data.tagline ?? "";
+    $("age").value = (data.age ?? "") === null ? "" : (data.age ?? "");
+    $("sex").value = data.sex ?? "";
+    $("height").value = (data.height ?? "") === null ? "" : (data.height ?? "");
     $("memo").value = data.memo ?? "";
 
     const st = data.stats ?? {};
@@ -707,10 +871,11 @@ $("btnLoad").onclick = ()=>{
 
     $("env_fixed").value = data.env_fixed ?? 0;
 
-    state.skills = Array.isArray(data.skills) ? data.skills : [];
-    state.items  = Array.isArray(data.items) ? data.items : [];
-    state.rels   = Array.isArray(data.rels) ? data.rels : [];
-    state.traits = Array.isArray(data.traits) ? data.traits : [];
+    state.goods = Array.isArray(data.goods) ? data.goods : [];
+    state.bads  = Array.isArray(data.bads)  ? data.bads  : [];
+    state.items = Array.isArray(data.items) ? data.items : [];
+    state.rels  = Array.isArray(data.rels)  ? data.rels  : [];
+    state.traits= Array.isArray(data.traits)? data.traits: [];
 
     ensureDefaultTraits();
     recalcAll();
