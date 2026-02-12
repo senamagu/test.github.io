@@ -666,76 +666,94 @@ function traitTargetLabel(t){
 /** render **/
 function renderGoods(){
   const box = $("goodList"); box.innerHTML = "";
+
   state.goods.forEach((s, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
+
     row.innerHTML = `
-      <div><span class="mono">${escAttr(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
-      <div class="mini">+1pt</div>
-      <div class="mini"></div>
-      <div class="del"><button class="danger" data-del-good="${idx}">削除</button></div>
+      <div class="mono">${escAttr(s.name)}</div>
+      <div><span class="pill">${catLabel(s.cat)}</span></div>
+      <div class="mini">+1</div>
+      <div><button class="danger" data-del-good="${idx}">削除</button></div>
     `;
+
     box.appendChild(row);
   });
+
   box.querySelectorAll("[data-del-good]").forEach(btn=>{
     btn.onclick = ()=>{ state.goods.splice(Number(btn.dataset.delGood),1); recalcAll(); };
   });
 }
 function renderBads(){
   const box = $("badList"); box.innerHTML = "";
+
   state.bads.forEach((s, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
+
     row.innerHTML = `
-      <div><span class="mono">${escAttr(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
-      <div class="mini">-1pt</div>
-      <div class="mini"></div>
-      <div class="del"><button class="danger" data-del-bad="${idx}">削除</button></div>
+      <div class="mono">${escAttr(s.name)}</div>
+      <div><span class="pill">${catLabel(s.cat)}</span></div>
+      <div class="mini">-1</div>
+      <div><button class="danger" data-del-bad="${idx}">削除</button></div>
     `;
+
     box.appendChild(row);
   });
+
   box.querySelectorAll("[data-del-bad]").forEach(btn=>{
     btn.onclick = ()=>{ state.bads.splice(Number(btn.dataset.delBad),1); recalcAll(); };
   });
 }
 function renderItems(){
   const box = $("itemList"); box.innerHTML = "";
+
   state.items.forEach((it, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
+
     row.innerHTML = `
-      <div><span class="mono">${escAttr(it.name)}</span> <span class="pill">${catLabel(it.cat)}</span></div>
-      <div class="mini">pt ${Number(it.pt)>=0?("+"+it.pt):it.pt}</div>
-      <div class="mini"></div>
-      <div class="del"><button class="danger" data-del-item="${idx}">削除</button></div>
+      <div class="mono">${escAttr(it.name)}</div>
+      <div><span class="pill">${catLabel(it.cat)}</span></div>
+      <div class="mini">${it.pt>=0?"+":""}${it.pt}</div>
+      <div><button class="danger" data-del-item="${idx}">削除</button></div>
     `;
+
     box.appendChild(row);
   });
+
   box.querySelectorAll("[data-del-item]").forEach(btn=>{
     btn.onclick = ()=>{ state.items.splice(Number(btn.dataset.delItem),1); recalcAll(); };
   });
 
   const totalPt = sumBy(state.items, x=>Number(x.pt||0));
-  const ok = totalPt <= 3 && state.items.length <= 3;
-  $("itemCapInfo").textContent = `枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3 ${ok ? "" : "（上限超え）"}`;
+  $("itemCapInfo").textContent =
+    `枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3`;
 }
+
 function renderRels(){
   const box = $("relList"); box.innerHTML = "";
+
   state.rels.forEach((r, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
+
     row.innerHTML = `
-      <div><span class="mono">${escAttr(r.name)}</span> <span class="pill">${escAttr(r.note||"")}</span></div>
-      <div class="mini">${Number(r.val)>=0?("+"+r.val):r.val}</div>
-      <div class="mini"></div>
-      <div class="del"><button class="danger" data-del-rel="${idx}">削除</button></div>
+      <div class="mono">${escAttr(r.name)}</div>
+      <div>${escAttr(r.note||"")}</div>
+      <div class="mini">${r.val>=0?"+":""}${r.val}</div>
+      <div><button class="danger" data-del-rel="${idx}">削除</button></div>
     `;
+
     box.appendChild(row);
   });
+
   box.querySelectorAll("[data-del-rel]").forEach(btn=>{
     btn.onclick = ()=>{ state.rels.splice(Number(btn.dataset.delRel),1); recalcAll(); };
   });
 }
+
 function renderTraits(){
   ensureDefaultTraits();
   const box = $("traitList"); box.innerHTML = "";
