@@ -37,8 +37,7 @@
     .item{ display:grid; gap:8px; grid-template-columns: 1.6fr 1fr 1fr .8fr; align-items:center; }
     .item .del{ justify-self:end; }
 
-    /* KPI: 名前を大きく・分かりやすく */
-    .kpi{ display:grid; gap:10px; grid-template-columns: repeat(3, 1fr); }
+    .kpi{ display:grid; gap:10px; grid-template-columns: repeat(3, 1fr); margin-top:12px; }
     .kpi .box{ background:#0f1219; border:1px solid var(--line); border-radius:10px; padding:12px; }
     .kpi .name{ font-size:16px; font-weight:800; letter-spacing:.5px; }
     .kpi .v{ font-size:26px; font-weight:900; margin-top:6px; }
@@ -55,39 +54,11 @@
     }
     .pill{ display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:11px; margin-left:6px; }
 
-    /* details */
     details{ border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#0f1219; }
     summary{ cursor:pointer; user-select:none; }
     summary::-webkit-details-marker{ display:none; }
-    summary::before{
-      content:"▶";
-      display:inline-block;
-      margin-right:8px;
-      color:var(--muted);
-      transform: translateY(-1px);
-    }
+    summary::before{ content:"▶"; display:inline-block; margin-right:8px; color:var(--muted); transform: translateY(-1px); }
     details[open] summary::before{ content:"▼"; }
-
-    /* section separators inside cards */
-    .subcard{
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px;
-      background:#0f1219;
-      margin-top:10px;
-    }
-    .subcard h3{
-      margin:0 0 8px;
-      font-size:13px;
-    }
-    .caps{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-top:8px;
-    }
-    .caps .mini{ margin:0; }
   </style>
 </head>
 <body>
@@ -97,7 +68,7 @@
 </header>
 
 <main>
-  <!-- 基本情報 -->
+  <!-- 基本情報カード -->
   <section class="card">
     <h2>基本情報</h2>
 
@@ -133,7 +104,27 @@
       </div>
     </div>
 
-    <h2 style="margin-top:12px;">能力値 <span class="pill">1〜5</span></h2>
+    <div class="row2">
+      <div>
+        <label>誕生日</label>
+        <input id="birthday" type="date" />
+      </div>
+      <div>
+        <label>（予備）</label>
+        <input id="misc" />
+      </div>
+    </div>
+
+    <div class="btns" style="margin-top:12px;">
+      <button class="primary" id="btnRandomProfile">プロフィールランダム（性別/年齢/身長/誕生日）</button>
+    </div>
+    <div class="mini">※キャラ名/職業は触らない</div>
+  </section>
+
+  <!-- 能力値カード -->
+  <section class="card">
+    <h2>能力値 <span class="pill">1〜5</span></h2>
+
     <div class="row">
       <div><label>身体</label><input id="stat_body" type="number" min="1" max="5" value="3"></div>
       <div><label>知性</label><input id="stat_int"  type="number" min="1" max="5" value="3"></div>
@@ -142,13 +133,10 @@
       <div><label>運</label><input id="stat_luk"  type="number" min="1" max="5" value="3"></div>
     </div>
 
-    <!-- ボタンは能力値の下 -->
     <div class="btns" style="margin-top:12px;">
-      <button class="primary" id="btnRandom">ランダム（能力値+年齢/性別/身長）</button>
+      <button class="primary" id="btnRandomStats">能力値ランダム</button>
       <button id="btnRecalc">再計算</button>
     </div>
-
-    <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
 
     <div class="kpi">
       <div class="box">
@@ -173,23 +161,21 @@
     </p>
   </section>
 
-  <!-- 特徴（固定3） -->
+  <!-- 以下：前のまま（特徴/分野/所持品/関係/メモ/チャパレ/JSON） -->
+  <!-- 特徴 -->
   <section class="card">
     <h2>特徴（信条×2 / 欠陥×1）</h2>
     <div class="hint">信条は対象ダイスに <b>+1d6</b>、欠陥は <b>-1d6</b>。詳細はタップで開閉。</div>
     <div class="list" id="traitList"></div>
   </section>
 
-  <!-- 分野：得意 -->
+  <!-- 得意分野 -->
   <section class="card">
     <h2>得意分野</h2>
     <div class="hint">得意は <b>+2pt</b>。ジャンル：知識 / 社交 / 支援 / 戦闘 / 行動。</div>
 
     <div class="row4">
-      <div>
-        <label>名称</label>
-        <input id="good_name" />
-      </div>
+      <div><label>名称</label><input id="good_name" /></div>
       <div>
         <label>ジャンル</label>
         <select id="good_cat">
@@ -200,32 +186,20 @@
           <option value="action">行動</option>
         </select>
       </div>
-      <div>
-        <label>pt</label>
-        <input value="+2" disabled />
-      </div>
-      <div style="align-self:end;">
-        <button class="primary" id="btnAddGood" style="width:100%;">追加</button>
-      </div>
-    </div>
-
-    <div class="caps">
-      <div class="mini" id="goodCapInfo"></div>
+      <div><label>pt</label><input value="+2" disabled /></div>
+      <div style="align-self:end;"><button class="primary" id="btnAddGood" style="width:100%;">追加</button></div>
     </div>
 
     <div class="list" id="goodList"></div>
   </section>
 
-  <!-- 分野：苦手 -->
+  <!-- 苦手分野 -->
   <section class="card">
     <h2>苦手分野</h2>
     <div class="hint">苦手は <b>-2pt</b>。</div>
 
     <div class="row4">
-      <div>
-        <label>名称</label>
-        <input id="bad_name" />
-      </div>
+      <div><label>名称</label><input id="bad_name" /></div>
       <div>
         <label>ジャンル</label>
         <select id="bad_cat">
@@ -236,17 +210,8 @@
           <option value="action">行動</option>
         </select>
       </div>
-      <div>
-        <label>pt</label>
-        <input value="-2" disabled />
-      </div>
-      <div style="align-self:end;">
-        <button class="primary" id="btnAddBad" style="width:100%;">追加</button>
-      </div>
-    </div>
-
-    <div class="caps">
-      <div class="mini" id="badCapInfo"></div>
+      <div><label>pt</label><input value="-2" disabled /></div>
+      <div style="align-self:end;"><button class="primary" id="btnAddBad" style="width:100%;">追加</button></div>
     </div>
 
     <div class="list" id="badList"></div>
@@ -258,10 +223,7 @@
     <div class="hint">追加時に上限を超える場合は <b>弾く</b>。</div>
 
     <div class="row4">
-      <div>
-        <label>名称</label>
-        <input id="item_name" />
-      </div>
+      <div><label>名称</label><input id="item_name" /></div>
       <div>
         <label>ジャンル</label>
         <select id="item_cat">
@@ -281,9 +243,7 @@
           <option value="3">+3</option>
         </select>
       </div>
-      <div style="align-self:end;">
-        <button class="primary" id="btnAddItem" style="width:100%;">追加</button>
-      </div>
+      <div style="align-self:end;"><button class="primary" id="btnAddItem" style="width:100%;">追加</button></div>
     </div>
 
     <div class="list" id="itemList"></div>
@@ -295,14 +255,8 @@
     <h2>関係</h2>
 
     <div class="row4">
-      <div>
-        <label>名前</label>
-        <input id="rel_name" />
-      </div>
-      <div>
-        <label>内容</label>
-        <input id="rel_note" />
-      </div>
+      <div><label>名前</label><input id="rel_name" /></div>
+      <div><label>内容</label><input id="rel_note" /></div>
       <div>
         <label>重要度</label>
         <select id="rel_val">
@@ -311,15 +265,13 @@
           <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option>
         </select>
       </div>
-      <div style="align-self:end;">
-        <button class="primary" id="btnAddRel" style="width:100%;">追加</button>
-      </div>
+      <div style="align-self:end;"><button class="primary" id="btnAddRel" style="width:100%;">追加</button></div>
     </div>
 
     <div class="list" id="relList"></div>
   </section>
 
-  <!-- キャラメモ（別枠） -->
+  <!-- キャラメモ -->
   <section class="card">
     <h2>キャラメモ</h2>
     <textarea id="memo" class="mono"></textarea>
@@ -332,7 +284,6 @@
       <div>
         <label>環境補正（固定値）</label>
         <input id="env_fixed" type="number" value="0" min="-3" max="3" />
-
         <label>関係補正を適用する対象名（任意）</label>
         <input id="rel_target" />
 
@@ -372,12 +323,11 @@
 </main>
 
 <script>
-/** ---------- helpers ---------- **/
+/** helpers **/
 const $ = (id)=>document.getElementById(id);
 const clamp = (n,min,max)=>Math.max(min, Math.min(max, n));
 const sign = (n)=> n>0?"+":(n<0?"-":"");
 const catLabel = (c)=>({ knowledge:"知識", social:"社交", support:"支援", combat:"戦闘", action:"行動" }[c] ?? c);
-
 function ptsToDieSize(pt){
   const neg = pt < 0;
   const a = Math.abs(pt);
@@ -395,47 +345,24 @@ function escAttr(s){
   return String(s ?? "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
-/** ---------- state ---------- **/
-const state = {
-  goods: [],  // {name, cat}
-  bads: [],   // {name, cat}
-  items: [],  // {name, cat, pt}
-  rels: [],   // {name, note, val}
-  traits: []  // {type, text, detail, target}
-};
+/** state **/
+const state = { goods:[], bads:[], items:[], rels:[], traits:[] };
 
 function ensureDefaultTraits(){
   if(!Array.isArray(state.traits)) state.traits = [];
   const beliefs = state.traits.filter(t=>t.type==="belief").slice(0,2);
   const flaws   = state.traits.filter(t=>t.type==="flaw").slice(0,1);
-
   while(beliefs.length < 2) beliefs.push({ type:"belief", text:"", detail:"", target:"action" });
   while(flaws.length < 1)   flaws.push({ type:"flaw",   text:"", detail:"", target:"action" });
-
-  state.traits = [...beliefs, ...flaws].map(t=>({
-    type: t.type,
-    text: t.text ?? "",
-    detail: t.detail ?? "",
-    target: t.target ?? "action"
-  }));
+  state.traits = [...beliefs, ...flaws].map(t=>({ type:t.type, text:t.text??"", detail:t.detail??"", target:t.target??"action" }));
 }
-
 function traitTargetLabel(t){
-  return ({
-    research:"調査ダイス",
-    social:"社交ダイス",
-    support:"支援ダイス",
-    attack:"攻撃ダイス",
-    action:"行動ダイス",
-    ability:"能力ダイス"
-  }[t] ?? t);
+  return ({ research:"調査ダイス", social:"社交ダイス", support:"支援ダイス", attack:"攻撃ダイス", action:"行動ダイス", ability:"能力ダイス" }[t] ?? t);
 }
 
-/** ---------- rendering ---------- **/
+/** render **/
 function renderGoods(){
-  $("goodCapInfo").textContent = `現在：${state.goods.length}`;
-  const box = $("goodList");
-  box.innerHTML = "";
+  const box = $("goodList"); box.innerHTML = "";
   state.goods.forEach((s, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
@@ -451,11 +378,8 @@ function renderGoods(){
     btn.onclick = ()=>{ state.goods.splice(Number(btn.dataset.delGood),1); recalcAll(); };
   });
 }
-
 function renderBads(){
-  $("badCapInfo").textContent = `現在：${state.bads.length}`;
-  const box = $("badList");
-  box.innerHTML = "";
+  const box = $("badList"); box.innerHTML = "";
   state.bads.forEach((s, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
@@ -471,10 +395,8 @@ function renderBads(){
     btn.onclick = ()=>{ state.bads.splice(Number(btn.dataset.delBad),1); recalcAll(); };
   });
 }
-
 function renderItems(){
-  const box = $("itemList");
-  box.innerHTML = "";
+  const box = $("itemList"); box.innerHTML = "";
   state.items.forEach((it, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
@@ -494,10 +416,8 @@ function renderItems(){
   const ok = totalPt <= 3 && state.items.length <= 3;
   $("itemCapInfo").textContent = `現在：枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3 ${ok ? "" : "（上限超え）"}`;
 }
-
 function renderRels(){
-  const box = $("relList");
-  box.innerHTML = "";
+  const box = $("relList"); box.innerHTML = "";
   state.rels.forEach((r, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
@@ -513,12 +433,9 @@ function renderRels(){
     btn.onclick = ()=>{ state.rels.splice(Number(btn.dataset.delRel),1); recalcAll(); };
   });
 }
-
 function renderTraits(){
   ensureDefaultTraits();
-  const box = $("traitList");
-  box.innerHTML = "";
-
+  const box = $("traitList"); box.innerHTML = "";
   state.traits.forEach((t, idx)=>{
     const wrap = document.createElement("div");
     wrap.style.display = "grid";
@@ -577,7 +494,7 @@ function renderTraits(){
   });
 }
 
-/** ---------- compute ---------- **/
+/** compute **/
 function getStats(){
   const body = clamp(Number($("stat_body").value||3),1,5);
   const intel= clamp(Number($("stat_int").value||3),1,5);
@@ -586,21 +503,18 @@ function getStats(){
   const luk  = clamp(Number($("stat_luk").value||3),1,5);
   return { body, intel, soc, spi, luk };
 }
-
 function computeDerived(stats){
   const hp = stats.body + stats.spi + 5;
   const db = stats.body - 3;
   const mv = stats.body + stats.luk;
   return { hp, db, mv };
 }
-
 function bonusPtsForCategory(cat){
   const goodPt = sumBy(state.goods.filter(s=>s.cat===cat), ()=> 2);
   const badPt  = sumBy(state.bads.filter(s=>s.cat===cat),  ()=> -2);
   const itemPt = sumBy(state.items.filter(i=>i.cat===cat),  i=> Number(i.pt||0));
   return goodPt + badPt + itemPt;
 }
-
 function traitDieFor(targetKey){
   let die = 0;
   state.traits.forEach(t=>{
@@ -612,13 +526,11 @@ function traitDieFor(targetKey){
   const s = die>0 ? "+" : "-";
   return `${s}${abs}d6`;
 }
-
 function relFixedForTargetName(name){
   if(!name) return 0;
   const r = state.rels.find(x=>x.name === name);
   return r ? Number(r.val||0) : 0;
 }
-
 function makeDiceExpr(){
   const stats = getStats();
   const env = clamp(Number($("env_fixed").value||0), -3, 3);
@@ -663,8 +575,7 @@ function recalcAll(){
   renderItems();
   renderRels();
 
-  const stats = getStats();
-  const d = computeDerived(stats);
+  const d = computeDerived(getStats());
   $("kpi_hp").textContent = d.hp;
   $("kpi_db").textContent = (d.db>=0?("+"+d.db):String(d.db));
   $("kpi_mv").textContent = d.mv;
@@ -682,19 +593,23 @@ function makePalette(){
   const age = $("age").value ? String($("age").value) : "";
   const sex = ($("sex").value||"").trim();
   const h   = $("height").value ? String($("height").value) : "";
+  const bd  = $("birthday").value ? String($("birthday").value) : "";
 
   const lines = [];
   lines.push(`// CSBM-TRPG チャパレ${nm ? "：" + nm : ""}`);
-  if(role || age || sex || h){
-    lines.push(`// ${role}${role && (age||sex||h) ? " / " : ""}${age?age+"歳":""}${sex?(" "+sex):""}${h?(" "+h+"cm"):""}`.trim());
-  }
+  const profileBits = [];
+  if(role) profileBits.push(role);
+  const a = [];
+  if(age) a.push(age+"歳");
+  if(sex) a.push(sex);
+  if(h) a.push(h+"cm");
+  if(bd) a.push("BD:"+bd);
+  if(a.length) profileBits.push(a.join(" "));
+  if(profileBits.length) lines.push(`// ${profileBits.join(" / ")}`);
+
   lines.push(`// HP:${d.hp} DB:${d.db>=0?"+":""}${d.db} MV:${d.mv}`);
-  if(ex.relTarget){
-    lines.push(`// 関係補正対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
-  }
-  if(ex.env){
-    lines.push(`// 環境補正：${ex.env>=0?"+":""}${ex.env}`);
-  }
+  if(ex.relTarget) lines.push(`// 関係補正対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
+  if(ex.env) lines.push(`// 環境補正：${ex.env>=0?"+":""}${ex.env}`);
 
   lines.push(`調査 ${ex.research}`);
   lines.push(`社交 ${ex.socialEx}`);
@@ -720,6 +635,8 @@ function makeJsonOut(){
     age: $("age").value ? Number($("age").value) : null,
     sex: $("sex").value||"",
     height: $("height").value ? Number($("height").value) : null,
+    birthday: $("birthday").value||"",
+    misc: $("misc").value||"",
     memo: $("memo").value||"",
     stats: getStats(),
     env_fixed: Number($("env_fixed").value||0),
@@ -732,7 +649,7 @@ function makeJsonOut(){
   $("json_out").value = JSON.stringify(data, null, 2);
 }
 
-/** ---------- random ---------- **/
+/** random **/
 function randomStatsSum15(){
   for(let tries=0; tries<20000; tries++){
     const arr = Array.from({length:5}, ()=> 1 + Math.floor(Math.random()*5));
@@ -741,21 +658,25 @@ function randomStatsSum15(){
   }
   return [3,3,3,3,3];
 }
-
 function randInt(min, maxInclusive){
   return min + Math.floor(Math.random() * (maxInclusive - min + 1));
 }
-
 function randomProfile(){
-  // ざっくり実用レンジ（必要なら後で設定可能にする）
   const age = randInt(16, 60);
   const height = randInt(140, 200);
   const sexes = ["男","女","その他"];
   const sex = sexes[randInt(0, sexes.length-1)];
-  return { age, height, sex };
+  const month = randInt(1,12);
+  const dayMax = new Date(2024, month, 0).getDate(); // うるう年固定でOK（誕生日は雰囲気）
+  const day = randInt(1, dayMax);
+  const yyyy = 2000; // 年は固定でdate入力を壊さない（欲しけりゃここ変える）
+  const mm = String(month).padStart(2,"0");
+  const dd = String(day).padStart(2,"0");
+  const birthday = `${yyyy}-${mm}-${dd}`;
+  return { age, height, sex, birthday };
 }
 
-/** ---------- add rules (hard block) ---------- **/
+/** add rules **/
 function tryAddItem({name, cat, pt}){
   const n = (name||"").trim();
   if(!n) return false;
@@ -777,38 +698,25 @@ function tryAddItem({name, cat, pt}){
   return true;
 }
 
-function tryAddGood({name, cat}){
-  const n = (name||"").trim();
-  if(!n) return false;
-
-  state.goods.push({ name:n, cat });
-  return true;
-}
-
-function tryAddBad({name, cat}){
-  const n = (name||"").trim();
-  if(!n) return false;
-
-  state.bads.push({ name:n, cat });
-  return true;
-}
-
-/** ---------- events ---------- **/
+/** events **/
 $("btnAddGood").onclick = ()=>{
-  const ok = tryAddGood({ name:$("good_name").value, cat:$("good_cat").value });
-  if(ok){ $("good_name").value=""; recalcAll(); }
+  const n = ($("good_name").value||"").trim();
+  if(!n) return;
+  state.goods.push({ name:n, cat:$("good_cat").value });
+  $("good_name").value="";
+  recalcAll();
 };
-
 $("btnAddBad").onclick = ()=>{
-  const ok = tryAddBad({ name:$("bad_name").value, cat:$("bad_cat").value });
-  if(ok){ $("bad_name").value=""; recalcAll(); }
+  const n = ($("bad_name").value||"").trim();
+  if(!n) return;
+  state.bads.push({ name:n, cat:$("bad_cat").value });
+  $("bad_name").value="";
+  recalcAll();
 };
-
 $("btnAddItem").onclick = ()=>{
   const ok = tryAddItem({ name:$("item_name").value, cat:$("item_cat").value, pt:Number($("item_pt").value||0) });
   if(ok){ $("item_name").value=""; recalcAll(); }
 };
-
 $("btnAddRel").onclick = ()=>{
   const name = ($("rel_name").value||"").trim();
   if(!name) return;
@@ -818,48 +726,45 @@ $("btnAddRel").onclick = ()=>{
 };
 
 $("btnMakePalette").onclick = makePalette;
-
 $("btnCopy").onclick = async ()=>{
-  try{
-    await navigator.clipboard.writeText($("palette").value);
-    alert("コピーした");
-  }catch(e){
-    alert("コピー失敗。手動でコピーしてくれ。");
-  }
+  try{ await navigator.clipboard.writeText($("palette").value); alert("コピーした"); }
+  catch(e){ alert("コピー失敗。手動でコピーしてくれ。"); }
 };
-
 $("btnRecalc").onclick = recalcAll;
 
-$("btnRandom").onclick = ()=>{
+$("btnRandomStats").onclick = ()=>{
   const [b,i,s,sp,l] = randomStatsSum15();
   $("stat_body").value = b;
   $("stat_int").value  = i;
   $("stat_soc").value  = s;
   $("stat_spi").value  = sp;
   $("stat_luk").value  = l;
+  recalcAll();
+};
 
+$("btnRandomProfile").onclick = ()=>{
   const p = randomProfile();
   $("age").value = p.age;
   $("sex").value = p.sex;
   $("height").value = p.height;
-
+  $("birthday").value = p.birthday;
   recalcAll();
 };
 
-["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","memo"]
+["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","birthday","misc","memo"]
   .forEach(id=> $(id).addEventListener("input", recalcAll));
 
 $("btnSave").onclick = makeJsonOut;
-
 $("btnLoad").onclick = ()=>{
   try{
     const data = JSON.parse(($("json_in").value||"").trim());
-
     $("name").value = data.name ?? "";
     $("role").value = data.role ?? "";
     $("age").value = (data.age ?? "") === null ? "" : (data.age ?? "");
     $("sex").value = data.sex ?? "";
     $("height").value = (data.height ?? "") === null ? "" : (data.height ?? "");
+    $("birthday").value = data.birthday ?? "";
+    $("misc").value = data.misc ?? "";
     $("memo").value = data.memo ?? "";
 
     const st = data.stats ?? {};
