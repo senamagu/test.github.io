@@ -433,6 +433,11 @@ input[type="number"]{
           <option value="support">支援</option>
           <option value="combat">戦闘</option>
           <option value="action">行動</option>
+          <option value="ability_body">能力(身体)</option>
+          <option value="ability_int">能力(知性)</option>
+          <option value="ability_soc">能力(社交)</option>
+          <option value="ability_spi">能力(精神)</option>
+          <option value="ability_luk">能力(運)</option>
         </select>
       </div>
       <div style="align-self:end;"><button class="primary" id="btnAddGood" style="width:100%;">追加</button></div>
@@ -455,6 +460,11 @@ input[type="number"]{
           <option value="support">支援</option>
           <option value="combat">戦闘</option>
           <option value="action">行動</option>
+          <option value="ability_body">能力(身体)</option>
+          <option value="ability_int">能力(知性)</option>
+          <option value="ability_soc">能力(社交)</option>
+          <option value="ability_spi">能力(精神)</option>
+          <option value="ability_luk">能力(運)</option>
         </select>
       </div>
       <div style="align-self:end;"><button class="primary" id="btnAddBad" style="width:100%;">追加</button></div>
@@ -477,6 +487,11 @@ input[type="number"]{
           <option value="support">支援</option>
           <option value="combat">戦闘</option>
           <option value="action">行動</option>
+          <option value="ability_body">能力(身体)</option>
+          <option value="ability_int">能力(知性)</option>
+          <option value="ability_soc">能力(社交)</option>
+          <option value="ability_spi">能力(精神)</option>
+          <option value="ability_luk">能力(運)</option>
         </select>
       </div>
       <div>
@@ -662,7 +677,19 @@ function loadFromLocal(){
 const $ = (id)=>document.getElementById(id);
 const clamp = (n,min,max)=>Math.max(min, Math.min(max, n));
 const sign = (n)=> n>0?"+":(n<0?"-":"");
-const catLabel = (c)=>({ knowledge:"知識", social:"社交", support:"支援", combat:"戦闘", action:"行動" }[c] ?? c);
+const catLabel = (c)=>({
+  knowledge:"知識",
+  social:"社交",
+  support:"支援",
+  combat:"戦闘",
+  action:"行動",
+
+  ability_body:"能力(身体)",
+  ability_int:"能力(知性)",
+  ability_soc:"能力(社交)",
+  ability_spi:"能力(精神)",
+  ability_luk:"能力(運)"
+}[c] ?? c);
 function ptsToDieSize(pt){
   const neg = pt < 0;
   const a = Math.abs(pt);
@@ -895,6 +922,12 @@ function relFixedForTargetName(name){
   const r = state.rels.find(x=>x.name === name);
   return r ? Number(r.val||0) : 0;
 }
+function abilityExpr(statKey, catKey){
+  const base = stats[statKey];
+  const pt = bonusPtsForCategory(catKey);
+  const die = fmtDie(ptsToDieSize(pt));
+  return `2d6+1d${base}${die}`;
+}
 function makeDiceExpr({ useRel } = { useRel:false }){
   const stats = getStats();
 
@@ -930,11 +963,16 @@ function makeDiceExpr({ useRel } = { useRel:false }){
   const mvHalf = Math.floor(mv / 2);
   const action = `2d6+1d${mvHalf}${dieA}${tAction}`;
 
-  const ability  = `2d6+1d${stats.intel}${tAbility}`;
+  const abilityBody = abilityExpr("body", "ability_body");
+  const abilityInt  = abilityExpr("intel","ability_int");
+  const abilitySoc  = abilityExpr("soc",  "ability_soc");
+  const abilitySpi  = abilityExpr("spi",  "ability_spi");
+  const abilityLuk  = abilityExpr("luk",  "ability_luk");
+
 
   return { research, socialEx, support, attack, action, ability, relTarget, rel };
 }
-
+  
 function recalcAll(){
   renderTraits();
   renderGoods();
@@ -1002,12 +1040,11 @@ function makePaletteBase(){
   lines.push(`${ex.action}+{環境補正} 【行動ダイス】`);
 
   lines.push(`// 能力ダイス`);
-  lines.push(`2d6+2d{身体}+{環境補正} 【能力ダイス(身体)】`);
-  lines.push(`2d6+2d{知性}+{環境補正} 【能力ダイス(知性)】`);
-  lines.push(`2d6+2d{社交}+{環境補正} 【能力ダイス(社交)】`);
-  lines.push(`2d6+2d{精神}+{環境補正} 【能力ダイス(精神)】`);
-  lines.push(`2d6+2d{運}+{環境補正} 【能力ダイス(運)】`);
-
+  lines.push(`${abilityBody}+{環境補正} 【能力ダイス(身体)】`);
+  lines.push(`${abilityInt}+{環境補正} 【能力ダイス(知性)】`);
+  lines.push(`${abilitySoc}+{環境補正} 【能力ダイス(社交)】`);
+  lines.push(`${abilitySpi}+{環境補正} 【能力ダイス(精神)】`);
+  lines.push(`${abilityLuk}+{環境補正} 【能力ダイス(運)】`);
   lines.push(`// 戦闘`);
   lines.push(`${ex.attack}>=9 【攻撃】`);
   lines.push(`${ex.action}>=n 【回避】`);
