@@ -192,6 +192,47 @@ details[open] summary::before{ content:"▼"; }
 /* full */
 .full{ grid-column: 1 / -1; }
 
+/* ===== traits を “得意/苦手と同じフォーム” に揃える ===== */
+.traitCard{
+  background: rgba(0,0,0,0.15);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+}
+
+.traitHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.traitTitle{
+  font-weight: 800;
+  color: var(--text);
+  display:flex;
+  align-items:center;
+  gap: 8px;
+}
+
+.traitRow label,
+.traitMemo label{
+  color: var(--text);
+  opacity: .9;
+}
+
+.traitRow input,
+.traitRow select,
+.traitMemo textarea{
+  margin-bottom: 0; /* ここで“余計な段差”消す */
+}
+
+/* スマホで3列きつい時は自動で縦積み */
+@media (max-width: 560px){
+  .traitRow{ grid-template-columns: 1fr !important; }
+}
+
   </style>
 </head>
 <body>
@@ -555,40 +596,50 @@ function renderRels(){
 function renderTraits(){
   ensureDefaultTraits();
   const box = $("traitList"); box.innerHTML = "";
+
   state.traits.forEach((t, idx)=>{
     const wrap = document.createElement("div");
-    wrap.style.display = "grid";
-    wrap.style.gap = "8px";
-    wrap.style.border = "1px solid var(--line)";
-    wrap.style.borderRadius = "12px";
-    wrap.style.padding = "10px";
+    wrap.className = "traitCard"; // ← CSSで揃える用
+
+    const title = (t.type==="belief") ? "信条" : "欠陥";
+    const badge = (t.type==="belief") ? "+1d6" : "-1d6";
 
     wrap.innerHTML = `
-      <div style="display:grid; gap:10px; grid-template-columns: 1fr 180px;">
+      <div class="traitHead">
+        <div class="traitTitle">${title}<span class="pill">${badge}</span></div>
+      </div>
+
+      <div class="row3 traitRow">
         <div>
-          <span>${t.type==="belief" ? "信条 +1d6" : "欠陥 -1d6"}</span>
-          <input data-trait-text="${idx}" value="${escAttr(t.text)}" style="width:100%; margin-top:6px;" />
+          <label>${title}（名称）</label>
+          <input data-trait-text="${idx}" value="${escAttr(t.text)}" />
         </div>
+
         <div>
-          <label style="margin-top:0;">対象</label>
-          <select data-trait-target="${idx}" style="width:100%;">
+          <label>対象</label>
+          <select data-trait-target="${idx}">
             ${["research","social","support","attack","action","ability"].map(k=>`
               <option value="${k}" ${t.target===k?"selected":""}>${traitTargetLabel(k)}</option>
             `).join("")}
           </select>
         </div>
+
+        <div>
+          <label> </label>
+          <button class="danger" data-trait-clear="${idx}" style="width:100%;">クリア</button>
+        </div>
       </div>
 
-      <details>
-        <summary class="mini">詳細メモ</summary>
-        <div style="margin-top:8px;">
-          <textarea data-trait-detail="${idx}" class="mono" style="min-height:90px;">${t.detail ?? ""}</textarea>
-        </div>
-      </details>
+      <div class="traitMemo">
+        <label>詳細メモ</label>
+        <textarea data-trait-detail="${idx}" class="mono" style="min-height:90px;">${t.detail ?? ""}</textarea>
+      </div>
     `;
+
     box.appendChild(wrap);
   });
 
+  // events
   box.querySelectorAll("[data-trait-target]").forEach(sel=>{
     sel.onchange = ()=>{
       const idx = Number(sel.dataset.traitTarget);
@@ -608,6 +659,14 @@ function renderTraits(){
       const idx = Number(ta.dataset.traitDetail);
       state.traits[idx].detail = ta.value;
       makeJsonOut();
+    };
+  });
+  box.querySelectorAll("[data-trait-clear]").forEach(btn=>{
+    btn.onclick = ()=>{
+      const idx = Number(btn.dataset.traitClear);
+      state.traits[idx].text = "";
+      state.traits[idx].detail = "";
+      recalcAll();
     };
   });
 }
