@@ -1041,7 +1041,7 @@ function makeCcfJson(){
   const d = computeDerived(stats);
 
   const name = ($("name").value||"").trim() || "キャラクター";
-  const commands = $("palette").value;
+  const commands = $("palette_base").value;
 
   const obj = {
     kind: "character",
@@ -1228,7 +1228,7 @@ $("btnRandomProfile").onclick = ()=>{
   recalcAll();
 };
 
-$("btnCcf").onclick = async ()=>{
+$("btnMakeCcf").onclick = async ()=>{
   try{
     const txt = makeCcfJson();
     await navigator.clipboard.writeText(txt);
