@@ -924,10 +924,11 @@ function makeDiceExpr({ useRel } = { useRel:false }){
   const research = `2d6+1d${stats.intel}${dieK}${tResearch}`;
   const socialEx = `2d6+1d${stats.soc}${dieS}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
   const support  = `2d6+1d${stats.intel}${dieSu}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
-  const attack = `2d6+1d${stats.body}${dieC}${tAttack}${relAtk?`${sign(relAtk)}${Math.abs(relAtk)}`:""}`;
+  const attack   = `2d6+1d${stats.body}${dieC}${tAttack}${relAtk?`${sign(relAtk)}${Math.abs(relAtk)}`:""}`;
 
-  // 行動は「MV + 所持品変数」で固定したい方針ならこっち推奨
-  const action   = `2d6+1d{MV}+1d{所持品}${tAction}`;
+  const mv = computeDerived(stats).mv;
+  const mvHalf = Math.floor(mv / 2);
+  const action = `2d6+1d${mvHalf}${dieA}${tAction}`;
 
   const ability  = `2d6+1d${stats.intel}${tAbility}`;
 
