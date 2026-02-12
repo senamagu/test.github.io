@@ -900,6 +900,7 @@ function makeDiceExpr({ useRel } = { useRel:false }){
 
   const relTarget = ($("rel_target").value||"").trim();
   const rel = (useRel ? relFixedForTargetName(relTarget) : 0);
+  const relAtk = -rel; // 攻撃だけ符号反転
 
   const ptsK = bonusPtsForCategory("knowledge");
   const ptsS = bonusPtsForCategory("social");
@@ -923,7 +924,7 @@ function makeDiceExpr({ useRel } = { useRel:false }){
   const research = `2d6+1d${stats.intel}${dieK}${tResearch}`;
   const socialEx = `2d6+1d${stats.soc}${dieS}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
   const support  = `2d6+1d${stats.intel}${dieSu}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
-  const attack   = `2d6+1d${stats.body}${dieC}${tAttack}`;
+  const attack = `2d6+1d${stats.body}${dieC}${tAttack}${relAtk?`${sign(relAtk)}${Math.abs(relAtk)}`:""}`;
 
   // 行動は「MV + 所持品変数」で固定したい方針ならこっち推奨
   const action   = `2d6+1d{MV}+1d{所持品}${tAction}`;
@@ -1023,11 +1024,12 @@ function makePaletteRel(){
   const ex = makeDiceExpr({ useRel:true });
 
   const lines = [];
-  lines.push(`// 関係補正つき（社交/支援のみ）`);
+  lines.push(`// 関係補正つき（社交/支援/攻撃）`);
   if(ex.relTarget) lines.push(`// 対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
 
   lines.push(`${ex.socialEx}+{環境補正} 【社交ダイス（関係補正）】`);
   lines.push(`${ex.support}+{環境補正} 【支援ダイス（関係補正）】`);
+  lines.push(`${ex.attack}+{環境補正} 【攻撃ダイス（関係補正）】`);
 
   $("palette_rel").value = lines.join("\n");
 }
