@@ -5,82 +5,111 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CSBM-TRPG キャラシ&チャパレ出力</title>
   <style>
-/* ===== color fix (override) ===== */
+/* ===== FINAL THEME (no color-mix / iOS安定) ===== */
 :root{
-  --bg:#4A5C52;          /* Background */
-  --text:#FFF8F3;        /* Headline */
-  --para:#B0C58B;        /* Paragraph */
-  --panel:#13969F;       /* box */
-  --btn:#F5B329;         /* Button */
-  --btnText:#13969F;     /* Button text */
+  --bg:#4A5C52;
+  --headline:#FFF8F3;
+  --para:#B0C58B;
+  --box:#13969F;
+  --btn:#F5B329;
+  --btnText:#13969F;
 
-  /* 補助（自然に見えるように） */
-  --line: color-mix(in srgb, var(--text) 28%, transparent);
-  --muted: color-mix(in srgb, var(--para) 85%, var(--text) 15%);
+  /* ここは俺が自然に調整したサブ色 */
+  --line: rgba(255,248,243,.18);
+  --card: rgba(255,248,243,.06);          /* カード面は白を薄く */
+  --field: rgba(0,0,0,.18);               /* 入力面は黒を薄く（真っ黒ではない） */
+  --field2: rgba(0,0,0,.26);
+  --muted: rgba(255,248,243,.72);
+  --boxTint: rgba(19,150,159,.14);        /* box色は“薄い差し色”に留める */
 }
 
-/* 基本 */
-body{ background:var(--bg); color:var(--text); }
+body{ background:var(--bg); color:var(--headline); }
+h1, .card h2{ color:var(--headline); }
 .sub{ color:var(--para); }
 label{ color:var(--para); }
+.mini,.hint{ color:var(--muted); }
 
-/* card(箱)は指定のbox色をベースに“少し透け” */
+header{
+  background: rgba(74,92,82,.92);
+  border-bottom:1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+
+/* card：面はニュートラル、box色は使わない */
 .card{
-  background: color-mix(in srgb, var(--panel) 30%, transparent);
-  border-color: var(--line);
+  background: var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
 }
 
-/* 入力欄：黒ベタ禁止、箱色に寄せる */
+/* 入力：黒ベタじゃなく“薄い黒”で締める */
 input, select, textarea{
-  background: color-mix(in srgb, var(--panel) 22%, var(--bg));
-  border-color: var(--line);
-  color: var(--text);
+  width:100%;
+  color:var(--headline);
+  background: var(--field);
+  border:1px solid var(--line);
 }
+textarea{ background: var(--field2); }
+
 input::placeholder, textarea::placeholder{
-  color: color-mix(in srgb, var(--text) 55%, transparent);
+  color: rgba(255,248,243,.55);
 }
 
-/* ボタン */
+/* ボタン：指定通り */
 button.primary{
   background: var(--btn);
-  border-color: color-mix(in srgb, var(--btn) 70%, var(--line));
+  border-color: rgba(245,179,41,.75);
   color: var(--btnText);
+  font-weight:800;
 }
 button{
-  background: color-mix(in srgb, var(--panel) 18%, var(--bg));
-  border-color: var(--line);
-  color: var(--text);
+  background: rgba(0,0,0,.14);
+  border:1px solid var(--line);
+  color:var(--headline);
+}
+button.danger{
+  background: rgba(255,90,90,.22);
+  border-color: rgba(255,90,90,.55);
+  color: var(--headline);
 }
 
 /* pill */
 .pill{
-  border-color: var(--line);
-  color: color-mix(in srgb, var(--text) 80%, transparent);
+  border:1px solid var(--line);
+  color: rgba(255,248,243,.78);
 }
 
-/* KPIも黒ベタ禁止 */
+/* KPI：ここで “box色” を気持ちよく使う */
 .kpi .box{
-  background: color-mix(in srgb, var(--panel) 22%, var(--bg));
-  border-color: var(--line);
+  background: var(--boxTint);
+  border:1px solid rgba(19,150,159,.35);
 }
 .kpi .v{ color: var(--btn); }
-.kpi .desc{ color: color-mix(in srgb, var(--text) 75%, transparent); }
+.kpi .desc{ color: rgba(255,248,243,.78); }
 
-/* ===== 特徴だけ真っ黒問題の根治 =====
-   renderTraits()で直書きされてる以下をCSSで上書きする
-   - wrap.style.background = "#0f1219"
-   - details background = "#0f1219"
-*/
+/* details：黒くしない */
+details{
+  background: rgba(0,0,0,.16);
+  border:1px solid var(--line);
+}
+summary{ color: rgba(255,248,243,.75); }
+
+/* ===== 特徴だけ真っ黒問題（JS直書き）を殴って上書き ===== */
 #traitList > div{
-  background: color-mix(in srgb, var(--panel) 22%, var(--bg)) !important;
+  background: rgba(0,0,0,.16) !important;
   border-color: var(--line) !important;
 }
 #traitList details{
-  background: color-mix(in srgb, var(--panel) 18%, var(--bg)) !important;
+  background: rgba(0,0,0,.14) !important;
   border-color: var(--line) !important;
 }
-#traitList summary{
-  color: color-mix(in srgb, var(--para) 90%, var(--text) 10%) !important;
+#traitList input, #traitList select, #traitList textarea{
+  background: rgba(0,0,0,.18) !important;
+}
+
+/* ちょいアクセント：区切りや強調だけにboxを使う */
+.card h2 .pill{
+  border-color: rgba(19,150,159,.45);
 }
 
 /* details */
