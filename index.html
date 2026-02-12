@@ -192,40 +192,14 @@ details[open] summary::before{ content:"▼"; }
 /* full */
 .full{ grid-column: 1 / -1; }
 
-/* ===== traits を “得意/苦手と同じフォーム” に揃える ===== */
-.traitCard{
-  background: rgba(0,0,0,0.15);
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  display: grid;
-  gap: 10px;
-}
-
-.traitHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
+/* 特徴カードの見出し */
 .traitTitle{
+  margin: 0 0 10px;
+  font-size: 14px;
   font-weight: 800;
-  color: var(--text);
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
   gap: 8px;
-}
-
-.traitRow label,
-.traitMemo label{
-  color: var(--text);
-  opacity: .9;
-}
-
-.traitRow input,
-.traitRow select,
-.traitMemo textarea{
-  margin-bottom: 0; /* ここで“余計な段差”消す */
 }
 
 /* スマホで3列きつい時は自動で縦積み */
@@ -599,19 +573,17 @@ function renderTraits(){
 
   state.traits.forEach((t, idx)=>{
     const wrap = document.createElement("div");
-    wrap.className = "traitCard"; // ← CSSで揃える用
+    wrap.className = "card traitCard"; // ← 普通のcardにする
 
     const title = (t.type==="belief") ? "信条" : "欠陥";
     const badge = (t.type==="belief") ? "+1d6" : "-1d6";
 
     wrap.innerHTML = `
-      <div class="traitHead">
-        <div class="traitTitle">${title}<span class="pill">${badge}</span></div>
-      </div>
+      <h3 class="traitTitle">${title}<span class="pill">${badge}</span></h3>
 
-      <div class="row3 traitRow">
+      <div class="row3">
         <div>
-          <label>${title}（名称）</label>
+          <label>${title}</label>
           <input data-trait-text="${idx}" value="${escAttr(t.text)}" />
         </div>
 
@@ -624,13 +596,10 @@ function renderTraits(){
           </select>
         </div>
 
-        <div>
-          <label> </label>
-          <button class="danger" data-trait-clear="${idx}" style="width:100%;">クリア</button>
-        </div>
+        <div></div>
       </div>
 
-      <div class="traitMemo">
+      <div>
         <label>詳細メモ</label>
         <textarea data-trait-detail="${idx}" class="mono" style="min-height:90px;">${t.detail ?? ""}</textarea>
       </div>
@@ -659,14 +628,6 @@ function renderTraits(){
       const idx = Number(ta.dataset.traitDetail);
       state.traits[idx].detail = ta.value;
       makeJsonOut();
-    };
-  });
-  box.querySelectorAll("[data-trait-clear]").forEach(btn=>{
-    btn.onclick = ()=>{
-      const idx = Number(btn.dataset.traitClear);
-      state.traits[idx].text = "";
-      state.traits[idx].detail = "";
-      recalcAll();
     };
   });
 }
