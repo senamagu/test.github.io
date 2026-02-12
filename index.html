@@ -264,6 +264,14 @@ details {
   padding-top: 10px;
 }
 
+.renderText{
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+
 /* ===== キャラメモ textarea をカードいっぱいに ===== */
 .card:has(#memo){
   display: flex;
@@ -290,6 +298,16 @@ details {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"]{
+  -moz-appearance: textfield; /* Firefox */
 }
 
 /* スマホで3列きつい時は自動で縦積み */
@@ -672,9 +690,9 @@ function renderGoods(){
     row.className = "item";
 
     row.innerHTML = `
-      <div class="mono">${escAttr(s.name)}</div>
+      <div class="renderText">${escAttr(s.name)}</div>
       <div><span class="pill">${catLabel(s.cat)}</span></div>
-      <div class="mini">+1</div>
+      <div class="renderText">+1</div>
       <div><button class="danger" data-del-good="${idx}">削除</button></div>
     `;
 
@@ -693,9 +711,9 @@ function renderBads(){
     row.className = "item";
 
     row.innerHTML = `
-      <div class="mono">${escAttr(s.name)}</div>
+      <div class="renderText">${escAttr(s.name)}</div>
       <div><span class="pill">${catLabel(s.cat)}</span></div>
-      <div class="mini">-1</div>
+      <div class="renderText">-1</div>
       <div><button class="danger" data-del-bad="${idx}">削除</button></div>
     `;
 
@@ -714,9 +732,9 @@ function renderItems(){
     row.className = "item";
 
     row.innerHTML = `
-      <div class="mono">${escAttr(it.name)}</div>
+      <div class="renderText">${escAttr(it.name)}</div>
       <div><span class="pill">${catLabel(it.cat)}</span></div>
-      <div class="mini">${it.pt>=0?"+":""}${it.pt}</div>
+      <div class="renderText">${it.pt>=0?"+":""}${it.pt}</div>
       <div><button class="danger" data-del-item="${idx}">削除</button></div>
     `;
 
@@ -740,9 +758,9 @@ function renderRels(){
     row.className = "item";
 
     row.innerHTML = `
-      <div class="mono">${escAttr(r.name)}</div>
-      <div>${escAttr(r.note||"")}</div>
-      <div class="mini">${r.val>=0?"+":""}${r.val}</div>
+      <div class="renderText">${escAttr(r.name)}</div>
+      <div><span class="pill">${escAttr(r.note||"")}</span></div
+      <div class="renderText">${r.val>=0?"+":""}${r.val}</div>
       <div><button class="danger" data-del-rel="${idx}">削除</button></div>
     `;
 
