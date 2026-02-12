@@ -63,8 +63,8 @@
 </head>
 <body>
 <header>
-  <h1>CSBM-TRPG キャラシ & ココフォリアチャパレ出力</h1>
-  <div class="sub">入力→自動計算→チャパレ→JSON保存/読込 / ランダム（能力値合計15・各1〜5）</div>
+  <h1>CSBM-TRPG キャラシ作成ツール</h1>
+  <div class="sub">beta版</div>
 </header>
 
 <main>
@@ -74,11 +74,11 @@
 
     <div class="row2">
       <div>
-        <label>キャラ名</label>
+        <label>名前</label>
         <input id="name" />
       </div>
       <div>
-        <label>概念 / 職業</label>
+        <label>職業</label>
         <input id="role" />
       </div>
     </div>
@@ -106,19 +106,18 @@
 
     <div class="row2">
       <div>
-        <label>誕生日</label>
+        <label>誕生日（m/d）</label>
         <input id="birthday_md" />
       </div>
 
     <div class="btns" style="margin-top:12px;">
-      <button class="primary" id="btnRandomProfile">プロフィールランダム（性別/年齢/身長/誕生日）</button>
+      <button class="primary" id="btnRandomProfile">プロフィールランダム</button>
     </div>
-    <div class="mini">※キャラ名/職業は触らない</div>
   </section>
 
   <!-- 能力値カード -->
   <section class="card">
-    <h2>能力値 <span class="pill">1〜5</span></h2>
+    <h2>能力値<span class="pill">1~5</span></h2>
 
     <div class="row">
       <div><label>身体</label><input id="stat_body" type="number" min="1" max="5" value="3"></div>
@@ -130,7 +129,6 @@
 
     <div class="btns" style="margin-top:12px;">
       <button class="primary" id="btnRandomStats">能力値ランダム</button>
-      <button id="btnRecalc">再計算</button>
     </div>
 
     <div class="kpi">
@@ -150,24 +148,19 @@
         <div class="desc">MV = 身体 + 運</div>
       </div>
     </div>
-
-    <p class="hint" style="margin-top:12px;">
-      補正ダイス変換：<span class="mono">合計pt → 0:無し / 1-2:d2 / 3-4:d4 / 5+:d6</span>（最大d6）
-    </p>
+    
   </section>
 
   <!-- 以下：前のまま（特徴/分野/所持品/関係/メモ/チャパレ/JSON） -->
   <!-- 特徴 -->
   <section class="card">
-    <h2>特徴（信条×2 / 欠陥×1）</h2>
-    <div class="hint">信条は対象ダイスに <b>+1d6</b>、欠陥は <b>-1d6</b>。詳細はタップで開閉。</div>
+    <h2>特徴</h2>
     <div class="list" id="traitList"></div>
   </section>
 
   <!-- 得意分野 -->
   <section class="card">
-    <h2>得意分野</h2>
-    <div class="hint">得意は <b>+2pt</b>。ジャンル：知識 / 社交 / 支援 / 戦闘 / 行動。</div>
+    <h2>得意分野<span class="pill">+1</span></h2>
 
     <div class="row3">
       <div><label>名称</label><input id="good_name" /></div>
@@ -189,8 +182,7 @@
 
   <!-- 苦手分野 -->
   <section class="card">
-    <h2>苦手分野</h2>
-    <div class="hint">苦手は <b>-2pt</b>。</div>
+    <h2>苦手分野<span class="pill">-1</span></h2>
 
     <div class="row3">
       <div><label>名称</label><input id="bad_name" /></div>
@@ -213,7 +205,6 @@
   <!-- 所持品 -->
   <section class="card">
     <h2>所持品 <span class="pill">最大3枠 / 合計+3</span></h2>
-    <div class="hint">追加時に上限を超える場合は <b>弾く</b>。</div>
 
     <div class="row4">
       <div><label>名称</label><input id="item_name" /></div>
@@ -407,7 +398,7 @@ function renderItems(){
 
   const totalPt = sumBy(state.items, x=>Number(x.pt||0));
   const ok = totalPt <= 3 && state.items.length <= 3;
-  $("itemCapInfo").textContent = `現在：枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3 ${ok ? "" : "（上限超え）"}`;
+  $("itemCapInfo").textContent = `枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3 ${ok ? "" : "（上限超え）"}`;
 }
 function renderRels(){
   const box = $("relList"); box.innerHTML = "";
@@ -613,7 +604,7 @@ function makePalette(){
 
   lines.push(`// 戦闘`);
   lines.push(`命中 ${ex.attack}>=9`);
-  lines.push(`回避 ${ex.action}  // 対抗：相手の攻撃値`);
+  lines.push(`回避 ${ex.action}>=`);
   lines.push(`庇う ${ex.action}>=9`);
   lines.push(`回復 ${ex.support}>=9`);
   lines.push(`ダメ 1d3${d.db? (d.db>0?`+${d.db}`:`${d.db}`):""}`);
@@ -721,7 +712,7 @@ $("btnAddRel").onclick = ()=>{
 $("btnMakePalette").onclick = makePalette;
 $("btnCopy").onclick = async ()=>{
   try{ await navigator.clipboard.writeText($("palette").value); alert("コピーした"); }
-  catch(e){ alert("コピー失敗。手動でコピーしてくれ。"); }
+  catch(e){ alert("コピー失敗"); }
 };
 $("btnRecalc").onclick = recalcAll;
 
@@ -778,7 +769,7 @@ $("btnLoad").onclick = ()=>{
     ensureDefaultTraits();
     recalcAll();
   }catch(e){
-    alert("JSON読込失敗：形式がおかしい");
+    alert("JSON読込失敗");
   }
 };
 
