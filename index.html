@@ -69,16 +69,6 @@
       </div>
     </div>
 
-    <label>一言タグ</label>
-    <input id="tagline" placeholder="例：真実中毒 / 仲間最優先" />
-
-    <div class="btns">
-      <button class="primary" id="btnRandom">能力値ランダム</button>
-      <button id="btnRecalc">再計算</button>
-    </div>
-
-    <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
-
     <h2 style="margin-top:0;">能力値 <span class="pill">1〜5</span></h2>
     <div class="row">
       <div><label>身体</label><input id="stat_body" type="number" min="1" max="5" value="3"></div>
@@ -88,6 +78,13 @@
       <div><label>運</label><input id="stat_luk"  type="number" min="1" max="5" value="3"></div>
     </div>
 
+    <div class="btns" style="margin-top:12px;">
+      <button class="primary" id="btnRandom">能力値ランダム</button>
+      <button id="btnRecalc">再計算</button>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+    
     <div class="kpi" style="margin-top:12px;">
       <div><div class="v" id="kpi_hp">-</div><div class="k">HP = 身体 + 精神 + 5</div></div>
       <div><div class="v" id="kpi_db">-</div><div class="k">DB = 身体 - 3</div></div>
@@ -106,12 +103,6 @@
     <div class="hint">信条は対象ダイスに <b>+1d6</b>、欠陥は <b>-1d6</b>（場面により適用）。</div>
 
     <div class="list" id="traitList"></div>
-    <div class="btns">
-      <button class="primary" id="btnAddBelief">信条を追加</button>
-      <button class="danger" id="btnAddFlaw">欠陥を追加</button>
-      <button id="btnResetTraits">初期化</button>
-    </div>
-  </section>
 
   <section class="card">
     <h2>分野（得意/苦手）</h2>
@@ -294,14 +285,21 @@ const state = {
 };
 
 function ensureDefaultTraits(){
-  // exactly 2 beliefs and 1 flaw
-  if(state.traits.length === 0){
-    state.traits = [
-      { type:"belief", text:"絶対に仲間を守る", target:"support" },
-      { type:"belief", text:"真実を暴く", target:"research" },
-      { type:"flaw",   text:"絶対に働かない", target:"action" }
-    ];
+  // 固定3つ：信条2 + 欠陥1
+  if(!Array.isArray(state.traits)) state.traits = [];
+
+  // 既存を信条/欠陥で分けて再構成（余計な分は捨てる）
+  const beliefs = state.traits.filter(t=>t.type==="belief").slice(0,2);
+  const flaws   = state.traits.filter(t=>t.type==="flaw").slice(0,1);
+
+  while(beliefs.length < 2){
+    beliefs.push({ type:"belief", text:"（信条）", target:"action" });
   }
+  while(flaws.length < 1){
+    flaws.push({ type:"flaw", text:"（欠陥）", target:"action" });
+  }
+
+  state.traits = [...beliefs, ...flaws];
 }
 
 function traitTargetLabel(t){
@@ -381,14 +379,22 @@ function renderTraits(){
   ensureDefaultTraits();
   const box = $("traitList");
   box.innerHTML = "";
+
   state.traits.forEach((t, idx)=>{
     const row = document.createElement("div");
     row.className = "item";
+
     row.innerHTML = `
       <div>
         <span class="pill">${t.type==="belief" ? "信条(+1d6)" : "欠陥(-1d6)"}</span>
-        <span class="mono">${escapeHtml(t.text)}</span>
+        <input
+          data-trait-text="${idx}"
+          value="${escapeHtml(t.text)}"
+          placeholder="${t.type==="belief" ? "信条を書く" : "欠陥を書く"}"
+          style="width:100%; margin-top:6px;"
+        />
       </div>
+
       <div>
         <select data-trait-target="${idx}">
           ${["research","social","support","attack","action","ability"].map(k=>`
@@ -396,9 +402,11 @@ function renderTraits(){
           `).join("")}
         </select>
       </div>
+
       <div class="mini"></div>
-      <div class="del"><button class="danger" data-del-trait="${idx}">削除</button></div>
+      <div class="del"></div>
     `;
+
     box.appendChild(row);
   });
 
@@ -409,6 +417,16 @@ function renderTraits(){
       recalcAll();
     };
   });
+
+  box.querySelectorAll("[data-trait-text]").forEach(inp=>{
+    inp.oninput = ()=>{
+      const idx = Number(inp.dataset.traitText);
+      state.traits[idx].text = inp.value;
+      // 文字変えただけなら再計算いらないけど、JSON/表示更新したいので recalc
+      recalcAll();
+    };
+  });
+}
 
   box.querySelectorAll("[data-del-trait]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -611,27 +629,6 @@ $("btnAddRel").onclick = ()=>{
   if(!name) return;
   state.rels.push({ name, note:($("rel_note").value||"").trim(), val:Number($("rel_val").value||0) });
   $("rel_name").value = ""; $("rel_note").value = ""; $("rel_val").value = "0";
-  recalcAll();
-};
-
-$("btnAddBelief").onclick = ()=>{
-  // limit to 2 beliefs
-  const beliefs = state.traits.filter(t=>t.type==="belief").length;
-  if(beliefs >= 2) { alert("信条は2つまで（MVP制限）"); return; }
-  state.traits.push({ type:"belief", text:"（信条）", target:"action" });
-  recalcAll();
-};
-
-$("btnAddFlaw").onclick = ()=>{
-  const flaws = state.traits.filter(t=>t.type==="flaw").length;
-  if(flaws >= 1) { alert("欠陥は1つまで（MVP制限）"); return; }
-  state.traits.push({ type:"flaw", text:"（欠陥）", target:"action" });
-  recalcAll();
-};
-
-$("btnResetTraits").onclick = ()=>{
-  state.traits = [];
-  ensureDefaultTraits();
   recalcAll();
 };
 
