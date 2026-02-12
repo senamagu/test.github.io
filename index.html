@@ -572,37 +572,42 @@ function renderTraits(){
   const box = $("traitList"); box.innerHTML = "";
 
   state.traits.forEach((t, idx)=>{
-    const wrap = document.createElement("div");
-    wrap.className = "card traitCard"; // ← 普通のcardにする
-
     const title = (t.type==="belief") ? "信条" : "欠陥";
     const badge = (t.type==="belief") ? "+1d6" : "-1d6";
 
+    const wrap = document.createElement("div");
+    wrap.className = "traitPanel"; // ← cardじゃない。特徴boxの中身用
+
     wrap.innerHTML = `
-      <h3 class="traitTitle">${title}<span class="pill">${badge}</span></h3>
+      <details class="traitDetails" ${t.type==="belief" ? "open" : ""}>
+        <summary class="traitSummary">
+          <span class="traitSummaryTitle">${title}</span>
+          <span class="pill">${badge}</span>
+          <span class="traitSummaryMini">${escAttr(t.text || "（未入力）")}</span>
+        </summary>
 
-      <div class="row3">
-        <div>
-          <label>${title}</label>
-          <input data-trait-text="${idx}" value="${escAttr(t.text)}" />
+        <div class="traitBody">
+          <div class="row2">
+            <div>
+              <label>${title}</label>
+              <input data-trait-text="${idx}" value="${escAttr(t.text)}" />
+            </div>
+            <div>
+              <label>対象</label>
+              <select data-trait-target="${idx}">
+                ${["research","social","support","attack","action","ability"].map(k=>`
+                  <option value="${k}" ${t.target===k?"selected":""}>${traitTargetLabel(k)}</option>
+                `).join("")}
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>詳細メモ</label>
+            <textarea data-trait-detail="${idx}" class="mono" style="min-height:110px;">${t.detail ?? ""}</textarea>
+          </div>
         </div>
-
-        <div>
-          <label>対象</label>
-          <select data-trait-target="${idx}">
-            ${["research","social","support","attack","action","ability"].map(k=>`
-              <option value="${k}" ${t.target===k?"selected":""}>${traitTargetLabel(k)}</option>
-            `).join("")}
-          </select>
-        </div>
-
-        <div></div>
-      </div>
-
-      <div>
-        <label>詳細メモ</label>
-        <textarea data-trait-detail="${idx}" class="mono" style="min-height:90px;">${t.detail ?? ""}</textarea>
-      </div>
+      </details>
     `;
 
     box.appendChild(wrap);
@@ -620,6 +625,11 @@ function renderTraits(){
     inp.oninput = ()=>{
       const idx = Number(inp.dataset.traitText);
       state.traits[idx].text = inp.value;
+
+      // summaryの（未入力）更新
+      const mini = inp.closest("details")?.querySelector(".traitSummaryMini");
+      if(mini) mini.textContent = inp.value.trim() ? inp.value.trim() : "（未入力）";
+
       makePalette(); makeJsonOut();
     };
   });
