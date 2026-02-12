@@ -3,581 +3,695 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Template Player (Slots + Texture Swap)</title>
+  <title>CSBM-TRPG キャラシ&チャパレ出力</title>
   <style>
-    html,body { margin:0; height:100%; background:#111; color:#ddd; font-family:system-ui; }
-    #ui {
-      position:fixed; top:10px; left:10px; right:10px;
-      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
-      z-index:10; background:rgba(0,0,0,.35); padding:10px; border-radius:10px;
-      backdrop-filter: blur(6px);
+    :root { --bg:#0f1115; --panel:#171a21; --text:#e7e9ee; --muted:#a9b0bf; --line:#2a3040; --acc:#7aa2ff; }
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui, -apple-system, "Segoe UI", sans-serif; }
+    header{ padding:16px 18px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(15,17,21,.92); backdrop-filter: blur(8px); }
+    h1{ font-size:16px; margin:0 0 6px; }
+    .sub{ color:var(--muted); font-size:12px; }
+    main{ padding:16px 18px; max-width:1100px; margin:0 auto; display:grid; gap:14px; grid-template-columns: 1fr 1fr; }
+    .card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px; }
+    .card h2{ font-size:14px; margin:0 0 10px; }
+    label{ display:block; font-size:12px; color:var(--muted); margin:8px 0 4px; }
+    input, select, textarea, button{
+      font:inherit; color:var(--text);
+      background:#0f1219; border:1px solid var(--line);
+      border-radius:10px; padding:9px 10px;
+      outline:none;
     }
-    button,input,select { padding:6px 10px; }
-    #stage { width:100vw; height:100vh; }
-    .label { opacity:.8; font-size:12px; }
+    textarea{ width:100%; min-height:140px; resize:vertical; }
+    input[type="number"]{ width:100%; }
+    .row{ display:grid; gap:10px; grid-template-columns: repeat(5, 1fr); }
+    .row2{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+    .row3{ display:grid; gap:10px; grid-template-columns: 2fr 1fr 1fr; }
+    .row4{ display:grid; gap:10px; grid-template-columns: 2fr 1fr 1fr 1fr; }
+    .btns{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    button{ cursor:pointer; }
+    button.primary{ border-color:rgba(122,162,255,.45); background:rgba(122,162,255,.12); }
+    button.danger{ border-color:rgba(255,90,90,.35); background:rgba(255,90,90,.10); }
+    .mini{ font-size:12px; color:var(--muted); }
+    .list{ display:grid; gap:8px; margin-top:10px; }
+    .item{ display:grid; gap:8px; grid-template-columns: 1.6fr 1fr 1fr .8fr; align-items:center; }
+    .item .del{ justify-self:end; }
+    .kpi{ display:grid; gap:8px; grid-template-columns: repeat(4, 1fr); }
+    .kpi div{ background:#0f1219; border:1px solid var(--line); border-radius:10px; padding:10px; }
+    .kpi .v{ font-size:18px; font-weight:700; }
+    .kpi .k{ font-size:11px; color:var(--muted); }
+    .full{ grid-column: 1 / -1; }
+    @media (max-width: 960px){
+      main{ grid-template-columns: 1fr; }
+      .row{ grid-template-columns: repeat(2,1fr); }
+      .kpi{ grid-template-columns: repeat(2,1fr); }
+    }
+    .pill{ display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:11px; margin-left:6px; }
+    .hint{ color:var(--muted); font-size:12px; line-height:1.5; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   </style>
 </head>
 <body>
-  <div id="ui">
-    <div>
-      <div class="label">テンプレJSON</div>
-      <input id="jsonFile" type="file" accept="application/json" />
+<header>
+  <h1>CSBM-TRPG キャラシ & ココフォリアチャパレ出力</h1>
+  <div class="sub">MVP：入力→自動計算→チャパレ→JSON保存/読込 / 能力値ランダム（合計15・各1〜5）</div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>基本情報</h2>
+    <div class="row2">
+      <div>
+        <label>キャラ名</label>
+        <input id="name" placeholder="例：霧島レン" />
+      </div>
+      <div>
+        <label>概念 / 職業</label>
+        <input id="role" placeholder="例：調査員 / 学生 / 傭兵" />
+      </div>
     </div>
 
-    <div>
-      <div class="label">内蔵テンプレ（選んだ瞬間に適用）</div>
-      <select id="builtinSelect"></select>
+    <label>一言タグ</label>
+    <input id="tagline" placeholder="例：真実中毒 / 仲間最優先" />
+
+    <div class="btns">
+      <button class="primary" id="btnRandom">能力値ランダム</button>
+      <button id="btnRecalc">再計算</button>
     </div>
 
-    <button id="exportTemplate">今のテンプレを書き出し</button>
+    <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
 
-    <div>
-      <div class="label">差し替え先スロット</div>
-      <select id="slotSelect"></select>
+    <h2 style="margin-top:0;">能力値 <span class="pill">1〜5</span></h2>
+    <div class="row">
+      <div><label>身体</label><input id="stat_body" type="number" min="1" max="5" value="3"></div>
+      <div><label>知性</label><input id="stat_int"  type="number" min="1" max="5" value="3"></div>
+      <div><label>社交</label><input id="stat_soc"  type="number" min="1" max="5" value="3"></div>
+      <div><label>精神</label><input id="stat_spi"  type="number" min="1" max="5" value="3"></div>
+      <div><label>運</label><input id="stat_luk"  type="number" min="1" max="5" value="3"></div>
     </div>
 
-    <div>
-      <div class="label">パーツフォルダ一括読み込み</div>
-      <input id="folder" type="file" webkitdirectory multiple />
-    </div>
-    <button id="applyFolder">フォルダを全部反映</button>
-
-    <div>
-      <div class="label">画像(PNG/WebP/JPG)</div>
-      <input id="imgFile" type="file" accept="image/*" />
+    <div class="kpi" style="margin-top:12px;">
+      <div><div class="v" id="kpi_hp">-</div><div class="k">HP = 身体 + 精神 + 5</div></div>
+      <div><div class="v" id="kpi_db">-</div><div class="k">DB = 身体 - 3</div></div>
+      <div><div class="v" id="kpi_mv">-</div><div class="k">MV = 身体 + 運</div></div>
+      <div><div class="v" id="kpi_mp">-</div><div class="k">MP = 知性 + 精神 + 5（拡張）</div></div>
     </div>
 
-    <button id="applyImg">差し替え</button>
-    <button id="resetSlot">このスロットをリセット</button>
+    <p class="hint" style="margin-top:12px;">
+      補正ダイス変換：<span class="mono">合計ポイント → 0:無し / 1-2:d2 / 3-4:d4 / 5+:d6</span>（最大d6）<br>
+      ※この変換は後で好きに調整できる。今はMVPの“動く形”を優先。
+    </p>
+  </section>
 
-    <span style="flex:1"></span>
+  <section class="card">
+    <h2>特徴（信条×2 / 欠陥×1）</h2>
+    <div class="hint">信条は対象ダイスに <b>+1d6</b>、欠陥は <b>-1d6</b>（場面により適用）。</div>
 
-    <button id="play">Play</button>
-    <button id="pause">Pause</button>
-    <button id="restart">Restart</button>
-  </div>
+    <div class="list" id="traitList"></div>
+    <div class="btns">
+      <button class="primary" id="btnAddBelief">信条を追加</button>
+      <button class="danger" id="btnAddFlaw">欠陥を追加</button>
+      <button id="btnResetTraits">初期化</button>
+    </div>
+  </section>
 
-  <div id="stage"></div>
+  <section class="card">
+    <h2>分野（得意/苦手）</h2>
+    <div class="hint">各3つ想定。ジャンル：知識 / 社交 / 支援 / 戦闘 / 行動。得意:+2pt / 苦手:-2pt を合算して補正ダイス化。</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
+    <div class="row4">
+      <div>
+        <label>名称</label>
+        <input id="skill_name" placeholder="例：潜入 / 化学 / 交渉" />
+      </div>
+      <div>
+        <label>ジャンル</label>
+        <select id="skill_cat">
+          <option value="knowledge">知識</option>
+          <option value="social">社交</option>
+          <option value="support">支援</option>
+          <option value="combat">戦闘</option>
+          <option value="action">行動</option>
+        </select>
+      </div>
+      <div>
+        <label>種別</label>
+        <select id="skill_kind">
+          <option value="good">得意 (+2pt)</option>
+          <option value="bad">苦手 (-2pt)</option>
+        </select>
+      </div>
+      <div style="align-self:end;">
+        <button class="primary" id="btnAddSkill" style="width:100%;">追加</button>
+      </div>
+    </div>
 
-  <!-- ★重要：top-level await を使うので module -->
-  <script type="module">
-    // ---- Helpers ----
-    const clamp01 = (x) => Math.max(0, Math.min(1, x));
-    const toRad = (deg) => deg * Math.PI / 180;
+    <div class="list" id="skillList"></div>
+  </section>
 
-    function hexToRgba(hex) {
-      if (typeof hex !== "string" || !hex.startsWith("#")) return { r:255, g:255, b:255, a:1 };
-      const h = hex.slice(1);
-      if (h.length === 8) {
-        const a = parseInt(h.slice(0,2), 16) / 255;
-        const r = parseInt(h.slice(2,4), 16);
-        const g = parseInt(h.slice(4,6), 16);
-        const b = parseInt(h.slice(6,8), 16);
-        return { r,g,b,a };
-      }
-      if (h.length === 6) {
-        const r = parseInt(h.slice(0,2), 16);
-        const g = parseInt(h.slice(2,4), 16);
-        const b = parseInt(h.slice(4,6), 16);
-        return { r,g,b,a:1 };
-      }
-      return { r:255, g:255, b:255, a:1 };
-    }
-    const rgbToTint = (r,g,b) => (r<<16) | (g<<8) | b;
+  <section class="card">
+    <h2>所持品（最大3枠 / 合計+3）</h2>
+    <div class="hint">所持品はジャンルに紐づけてpt加算（例：辞典+1→知識、拳銃+2→戦闘）。</div>
 
-    // ---- Cubic Bezier easing (minimal) ----
-    function makeCubicBezier(x1, y1, x2, y2) {
-      const cx = 3*x1, bx = 3*(x2-x1)-cx, ax = 1-cx-bx;
-      const cy = 3*y1, by = 3*(y2-y1)-cy, ay = 1-cy-by;
-      const sampleX = (t)=>((ax*t+bx)*t+cx)*t;
-      const sampleY = (t)=>((ay*t+by)*t+cy)*t;
-      const derivX  = (t)=>(3*ax*t+2*bx)*t+cx;
+    <div class="row4">
+      <div>
+        <label>名称</label>
+        <input id="item_name" placeholder="例：救急箱 / 辞典 / 拳銃" />
+      </div>
+      <div>
+        <label>ジャンル</label>
+        <select id="item_cat">
+          <option value="knowledge">知識</option>
+          <option value="social">社交</option>
+          <option value="support">支援</option>
+          <option value="combat">戦闘</option>
+          <option value="action">行動</option>
+        </select>
+      </div>
+      <div>
+        <label>補正pt</label>
+        <select id="item_pt">
+          <option value="0">0</option>
+          <option value="1">+1</option>
+          <option value="2">+2</option>
+          <option value="3">+3</option>
+        </select>
+      </div>
+      <div style="align-self:end;">
+        <button class="primary" id="btnAddItem" style="width:100%;">追加</button>
+      </div>
+    </div>
 
-      function solveX(x) {
-        let t = x;
-        for (let i=0;i<6;i++){
-          const dx = sampleX(t)-x;
-          const d  = derivX(t);
-          if (Math.abs(dx) < 1e-6) return t;
-          if (Math.abs(d)  < 1e-6) break;
-          t = t - dx/d;
-        }
-        let t0=0,t1=1; t=x;
-        for (let i=0;i<20;i++){
-          const dx = sampleX(t)-x;
-          if (Math.abs(dx) < 1e-6) return t;
-          if (dx > 0) t1=t; else t0=t;
-          t = (t0+t1)/2;
-        }
-        return t;
-      }
-      return (x)=>{
-        x = clamp01(x);
-        const t = solveX(x);
-        return clamp01(sampleY(t));
-      };
-    }
-    function parseEase(e) {
-      if (!e) return null;
-      const m = String(e).match(/^cubicBezier\(([-\d.]+),([-\d.]+),([-\d.]+),([-\d.]+)\)$/);
-      if (!m) return null;
-      return makeCubicBezier(+m[1],+m[2],+m[3],+m[4]);
-    }
+    <div class="list" id="itemList"></div>
+    <div class="mini" id="itemCapInfo" style="margin-top:8px;"></div>
+  </section>
 
-    // ---- Keyframe sampling ----
-    function sampleTrack(track, t) {
-      if (!track || track.length === 0) return null;
-      if (t <= track[0].t) return track[0].v;
-      if (t >= track[track.length-1].t) return track[track.length-1].v;
+  <section class="card">
+    <h2>関係</h2>
+    <div class="hint">対象が関係リストにいる時のみ適用（社交/支援などに +数値）。</div>
 
-      let i=0;
-      for (; i<track.length-1; i++){
-        if (t >= track[i].t && t <= track[i+1].t) break;
-      }
-      const k0 = track[i], k1 = track[i+1];
-      const span = (k1.t - k0.t) || 1e-6;
-      let u = (t - k0.t) / span;
+    <div class="row4">
+      <div>
+        <label>名前</label>
+        <input id="rel_name" placeholder="例：相棒 / 母 / 上司" />
+      </div>
+      <div>
+        <label>内容</label>
+        <input id="rel_note" placeholder="例：信頼 / 嫌い / 借り" />
+      </div>
+      <div>
+        <label>重要度</label>
+        <select id="rel_val">
+          <option value="-3">-3</option><option value="-2">-2</option><option value="-1">-1</option>
+          <option value="0" selected>0</option>
+          <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option>
+        </select>
+      </div>
+      <div style="align-self:end;">
+        <button class="primary" id="btnAddRel" style="width:100%;">追加</button>
+      </div>
+    </div>
 
-      const easeFn = parseEase(k1.ease) || parseEase(k0.ease);
-      if (easeFn) u = easeFn(u);
+    <div class="list" id="relList"></div>
+  </section>
 
-      const v0 = k0.v, v1 = k1.v;
+  <section class="card full">
+    <h2>チャパレ（ココフォリア用）</h2>
+    <div class="row2">
+      <div>
+        <label>環境補正（固定値）</label>
+        <input id="env_fixed" type="number" value="0" min="-3" max="3" />
+        <div class="mini">例：暗闇 -1 / 応援 +1</div>
 
-      if (typeof v0 === "number" && typeof v1 === "number")
-        return v0 + (v1 - v0) * u;
+        <label>関係補正を適用する対象名（任意）</label>
+        <input id="rel_target" placeholder="例：相棒（この名前が関係にあれば加算）" />
+        <div class="mini">空なら関係補正はチャパレには付けず、GM判断で足す運用。</div>
 
-      if (Array.isArray(v0) && Array.isArray(v1)) {
-        const n = Math.min(v0.length, v1.length);
-        const out = new Array(n);
-        for (let j=0; j<n; j++) out[j] = v0[j] + (v1[j] - v0[j]) * u;
-        return out;
-      }
+        <div class="btns">
+          <button class="primary" id="btnMakePalette">チャパレ生成</button>
+          <button id="btnCopy">コピー</button>
+        </div>
+      </div>
 
-      if (typeof v0 === "string" && typeof v1 === "string")
-        return (u < 0.5) ? v0 : v1;
+      <div>
+        <label>出力</label>
+        <textarea id="palette" class="mono" readonly></textarea>
+      </div>
+    </div>
+  </section>
 
-      return v0;
-    }
+  <section class="card full">
+    <h2>JSON保存 / 読込</h2>
+    <div class="row2">
+      <div>
+        <label>保存（ここをコピーして保存）</label>
+        <textarea id="json_out" class="mono" readonly></textarea>
+        <div class="btns">
+          <button id="btnSave">JSON生成</button>
+        </div>
+      </div>
+      <div>
+        <label>読込（ここに貼って読込）</label>
+        <textarea id="json_in" class="mono" placeholder='{"name":"..."}'></textarea>
+        <div class="btns">
+          <button class="primary" id="btnLoad">JSON読込</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
 
-    // ---- Pixi setup ----
-    const app = new PIXI.Application();
-    await app.init({ resizeTo: window, backgroundAlpha: 0, antialias: true });
-    document.getElementById("stage").appendChild(app.canvas);
+<script>
+/** ---------- helpers ---------- **/
+const $ = (id)=>document.getElementById(id);
+const clamp = (n,min,max)=>Math.max(min, Math.min(max, n));
+const sign = (n)=> n>0?"+":(n<0?"-":"");
+const catLabel = (c)=>({
+  knowledge:"知識", social:"社交", support:"支援", combat:"戦闘", action:"行動"
+}[c] ?? c);
 
-    // ---- Builtin templates ----
-    const BUILTIN_TEMPLATES = [
-      {
-        id: "static_base",
-        name: "素体（静止）",
-        data: {
-          meta: { title: "Chibi Template", fps: 12, duration: 2, loop: true },
-          slots: {
-            "effect/exclamation": { label: "！マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 1000 },
-            "effect/question":    { label: "？マーク", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 999 },
-            "effect/heart":       { label: "ハート",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 998 },
-            "effect/star":        { label: "スター",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 997 },
-            "effect/impact":      { label: "衝撃",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 996 },
-            "effect/notice":      { label: "気付き",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 995 },
+function ptsToDieSize(pt){
+  // pt can be negative; we return {die: number|null, neg:boolean}
+  const neg = pt < 0;
+  const a = Math.abs(pt);
+  if(a <= 0) return { die:null, neg:false };
+  if(a <= 2) return { die:2, neg };
+  if(a <= 4) return { die:4, neg };
+  return { die:6, neg }; // cap at d6
+}
 
-            "outer/head/catyusha": { label: "カチューシャ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 981 },
-            "outer/head/headphone":{ label: "ヘッドホン",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 980 },
-            "outer/face/square":   { label: "四角",         baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 979 },
-            "outer/face/glasses":  { label: "眼鏡",         baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 978 },
-            "outer/body/muffler":  { label: "マフラー",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 977 },
+function fmtDie(dieObj){
+  if(!dieObj.die) return "";
+  return (dieObj.neg ? "-1d" : "+1d") + dieObj.die;
+}
 
-            "outer/right_hand/hand":  { label: "右手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 970 },
-            "outer/right_hand/stick": { label: "右手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 969 },
-            "outer/right_hand/ball":  { label: "右手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 968 },
+function sumBy(list, fn){ return list.reduce((acc,x)=>acc+fn(x),0); }
 
-            "outer/left_hand/hand":  { label: "左手 手", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 967 },
-            "outer/left_hand/stick": { label: "左手 スティック", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 966 },
-            "outer/left_hand/ball":  { label: "左手 ボール", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 965 },
+/** ---------- state ---------- **/
+const state = {
+  skills: [], // {name, cat, kind} kind:good|bad
+  items: [],  // {name, cat, pt}
+  rels: [],   // {name, note, val}
+  traits: []  // {type:belief|flaw, text, target} target: research/social/support/attack/action/ability
+};
 
-            "emotion/angry":     { label: "怒",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 930 },
-            "emotion/doubt":     { label: "疑",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 929 },
-            "emotion/blush":     { label: "赤面", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 928 },
-            "emotion/ear_blush": { label: "耳赤", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 927 },
-            "emotion/cheek":     { label: "ほっぺ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 926 },
-            "emotion/sweat/3":   { label: "汗 3段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 925 },
-            "emotion/sweat/2":   { label: "汗 2段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 924 },
-            "emotion/sweat/1":   { label: "汗 1段階", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 923 },
-            "emotion/tears":     { label: "涙", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 922 },
-
-            "mouth/oo":        { label: "おお", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 900 },
-            "mouth/o":         { label: "お",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 899 },
-            "mouth/e":         { label: "え",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 898 },
-            "mouth/u":         { label: "う",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 897 },
-            "mouth/yu":        { label: "ゆ",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 896 },
-            "mouth/ni":        { label: "に",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 895 },
-            "mouth/i":         { label: "い",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 894 },
-            "mouth/a":         { label: "あ",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 893 },
-            "mouth/n_smile":   { label: "んぃ🙂", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 892 },
-            "mouth/n_frown":   { label: "んぅ🙁", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 891 },
-            "mouth/n_neutral": { label: "ん😶",  baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 890 },
-
-            "eye/right/upper_close": { label: "目 右 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 880 },
-            "eye/right/lower_close": { label: "目 右 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 879 },
-            "eye/right/normal":      { label: "目 右 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 878 },
-            "eye/right/surprise":    { label: "目 右 驚",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 877 },
-            "eye/right/thin":        { label: "目 右 細",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 876 },
-
-            "eye/left/upper_close":  { label: "目 左 上閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 875 },
-            "eye/left/lower_close":  { label: "目 左 下閉", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 874 },
-            "eye/left/normal":       { label: "目 左 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 873 },
-            "eye/left/surprise":     { label: "目 左 驚",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 872 },
-            "eye/left/thin":         { label: "目 左 細",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 871 },
-
-            "brow/right/kiri":     { label: "眉 右 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 860 },
-            "brow/right/komari":   { label: "眉 右 困",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 859 },
-            "brow/right/normal":   { label: "眉 右 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 858 },
-            "brow/right/parallel": { label: "眉 右 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 857 },
-
-            "brow/left/kiri":      { label: "眉 左 キリ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 856 },
-            "brow/left/komari":    { label: "眉 左 困",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 855 },
-            "brow/left/normal":    { label: "眉 左 普",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 854 },
-            "brow/left/parallel":  { label: "眉 左 平行", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 853 },
-
-            "hair/front_center": { label: "前髪センター", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 820 },
-            "hair/front_side":   { label: "前髪サイド",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 819 },
-            "hair/side_1":       { label: "横髪1",        baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 818 },
-            "hair/side_2":       { label: "横髪2",        baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 817 },
-
-            "facecolor/shadow": { label: "影",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 780 },
-            "facecolor/pale":   { label: "青ざめ", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 779 },
-            "facecolor/blush":  { label: "赤面",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 778 },
-            "facecolor/red":    { label: "赤み",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 777 },
-            "facecolor/none":   { label: "無",     baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 776 },
-
-            "face/face": { label: "顔", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 740 },
-
-            "hair2/back": { label: "後ろ髪", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 700 },
-
-            "body/jacket":  { label: "上着", baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 650 },
-            "body/clothes": { label: "服",   baseSize: { w: 1024, h: 1024 }, fit: "contain", z: 649 }
-          },
-          tracks: {}
-        }
-      },
-
-      {
-        id: "bounce_simple",
-        name: "テスト：ふわっと拡大（口）",
-        data: {
-          meta: { title: "Bounce Test", fps: 12, duration: 2, loop: true },
-          slots: {
-            "mouth/o":  { label:"お",  baseSize:{w:1024,h:1024}, fit:"contain", z:899 },
-            "face/face":{ label:"顔", baseSize:{w:1024,h:1024}, fit:"contain", z:740 }
-          },
-          tracks: {
-            "mouth/o": {
-              position: [{ t:0, v:[540, 620] }],
-              scale: [
-                { t:0.0, v:[1.0, 1.0] },
-                { t:0.5, v:[1.15, 1.15], ease:"cubicBezier(0,0,0,1)" },
-                { t:1.0, v:[1.0, 1.0], ease:"cubicBezier(0,0,0,1)" }
-              ]
-            },
-            "face/face": { position: [{ t:0, v:[540, 540] }] }
-          }
-        }
-      }
+function ensureDefaultTraits(){
+  // exactly 2 beliefs and 1 flaw
+  if(state.traits.length === 0){
+    state.traits = [
+      { type:"belief", text:"絶対に仲間を守る", target:"support" },
+      { type:"belief", text:"真実を暴く", target:"research" },
+      { type:"flaw",   text:"絶対に働かない", target:"action" }
     ];
+  }
+}
 
-    // ---- Player state ----
-    let template = null;
-    let playing = true;
-    let timeSec = 0;
-    let durationSec = 2;
+function traitTargetLabel(t){
+  return ({
+    research:"調査ダイス",
+    social:"社交ダイス",
+    support:"支援ダイス",
+    attack:"攻撃ダイス",
+    action:"行動ダイス",
+    ability:"能力ダイス"
+  }[t] ?? t);
+}
 
-    // slotId -> { container, placeholder, sprite|null }
-    const slotNodes = new Map();
+/** ---------- rendering ---------- **/
+function renderSkills(){
+  const box = $("skillList");
+  box.innerHTML = "";
+  state.skills.forEach((s, idx)=>{
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML = `
+      <div><span class="mono">${escapeHtml(s.name)}</span> <span class="pill">${catLabel(s.cat)}</span></div>
+      <div class="mini">${s.kind==="good" ? "得意(+2pt)" : "苦手(-2pt)"}</div>
+      <div class="mini"></div>
+      <div class="del"><button class="danger" data-del-skill="${idx}">削除</button></div>
+    `;
+    box.appendChild(row);
+  });
+  box.querySelectorAll("[data-del-skill]").forEach(btn=>{
+    btn.onclick = ()=>{ state.skills.splice(Number(btn.dataset.delSkill),1); recalcAll(); };
+  });
+}
 
-    function clearScene() {
-      app.stage.removeChildren();
-      slotNodes.clear();
-      document.getElementById("slotSelect").innerHTML = "";
-    }
+function renderItems(){
+  const box = $("itemList");
+  box.innerHTML = "";
+  state.items.forEach((it, idx)=>{
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML = `
+      <div><span class="mono">${escapeHtml(it.name)}</span> <span class="pill">${catLabel(it.cat)}</span></div>
+      <div class="mini">pt ${it.pt>=0?("+"+it.pt):it.pt}</div>
+      <div class="mini"></div>
+      <div class="del"><button class="danger" data-del-item="${idx}">削除</button></div>
+    `;
+    box.appendChild(row);
+  });
+  box.querySelectorAll("[data-del-item]").forEach(btn=>{
+    btn.onclick = ()=>{ state.items.splice(Number(btn.dataset.delItem),1); recalcAll(); };
+  });
 
-    function addSlotOption(slotId, label) {
-      const sel = document.getElementById("slotSelect");
-      const opt = document.createElement("option");
-      opt.value = slotId;
-      opt.textContent = label ? `${label} (${slotId})` : slotId;
-      sel.appendChild(opt);
-    }
+  const totalPt = sumBy(state.items, x=>x.pt);
+  const cap = totalPt <= 3 && state.items.length <= 3;
+  $("itemCapInfo").textContent = `現在：枠 ${state.items.length}/3、補正pt合計 ${totalPt}/3 ${cap ? "" : "（上限超え）"}`;
+}
 
-    function buildPlaceholder(slotId, slot, tracks) {
-      const g = new PIXI.Graphics();
-      const w = 220, h = 140;
+function renderRels(){
+  const box = $("relList");
+  box.innerHTML = "";
+  state.rels.forEach((r, idx)=>{
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML = `
+      <div><span class="mono">${escapeHtml(r.name)}</span> <span class="pill">${escapeHtml(r.note||"関係")}</span></div>
+      <div class="mini">${r.val>=0?("+"+r.val):r.val}</div>
+      <div class="mini"></div>
+      <div class="del"><button class="danger" data-del-rel="${idx}">削除</button></div>
+    `;
+    box.appendChild(row);
+  });
+  box.querySelectorAll("[data-del-rel]").forEach(btn=>{
+    btn.onclick = ()=>{ state.rels.splice(Number(btn.dataset.delRel),1); recalcAll(); };
+  });
+}
 
-      const fc = (tracks.fillColor && tracks.fillColor[0]) ? tracks.fillColor[0].v : slot.fillColor;
-      const rgba = hexToRgba(fc || "#FFFFFFFF");
+function renderTraits(){
+  ensureDefaultTraits();
+  const box = $("traitList");
+  box.innerHTML = "";
+  state.traits.forEach((t, idx)=>{
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML = `
+      <div>
+        <span class="pill">${t.type==="belief" ? "信条(+1d6)" : "欠陥(-1d6)"}</span>
+        <span class="mono">${escapeHtml(t.text)}</span>
+      </div>
+      <div>
+        <select data-trait-target="${idx}">
+          ${["research","social","support","attack","action","ability"].map(k=>`
+            <option value="${k}" ${t.target===k?"selected":""}>${traitTargetLabel(k)}</option>
+          `).join("")}
+        </select>
+      </div>
+      <div class="mini"></div>
+      <div class="del"><button class="danger" data-del-trait="${idx}">削除</button></div>
+    `;
+    box.appendChild(row);
+  });
 
-      g.clear();
-      g.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
-      g.drawRect(-w/2, -h/2, w, h);
-      g.endFill();
-
-      return g;
-    }
-
-    function buildSceneFromTemplate(tpl) {
-      clearScene();
-      template = tpl;
-      durationSec = tpl?.meta?.duration ?? 2;
-
-      app.stage.sortableChildren = true;
-
-      const slots = tpl.slots || {};
-      const cx = app.screen.width / 2;
-      const cy = app.screen.height / 2;
-
-      for (const [slotId, slot] of Object.entries(slots)) {
-        const tracks = tpl.tracks?.[slotId] || {};
-        const c = new PIXI.Container();
-
-        // 初期は中央に置いとく（positionトラックがあるなら後で上書き）
-        c.position.set(cx, cy);
-
-        const placeholder = buildPlaceholder(slotId, slot, tracks);
-        c.addChild(placeholder);
-
-        c.zIndex = slot.z ?? 0;
-        app.stage.addChild(c);
-
-        slotNodes.set(slotId, { container: c, placeholder, sprite: null });
-        addSlotOption(slotId, slot.label || slotId);
-      }
-
-      timeSec = 0;
-      applyAtTime(0);
-    }
-
-    function fitSpriteToBaseSize(sprite, baseSize, fit = "contain") {
-      if (!baseSize || !baseSize.w || !baseSize.h) return;
-
-      const tw = sprite.texture.width;
-      const th = sprite.texture.height;
-      if (!tw || !th) return;
-
-      const sx = baseSize.w / tw;
-      const sy = baseSize.h / th;
-
-      if (fit === "stretch") {
-        sprite.scale.set(sx, sy);
-        return;
-      }
-      const s = (fit === "cover") ? Math.max(sx, sy) : Math.min(sx, sy);
-      sprite.scale.set(s, s);
-    }
-
-    function setSlotTexture(slotId, texture) {
-      const entry = slotNodes.get(slotId);
-      if (!entry) return;
-
-      const slot = template?.slots?.[slotId] || {};
-
-      if (entry.sprite) {
-        entry.container.removeChild(entry.sprite);
-        entry.sprite.destroy({ children: true });
-        entry.sprite = null;
-      }
-
-      entry.placeholder.visible = false;
-
-      const sp = new PIXI.Sprite(texture);
-      sp.anchor.set(0.5, 0.5);
-
-      fitSpriteToBaseSize(
-        sp,
-        slot.baseSize || { w: 1024, h: 1024 },
-        slot.fit || "contain"
-      );
-
-      entry.container.addChild(sp);
-      entry.sprite = sp;
-    }
-
-    function resetSlot(slotId) {
-      const entry = slotNodes.get(slotId);
-      if (!entry) return;
-      if (entry.sprite) {
-        entry.container.removeChild(entry.sprite);
-        entry.sprite.destroy({ children: true });
-        entry.sprite = null;
-      }
-      entry.placeholder.visible = true;
-    }
-
-    function applyAtTime(t) {
-      if (!template) return;
-
-      for (const [slotId, entry] of slotNodes.entries()) {
-        const c = entry.container;
-        const tr = template.tracks?.[slotId] || {};
-
-        const pos = sampleTrack(tr.position, t);
-        if (pos) c.position.set(pos[0], pos[1]);
-
-        const sc = sampleTrack(tr.scale, t);
-        if (sc) c.scale.set(sc[0], sc[1]);
-
-        const rot = sampleTrack(tr.rotation, t);
-        if (rot != null) c.rotation = toRad(rot);
-
-        const op = sampleTrack(tr.opacity, t);
-        if (op != null) c.alpha = op;
-
-        const sk = sampleTrack(tr.skew, t);
-        if (sk) c.skew.set(sk[0], sk[1]);
-
-        // spriteが無いときだけ placeholder を色変化させる（任意）
-        if (!entry.sprite) {
-          const col = sampleTrack(tr.fillColor, t);
-          if (col) {
-            const rgba = hexToRgba(col);
-            const w = 220, h = 140;
-            entry.placeholder.clear();
-            entry.placeholder.beginFill(rgbToTint(rgba.r, rgba.g, rgba.b), rgba.a);
-            entry.placeholder.drawRect(-w/2, -h/2, w, h);
-            entry.placeholder.endFill();
-          }
-        }
-      }
-    }
-
-    // ---- Folder mapping ----
-    function slotIdFromFile(file) {
-      const rel = file.webkitRelativePath || file.name;
-      const p = rel.replace(/\\/g, "/");
-      const afterRoot = p.includes("/") ? p.slice(p.indexOf("/") + 1) : p;
-      return afterRoot.replace(/\.[^.]+$/, "");
-    }
-
-    async function loadTextureFromFile(file) {
-      const url = URL.createObjectURL(file);
-      const tex = await PIXI.Assets.load(url);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      return tex;
-    }
-
-    // ---- Loop ----
-    let last = performance.now();
-    app.ticker.add(() => {
-      const now = performance.now();
-      const dt = (now - last) / 1000;
-      last = now;
-
-      if (playing && template) {
-        timeSec += dt;
-        if (durationSec > 0 && timeSec > durationSec) timeSec = timeSec % durationSec;
-        applyAtTime(timeSec);
-      }
-    });
-
-    // ---- UI ----
-    document.getElementById("play").onclick = () => playing = true;
-    document.getElementById("pause").onclick = () => playing = false;
-    document.getElementById("restart").onclick = () => { timeSec = 0; applyAtTime(0); };
-
-    // 内蔵テンプレ：選んだ瞬間に適用
-    function initBuiltinList() {
-      const sel = document.getElementById("builtinSelect");
-      sel.innerHTML = "";
-      for (const t of BUILTIN_TEMPLATES) {
-        const opt = document.createElement("option");
-        opt.value = t.id;
-        opt.textContent = t.name;
-        sel.appendChild(opt);
-      }
-
-      if (BUILTIN_TEMPLATES.length) {
-        sel.value = BUILTIN_TEMPLATES[0].id;
-        buildSceneFromTemplate(structuredClone(BUILTIN_TEMPLATES[0].data));
-      }
-
-      sel.addEventListener("change", () => {
-        const id = sel.value;
-        const t = BUILTIN_TEMPLATES.find(x => x.id === id);
-        if (!t) return;
-        buildSceneFromTemplate(structuredClone(t.data));
-      });
-    }
-    initBuiltinList();
-
-    // 外部JSON読み込み
-    document.getElementById("jsonFile").addEventListener("change", async (ev) => {
-      const file = ev.target.files?.[0];
-      if (!file) return;
-      const tpl = JSON.parse(await file.text());
-      buildSceneFromTemplate(tpl);
-    });
-
-    // 単品差し替え
-    let lastImageFile = null;
-    document.getElementById("imgFile").addEventListener("change", (ev) => {
-      lastImageFile = ev.target.files?.[0] || null;
-    });
-
-    document.getElementById("applyImg").onclick = async () => {
-      if (!template) return alert("先にテンプレJSONを読み込んで");
-      const slotId = document.getElementById("slotSelect").value;
-      if (!slotId) return alert("スロット選んで");
-      if (!lastImageFile) return alert("画像ファイル選んで");
-
-      const url = URL.createObjectURL(lastImageFile);
-      const tex = await PIXI.Assets.load(url);
-      setSlotTexture(slotId, tex);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      applyAtTime(timeSec);
+  box.querySelectorAll("[data-trait-target]").forEach(sel=>{
+    sel.onchange = ()=>{
+      const idx = Number(sel.dataset.traitTarget);
+      state.traits[idx].target = sel.value;
+      recalcAll();
     };
+  });
 
-    document.getElementById("resetSlot").onclick = () => {
-      const slotId = document.getElementById("slotSelect").value;
-      if (!slotId) return;
-      resetSlot(slotId);
-      applyAtTime(timeSec);
+  box.querySelectorAll("[data-del-trait]").forEach(btn=>{
+    btn.onclick = ()=>{
+      state.traits.splice(Number(btn.dataset.delTrait),1);
+      recalcAll();
     };
+  });
+}
 
-    // フォルダ一括
-    document.getElementById("applyFolder").onclick = async () => {
-      if (!template) return alert("先にテンプレJSONを読み込んで（or 内蔵選んで）");
-      const input = document.getElementById("folder");
-      const files = Array.from(input.files || []);
-      if (!files.length) return alert("フォルダ選んで");
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, (m)=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
 
-      const existingSlots = new Set(Object.keys(template.slots || {}));
-      const imgFiles = files.filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f.name));
+/** ---------- compute ---------- **/
+function getStats(){
+  const body = clamp(Number($("stat_body").value||3),1,5);
+  const intel= clamp(Number($("stat_int").value||3),1,5);
+  const soc  = clamp(Number($("stat_soc").value||3),1,5);
+  const spi  = clamp(Number($("stat_spi").value||3),1,5);
+  const luk  = clamp(Number($("stat_luk").value||3),1,5);
+  return { body, intel, soc, spi, luk };
+}
 
-      let applied = 0;
-      for (const f of imgFiles) {
-        const slotId = slotIdFromFile(f);
-        if (!existingSlots.has(slotId)) {
-          console.warn("No slot:", slotId, "from", f.webkitRelativePath || f.name);
-          continue;
-        }
-        const tex = await loadTextureFromFile(f);
-        setSlotTexture(slotId, tex);
-        applied++;
-      }
+function computeDerived(stats){
+  const hp = stats.body + stats.spi + 5;
+  const db = stats.body - 3;
+  const mv = stats.body + stats.luk;
+  const mp = stats.intel + stats.spi + 5;
+  return { hp, db, mv, mp };
+}
 
-      applyAtTime(timeSec);
-      alert(`反映: ${applied} / ${imgFiles.length}`);
-    };
+function bonusPtsForCategory(cat){
+  // skills: good +2, bad -2; items: add pt
+  const spt = sumBy(state.skills.filter(s=>s.cat===cat), s=> s.kind==="good" ? 2 : -2);
+  const ipt = sumBy(state.items.filter(i=>i.cat===cat), i=> Number(i.pt||0));
+  return spt + ipt;
+}
 
-    // 書き出し
-    document.getElementById("exportTemplate").onclick = () => {
-      if (!template) return alert("テンプレが無い");
-      const blob = new Blob([JSON.stringify(template, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = (template.meta?.title || "template") + ".json";
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    };
-  </script>
+function traitDieFor(targetKey){
+  // beliefs +1d6, flaws -1d6 for matching target
+  let die = 0;
+  state.traits.forEach(t=>{
+    if(t.target !== targetKey) return;
+    die += (t.type==="belief" ? 1 : -1);
+  });
+  // die is count of d6 dice with sign; we only support -1d6..+2d6 etc.
+  if(die === 0) return "";
+  const abs = Math.abs(die);
+  const s = die>0 ? "+" : "-";
+  return `${s}${abs}d6`;
+}
+
+function relFixedForTargetName(name){
+  if(!name) return 0;
+  const r = state.rels.find(x=>x.name === name);
+  return r ? Number(r.val||0) : 0;
+}
+
+function makeDiceExpr(){
+  const stats = getStats();
+  const env = clamp(Number($("env_fixed").value||0), -3, 3);
+  const relTarget = ($("rel_target").value||"").trim();
+  const rel = relFixedForTargetName(relTarget);
+
+  const ptsKnowledge = bonusPtsForCategory("knowledge");
+  const ptsSocial    = bonusPtsForCategory("social");
+  const ptsSupport   = bonusPtsForCategory("support");
+  const ptsCombat    = bonusPtsForCategory("combat");
+  const ptsAction    = bonusPtsForCategory("action");
+
+  const dieK = fmtDie(ptsToDieSize(ptsKnowledge));
+  const dieS = fmtDie(ptsToDieSize(ptsSocial));
+  const dieSu= fmtDie(ptsToDieSize(ptsSupport));
+  const dieC = fmtDie(ptsToDieSize(ptsCombat));
+  const dieA = fmtDie(ptsToDieSize(ptsAction));
+
+  // trait dice by target
+  const tResearch = traitDieFor("research");
+  const tSocial   = traitDieFor("social");
+  const tSupport  = traitDieFor("support");
+  const tAttack   = traitDieFor("attack");
+  const tAction   = traitDieFor("action");
+  const tAbility  = traitDieFor("ability");
+
+  // expressions (you can tweak to match your final formula)
+  const research = `2d6+1d${stats.intel}${dieK}${env?`${sign(env)}${Math.abs(env)}`:""}${tResearch}`;
+  const socialEx = `2d6+1d${stats.soc}${dieS}${env?`${sign(env)}${Math.abs(env)}`:""}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
+  const support  = `2d6+1d${stats.intel}${dieSu}${env?`${sign(env)}${Math.abs(env)}`:""}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
+  const attack   = `2d6+1d${stats.body}${dieC}${env?`${sign(env)}${Math.abs(env)}`:""}${tAttack}`; // 関係補正は通常入れない運用
+  const action   = `2d6+1d${computeDerived(stats).mv}${dieA}${env?`${sign(env)}${Math.abs(env)}`:""}${tAction}`;
+  // ability dice: safer form
+  const ability  = `2d6+1d${stats.intel}+${stats.intel}${env?`${sign(env)}${Math.abs(env)}`:""}${tAbility}`; // デフォは知性参照、必要なら切替
+
+  return { research, socialEx, support, attack, action, ability, env, relTarget, rel };
+}
+
+function recalcAll(){
+  renderSkills(); renderItems(); renderRels(); renderTraits();
+
+  const stats = getStats();
+  const d = computeDerived(stats);
+  $("kpi_hp").textContent = d.hp;
+  $("kpi_db").textContent = (d.db>=0?("+"+d.db):String(d.db));
+  $("kpi_mv").textContent = d.mv;
+  $("kpi_mp").textContent = d.mp;
+
+  // auto refresh palette + json
+  makePalette();
+  makeJsonOut();
+}
+
+function makePalette(){
+  const stats = getStats();
+  const d = computeDerived(stats);
+  const ex = makeDiceExpr();
+
+  const lines = [];
+  const nm = ($("name").value||"PC").trim() || "PC";
+  lines.push(`// CSBM-TRPG チャパレ：${nm}`);
+  lines.push(`// HP:${d.hp} DB:${d.db>=0?"+":""}${d.db} MV:${d.mv} MP:${d.mp}`);
+  if(ex.relTarget){
+    lines.push(`// 関係補正対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
+  }
+  if(ex.env){
+    lines.push(`// 環境補正：${ex.env>=0?"+":""}${ex.env}`);
+  }
+
+  lines.push(`調査 ${ex.research}`);
+  lines.push(`社交 ${ex.socialEx}`);
+  lines.push(`支援 ${ex.support}`);
+  lines.push(`攻撃 ${ex.attack}`);
+  lines.push(`行動 ${ex.action}`);
+  lines.push(`能力 ${ex.ability}`);
+
+  lines.push(`// 戦闘`);
+  lines.push(`命中 ${ex.attack}>=9`);
+  lines.push(`回避 ${ex.action}>=9`);
+  lines.push(`庇う ${ex.action}>=9`);
+  lines.push(`回復 ${ex.support}>=9`);
+  lines.push(`ダメ 1d3${d.db? (d.db>0?`+${d.db}`:`${d.db}`):""}`);
+
+  $("palette").value = lines.join("\n");
+}
+
+function makeJsonOut(){
+  const stats = getStats();
+  const data = {
+    name: $("name").value||"",
+    role: $("role").value||"",
+    tagline: $("tagline").value||"",
+    stats,
+    env_fixed: Number($("env_fixed").value||0),
+    skills: state.skills,
+    items: state.items,
+    rels: state.rels,
+    traits: state.traits
+  };
+  $("json_out").value = JSON.stringify(data, null, 2);
+}
+
+function makePaletteButton(){
+  makePalette();
+}
+
+function randomStatsSum15(){
+  // generate 5 stats 1..5 sum 15
+  // brute force loop
+  for(let tries=0; tries<20000; tries++){
+    const arr = Array.from({length:5}, ()=> 1 + Math.floor(Math.random()*5));
+    const sum = arr.reduce((a,b)=>a+b,0);
+    if(sum === 15) return arr;
+  }
+  // fallback deterministic
+  return [3,3,3,3,3];
+}
+
+/** ---------- events ---------- **/
+$("btnAddSkill").onclick = ()=>{
+  const name = ($("skill_name").value||"").trim();
+  if(!name) return;
+  state.skills.push({ name, cat:$("skill_cat").value, kind:$("skill_kind").value });
+  $("skill_name").value = "";
+  recalcAll();
+};
+
+$("btnAddItem").onclick = ()=>{
+  const name = ($("item_name").value||"").trim();
+  if(!name) return;
+  const pt = Number($("item_pt").value||0);
+  // enforce caps softly (allow but warn via text)
+  state.items.push({ name, cat:$("item_cat").value, pt });
+  $("item_name").value = "";
+  recalcAll();
+};
+
+$("btnAddRel").onclick = ()=>{
+  const name = ($("rel_name").value||"").trim();
+  if(!name) return;
+  state.rels.push({ name, note:($("rel_note").value||"").trim(), val:Number($("rel_val").value||0) });
+  $("rel_name").value = ""; $("rel_note").value = ""; $("rel_val").value = "0";
+  recalcAll();
+};
+
+$("btnAddBelief").onclick = ()=>{
+  // limit to 2 beliefs
+  const beliefs = state.traits.filter(t=>t.type==="belief").length;
+  if(beliefs >= 2) { alert("信条は2つまで（MVP制限）"); return; }
+  state.traits.push({ type:"belief", text:"（信条）", target:"action" });
+  recalcAll();
+};
+
+$("btnAddFlaw").onclick = ()=>{
+  const flaws = state.traits.filter(t=>t.type==="flaw").length;
+  if(flaws >= 1) { alert("欠陥は1つまで（MVP制限）"); return; }
+  state.traits.push({ type:"flaw", text:"（欠陥）", target:"action" });
+  recalcAll();
+};
+
+$("btnResetTraits").onclick = ()=>{
+  state.traits = [];
+  ensureDefaultTraits();
+  recalcAll();
+};
+
+$("btnMakePalette").onclick = makePaletteButton;
+
+$("btnCopy").onclick = async ()=>{
+  try{
+    await navigator.clipboard.writeText($("palette").value);
+    alert("コピーした");
+  }catch(e){
+    alert("コピー失敗。手動でコピーしてくれ。");
+  }
+};
+
+$("btnRecalc").onclick = recalcAll;
+
+$("btnRandom").onclick = ()=>{
+  const [b,i,s,sp,l] = randomStatsSum15();
+  $("stat_body").value = b;
+  $("stat_int").value  = i;
+  $("stat_soc").value  = s;
+  $("stat_spi").value  = sp;
+  $("stat_luk").value  = l;
+  recalcAll();
+};
+
+["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","tagline"]
+  .forEach(id=> $(id).addEventListener("input", recalcAll));
+
+$("btnSave").onclick = makeJsonOut;
+
+$("btnLoad").onclick = ()=>{
+  try{
+    const txt = $("json_in").value.trim();
+    const data = JSON.parse(txt);
+    $("name").value = data.name ?? "";
+    $("role").value = data.role ?? "";
+    $("tagline").value = data.tagline ?? "";
+    const st = data.stats ?? {};
+    $("stat_body").value = st.body ?? 3;
+    $("stat_int").value  = st.intel ?? 3;
+    $("stat_soc").value  = st.soc ?? 3;
+    $("stat_spi").value  = st.spi ?? 3;
+    $("stat_luk").value  = st.luk ?? 3;
+    $("env_fixed").value = data.env_fixed ?? 0;
+
+    state.skills = Array.isArray(data.skills) ? data.skills : [];
+    state.items  = Array.isArray(data.items) ? data.items : [];
+    state.rels   = Array.isArray(data.rels) ? data.rels : [];
+    state.traits = Array.isArray(data.traits) ? data.traits : [];
+    ensureDefaultTraits();
+    recalcAll();
+  }catch(e){
+    alert("JSON読込失敗：形式がおかしい");
+  }
+};
+
+// init
+ensureDefaultTraits();
+recalcAll();
+</script>
 </body>
 </html>
