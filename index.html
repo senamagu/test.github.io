@@ -692,7 +692,7 @@ function ensureDefaultTraits(){
   state.traits = [...beliefs, ...flaws].map(t=>({ type:t.type, text:t.text??"", detail:t.detail??"", target:t.target??"action" }));
 }
 function traitTargetLabel(t){
-  return ({ research:"調査ダイス", social:"社交ダイス", support:"支援ダイス", attack:"攻撃ダイス", action:"行動ダイス", ability:"能力ダイス" }[t] ?? t);
+  return ({ research:"調査", social:"社交", support:"支援", attack:"攻撃", action:"行動", ability:"能力" }[t] ?? t);
 }
 
 /** render **/
