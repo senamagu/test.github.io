@@ -522,26 +522,45 @@ input[type="number"]{
     <textarea id="memo" class="mono"></textarea>
   </section>
 
-  <!-- チャパレ -->
-  <section class="card full">
-    <h2>チャパレ（ココフォリア用）</h2>
-    <div class="row2">
-      <div>
-        <label>関係補正を適用する対象名（任意）</label>
-        <input id="rel_target" />
-
-        <div class="btns">
-          <button class="primary" id="btnMakePalette">チャパレ生成</button>
-          <button id="btnCopy">コピー</button>
-        </div>
-      </div>
-
-      <div>
-        <label>出力</label>
-        <textarea id="palette" class="mono" readonly></textarea>
+<!-- チャパレ -->
+<section class="card full">
+  <h2>チャパレ（ココフォリア用）</h2>
+  <div class="row2">
+    <div>
+      <div class="btns">
+        <button class="btnCcf" id="btnMakeCcf">ココフォリア出力</button>
+        <button class="primary" id="btnMakePaletteBase">チャパレ生成</button>
+        <button id="btnCopyBase">チャパレコピー</button>
       </div>
     </div>
-  </section>
+
+    <div>
+      <label>出力</label>
+      <textarea id="palette_base" class="mono" readonly></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- 関係補正 -->
+<section class="card full">
+  <h2>関係補正</h2>
+  <div class="row2">
+    <div>
+      <label>関係補正を適用する対象名（任意）</label>
+      <input id="rel_target" />
+
+      <div class="btns">
+        <button class="primary" id="btnMakePaletteRel">チャパレ生成</button>
+        <button id="btnCopyRel">チャパレコピー</button>
+      </div>
+    </div>
+
+    <div>
+      <label>出力</label>
+      <textarea id="palette_rel" class="mono" readonly></textarea>
+    </div>
+  </div>
+</section>
 
   <!-- JSON -->
   <section class="card full">
@@ -876,10 +895,11 @@ function relFixedForTargetName(name){
   const r = state.rels.find(x=>x.name === name);
   return r ? Number(r.val||0) : 0;
 }
-function makeDiceExpr(){
+function makeDiceExpr({ useRel } = { useRel:false }){
   const stats = getStats();
+
   const relTarget = ($("rel_target").value||"").trim();
-  const rel = relFixedForTargetName(relTarget);
+  const rel = (useRel ? relFixedForTargetName(relTarget) : 0);
 
   const ptsK = bonusPtsForCategory("knowledge");
   const ptsS = bonusPtsForCategory("social");
@@ -904,7 +924,10 @@ function makeDiceExpr(){
   const socialEx = `2d6+1d${stats.soc}${dieS}${tSocial}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
   const support  = `2d6+1d${stats.intel}${dieSu}${tSupport}${rel?`${sign(rel)}${Math.abs(rel)}`:""}`;
   const attack   = `2d6+1d${stats.body}${dieC}${tAttack}`;
-  const action   = `2d6+1d${computeDerived(stats).mv}${dieA}${tAction}`;
+
+  // 行動は「MV + 所持品変数」で固定したい方針ならこっち推奨
+  const action   = `2d6+1d{MV}+1d{所持品}${tAction}`;
+
   const ability  = `2d6+1d${stats.intel}${tAbility}`;
 
   return { research, socialEx, support, attack, action, ability, relTarget, rel };
@@ -922,15 +945,16 @@ function recalcAll(){
   $("kpi_db").textContent = (d.db>=0?("+"+d.db):String(d.db));
   $("kpi_mv").textContent = d.mv;
 
-  makePalette();
+  makePaletteBase();
   makeJsonOut();
 
   scheduleAutosave();
 }
 
-function makePalette(){
-  const d = computeDerived(getStats());
-  const ex = makeDiceExpr();
+  
+function buildPaletteHeader({ includeRelComment, ex }){
+  const stats = getStats();
+  const d = computeDerived(stats);
 
   const nm = ($("name").value||"").trim();
   const role = ($("role").value||"").trim();
@@ -939,9 +963,9 @@ function makePalette(){
   const h   = $("height").value ? String($("height").value) : "";
   const bd  = ($("birthday_md").value||"").trim();
 
-  const healBonus = supportItemBonus();
   const lines = [];
   lines.push(`// CSBM-TRPG チャパレ${nm ? "：" + nm : ""}`);
+
   const profileBits = [];
   if(role) profileBits.push(role);
   const a = [];
@@ -953,8 +977,21 @@ function makePalette(){
   if(profileBits.length) lines.push(`// ${profileBits.join(" / ")}`);
 
   lines.push(`// HP:${d.hp} DB:${d.db>=0?"+":""}${d.db} MV:${d.mv}`);
-  if(ex.relTarget) lines.push(`// 関係補正対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
+
+  if(includeRelComment && ex.relTarget){
+    lines.push(`// 関係補正対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
+  }
+
+  return lines;
+}
   
+function makePaletteBase(){
+  const ex = makeDiceExpr({ useRel:false });
+  const d = computeDerived(getStats());
+  const healBonus = supportItemBonus();
+
+  const lines = buildPaletteHeader({ includeRelComment:false, ex });
+
   lines.push(`// 分野ダイス`);
   lines.push(`${ex.research}+{環境補正} 【調査ダイス】`);
   lines.push(`${ex.socialEx}+{環境補正} 【社交ダイス】`);
@@ -979,9 +1016,58 @@ function makePalette(){
   lines.push(`1d3${d.db? (d.db>0?`+${d.db}`:`${d.db}`):""} 【ダメージ】`);
   lines.push(`1d4${healBonus ? (healBonus>0?`+${healBonus}`:`${healBonus}`) : ""} 【回復値】`);
 
-  $("palette").value = lines.join("\n");
+  $("palette_base").value = lines.join("\n");
 }
 
+function makePaletteRel(){
+  const ex = makeDiceExpr({ useRel:true });
+
+  const lines = [];
+  lines.push(`// 関係補正つき（社交/支援のみ）`);
+  if(ex.relTarget) lines.push(`// 対象：${ex.relTarget} (${ex.rel>=0?"+":""}${ex.rel})`);
+
+  lines.push(`${ex.socialEx}+{環境補正} 【社交ダイス（関係補正）】`);
+  lines.push(`${ex.support}+{環境補正} 【支援ダイス（関係補正）】`);
+
+  $("palette_rel").value = lines.join("\n");
+}
+
+function makeCcfJson(){
+  makePaletteBase(); // 最新チャパレを保証
+
+  const stats = getStats();
+  const d = computeDerived(stats);
+
+  const name = ($("name").value||"").trim() || "キャラクター";
+  const commands = $("palette").value;
+
+  const obj = {
+    kind: "character",
+    data: {
+      name,
+      initiative: d.mv,
+      externalUrl: "",
+      iconUrl: "",
+      commands,
+      status: [
+        { label: "HP", value: d.hp, max: d.hp },
+        { label: "環境補正", value: 0, max: 3 }
+      ],
+      params: [
+        { label: "DB", value: String(d.db) },
+        { label: "MV", value: String(d.mv) },
+        { label: "身体", value: String(stats.body) },
+        { label: "知性", value: String(stats.intel) },
+        { label: "社交", value: String(stats.soc) },
+        { label: "精神", value: String(stats.spi) },
+        { label: "運", value: String(stats.luk) }
+      ]
+    }
+  };
+
+  return JSON.stringify(obj, null, 2);
+}
+  
 function makeJsonOut(){
   const data = {
     name: $("name").value||"",
@@ -1099,10 +1185,26 @@ $("btnAddRel").onclick = ()=>{
   recalcAll();
 };
 
-$("btnMakePalette").onclick = makePalette;
-$("btnCopy").onclick = async ()=>{
-  try{ await navigator.clipboard.writeText($("palette").value); alert("コピーした"); }
+$("btnMakePaletteBase").onclick = makePaletteBase;
+$("btnCopyBase").onclick = async ()=>{
+  try{ await navigator.clipboard.writeText($("palette_base").value); alert("チャパレをコピーした"); }
   catch(e){ alert("コピーに失敗しました"); }
+};
+
+$("btnMakePaletteRel").onclick = makePaletteRel;
+$("btnCopyRel").onclick = async ()=>{
+  try{ await navigator.clipboard.writeText($("palette_rel").value); alert("関係補正チャパレをコピーした"); }
+  catch(e){ alert("コピーに失敗しました"); }
+};
+
+$("btnMakeCcf").onclick = async ()=>{
+  try{
+    const txt = makeCcfJson();
+    await navigator.clipboard.writeText(txt);
+    alert("ココフォリア形式をコピーした");
+  }catch(e){
+    alert("コピーに失敗しました");
+  }
 };
 
 $("btnRandomStats").onclick = ()=>{
@@ -1124,6 +1226,16 @@ $("btnRandomProfile").onclick = ()=>{
   recalcAll();
 };
 
+$("btnCcf").onclick = async ()=>{
+  try{
+    const txt = makeCcfJson();
+    await navigator.clipboard.writeText(txt);
+    alert("コピーしました");
+  }catch(e){
+    alert("コピーに失敗しました");
+  }
+};
+  
 ["stat_body","stat_int","stat_soc","stat_spi","stat_luk","rel_target","name","role","age","sex","height","birthday_md","memo"]
   .forEach(id=> $(id).addEventListener("input", recalcAll));
 
