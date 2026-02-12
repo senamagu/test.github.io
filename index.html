@@ -182,12 +182,74 @@ details {
   border-radius: 12px;
   background: rgba(0,0,0,0.1);
 }
-summary{ cursor:pointer; user-select:none; color:var(--muted); }
-summary { list-style: none; }
-summary::-webkit-details-marker{ display:none; }
-summary::marker { content: ""; }
-summary::before{ content:"▶"; display:inline-block; margin-right:8px; color:var(--muted); transform: translateY(-1px); }
-details[open] summary::before{ content:"▼"; }
+    
+/* ===== Traits: box内に枠を作らない / 折りたたみは維持 ===== */
+#traitList{
+  display: grid;
+  gap: 10px;
+}
+
+/* detailsのデフォ枠を消す（box内box禁止） */
+.traitDetails{
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* summaryを“フォームの見出し行”っぽく */
+.traitSummary{
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;          /* 区切りの余白だけ */
+  list-style: none;
+}
+.traitSummary::-webkit-details-marker{ display:none; }
+.traitSummary::marker { content: ""; }
+
+/* 開閉アイコン（控えめ） */
+.traitSummary::before{
+  content:"▶";
+  display:inline-block;
+  margin-right: 6px;
+  color: rgba(255,248,243,.65);
+  transform: translateY(-1px);
+}
+.traitDetails[open] .traitSummary::before{ content:"▼"; }
+
+.traitSummaryTitle{
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* 中身はちょいインデントで“階層”だけ出す */
+.traitBody{
+  padding-left: 18px;
+  padding-top: 6px;
+}
+
+/* うっすら区切り線だけ（枠じゃない） */
+.traitDetails + .traitDetails{
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+/* ===== キャラメモ textarea をカードいっぱいに ===== */
+.card:has(#memo){
+  display: flex;
+  flex-direction: column;
+}
+
+/* 高さは好みで。スマホ基準で見やすい値にしてる */
+#memo{
+  flex: 1;
+  min-height: 380px;
+  height: 100%;
+  margin-bottom: 0;
+}
+
 
 /* full */
 .full{ grid-column: 1 / -1; }
@@ -575,39 +637,38 @@ function renderTraits(){
     const title = (t.type==="belief") ? "信条" : "欠陥";
     const badge = (t.type==="belief") ? "+1d6" : "-1d6";
 
-    const wrap = document.createElement("div");
-    wrap.className = "traitPanel"; // ← cardじゃない。特徴boxの中身用
+    const wrap = document.createElement("details");
+    wrap.className = "traitDetails";
+    wrap.open = true; // 初期は開いててOK。閉じたいなら false に
 
     wrap.innerHTML = `
-      <details class="traitDetails" ${t.type==="belief" ? "open" : ""}>
-        <summary class="traitSummary">
-          <span class="traitSummaryTitle">${title}</span>
-          <span class="pill">${badge}</span>
-          <span class="traitSummaryMini">${escAttr(t.text || "（未入力）")}</span>
-        </summary>
+      <summary class="traitSummary">
+        <span class="traitSummaryTitle">${title}</span>
+        <span class="pill">${badge}</span>
+      </summary>
 
-        <div class="traitBody">
-          <div class="row2">
-            <div>
-              <label>${title}</label>
-              <input data-trait-text="${idx}" value="${escAttr(t.text)}" />
-            </div>
-            <div>
-              <label>対象</label>
-              <select data-trait-target="${idx}">
-                ${["research","social","support","attack","action","ability"].map(k=>`
-                  <option value="${k}" ${t.target===k?"selected":""}>${traitTargetLabel(k)}</option>
-                `).join("")}
-              </select>
-            </div>
-          </div>
-
-          <div style="margin-top:10px;">
-            <label>詳細メモ</label>
-            <textarea data-trait-detail="${idx}" class="mono" style="min-height:110px;">${t.detail ?? ""}</textarea>
-          </div>
+      <div class="row3 traitBody">
+        <div>
+          <label>${title}</label>
+          <input data-trait-text="${idx}" value="${escAttr(t.text)}" />
         </div>
-      </details>
+
+        <div>
+          <label>対象</label>
+          <select data-trait-target="${idx}">
+            ${["research","social","support","attack","action","ability"].map(k=>`
+              <option value="${k}" ${t.target===k?"selected":""}>${traitTargetLabel(k)}</option>
+            `).join("")}
+          </select>
+        </div>
+
+        <div></div>
+      </div>
+
+      <div class="traitBody">
+        <label>詳細メモ</label>
+        <textarea data-trait-detail="${idx}" class="mono" style="min-height:90px;">${t.detail ?? ""}</textarea>
+      </div>
     `;
 
     box.appendChild(wrap);
@@ -625,11 +686,6 @@ function renderTraits(){
     inp.oninput = ()=>{
       const idx = Number(inp.dataset.traitText);
       state.traits[idx].text = inp.value;
-
-      // summaryの（未入力）更新
-      const mini = inp.closest("details")?.querySelector(".traitSummaryMini");
-      if(mini) mini.textContent = inp.value.trim() ? inp.value.trim() : "（未入力）";
-
       makePalette(); makeJsonOut();
     };
   });
