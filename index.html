@@ -107,13 +107,8 @@
     <div class="row2">
       <div>
         <label>誕生日</label>
-        <input id="birthday" type="date" />
+        <input id="birthday_md" />
       </div>
-      <div>
-        <label>（予備）</label>
-        <input id="misc" />
-      </div>
-    </div>
 
     <div class="btns" style="margin-top:12px;">
       <button class="primary" id="btnRandomProfile">プロフィールランダム（性別/年齢/身長/誕生日）</button>
@@ -174,7 +169,7 @@
     <h2>得意分野</h2>
     <div class="hint">得意は <b>+2pt</b>。ジャンル：知識 / 社交 / 支援 / 戦闘 / 行動。</div>
 
-    <div class="row4">
+    <div class="row3">
       <div><label>名称</label><input id="good_name" /></div>
       <div>
         <label>ジャンル</label>
@@ -186,7 +181,6 @@
           <option value="action">行動</option>
         </select>
       </div>
-      <div><label>pt</label><input value="+2" disabled /></div>
       <div style="align-self:end;"><button class="primary" id="btnAddGood" style="width:100%;">追加</button></div>
     </div>
 
@@ -198,7 +192,7 @@
     <h2>苦手分野</h2>
     <div class="hint">苦手は <b>-2pt</b>。</div>
 
-    <div class="row4">
+    <div class="row3">
       <div><label>名称</label><input id="bad_name" /></div>
       <div>
         <label>ジャンル</label>
@@ -210,7 +204,6 @@
           <option value="action">行動</option>
         </select>
       </div>
-      <div><label>pt</label><input value="-2" disabled /></div>
       <div style="align-self:end;"><button class="primary" id="btnAddBad" style="width:100%;">追加</button></div>
     </div>
 
@@ -448,7 +441,7 @@ function renderTraits(){
     wrap.innerHTML = `
       <div style="display:grid; gap:10px; grid-template-columns: 1fr 180px;">
         <div>
-          <span class="pill">${t.type==="belief" ? "信条(+1d6)" : "欠陥(-1d6)"}</span>
+          <span class=" ${t.type==="desc" ? "desc" : ""}">${t.type==="belief" ? "信条 +1d6" : "欠陥 -1d6"}</span>
           <input data-trait-text="${idx}" value="${escAttr(t.text)}" style="width:100%; margin-top:6px;" />
         </div>
         <div>
@@ -510,8 +503,8 @@ function computeDerived(stats){
   return { hp, db, mv };
 }
 function bonusPtsForCategory(cat){
-  const goodPt = sumBy(state.goods.filter(s=>s.cat===cat), ()=> 2);
-  const badPt  = sumBy(state.bads.filter(s=>s.cat===cat),  ()=> -2);
+  const goodPt = sumBy(state.goods.filter(s=>s.cat===cat), ()=> 1);
+  const badPt  = sumBy(state.bads.filter(s=>s.cat===cat),  ()=> -1);
   const itemPt = sumBy(state.items.filter(i=>i.cat===cat),  i=> Number(i.pt||0));
   return goodPt + badPt + itemPt;
 }
@@ -593,7 +586,7 @@ function makePalette(){
   const age = $("age").value ? String($("age").value) : "";
   const sex = ($("sex").value||"").trim();
   const h   = $("height").value ? String($("height").value) : "";
-  const bd  = $("birthday").value ? String($("birthday").value) : "";
+  const bd  = ($("birthday_md").value||"").trim();
 
   const lines = [];
   lines.push(`// CSBM-TRPG チャパレ${nm ? "：" + nm : ""}`);
@@ -635,7 +628,7 @@ function makeJsonOut(){
     age: $("age").value ? Number($("age").value) : null,
     sex: $("sex").value||"",
     height: $("height").value ? Number($("height").value) : null,
-    birthday: $("birthday").value||"",
+    birthday_md: $("birthday_md").value||"",
     misc: $("misc").value||"",
     memo: $("memo").value||"",
     stats: getStats(),
@@ -672,8 +665,8 @@ function randomProfile(){
   const yyyy = 2000; // 年は固定でdate入力を壊さない（欲しけりゃここ変える）
   const mm = String(month).padStart(2,"0");
   const dd = String(day).padStart(2,"0");
-  const birthday = `${yyyy}-${mm}-${dd}`;
-  return { age, height, sex, birthday };
+  const birthday_md = `${month}/${day}`;
+  return { age, height, sex, birthday_md };
 }
 
 /** add rules **/
@@ -747,11 +740,11 @@ $("btnRandomProfile").onclick = ()=>{
   $("age").value = p.age;
   $("sex").value = p.sex;
   $("height").value = p.height;
-  $("birthday").value = p.birthday;
+  $("birthday_md").value = p.birthday_md;
   recalcAll();
 };
 
-["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","birthday","misc","memo"]
+["stat_body","stat_int","stat_soc","stat_spi","stat_luk","env_fixed","rel_target","name","role","age","sex","height","birthday_md","memo"]
   .forEach(id=> $(id).addEventListener("input", recalcAll));
 
 $("btnSave").onclick = makeJsonOut;
@@ -763,7 +756,7 @@ $("btnLoad").onclick = ()=>{
     $("age").value = (data.age ?? "") === null ? "" : (data.age ?? "");
     $("sex").value = data.sex ?? "";
     $("height").value = (data.height ?? "") === null ? "" : (data.height ?? "");
-    $("birthday").value = data.birthday ?? "";
+    $("birthday_md").value = data.birthday_md ?? "";
     $("misc").value = data.misc ?? "";
     $("memo").value = data.memo ?? "";
 
