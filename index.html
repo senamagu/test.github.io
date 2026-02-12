@@ -280,7 +280,11 @@ details {
 <main>
   <!-- 基本情報カード -->
   <section class="card">
-    <h2>基本情報</h2>
+    <h2>
+      基本情報
+      <button class="danger" id="btnResetAll" style="margin-left:auto;">全リセット</button>
+    </h2>
+
 
     <div class="row2">
       <div>
@@ -975,6 +979,34 @@ function tryAddItem({name, cat, pt}){
 }
 
 /** events **/
+$("btnResetAll").onclick = ()=>{
+  if(!confirm("すべての入力をリセットします。よろしい？")) return;
+
+  localStorage.removeItem(STORAGE_KEY);
+
+  // state初期化
+  state.goods = [];
+  state.bads = [];
+  state.items = [];
+  state.rels = [];
+  state.traits = [];
+
+  // 入力初期化
+  ["name","role","age","sex","height","birthday_md","memo","rel_target"]
+    .forEach(id=> $(id).value = "");
+
+  $("env_fixed").value = 0;
+
+  $("stat_body").value = 3;
+  $("stat_int").value  = 3;
+  $("stat_soc").value  = 3;
+  $("stat_spi").value  = 3;
+  $("stat_luk").value  = 3;
+
+  ensureDefaultTraits();
+  recalcAll();
+};
+
 $("btnAddGood").onclick = ()=>{
   const n = ($("good_name").value||"").trim();
   if(!n) return;
