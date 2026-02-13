@@ -586,6 +586,8 @@
       margin-top:16px;
     }
     .btn-list{
+      font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+      font-weight:900;
       background:var(--accent);
       color:var(--name);
       border:none;
@@ -825,39 +827,41 @@
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
 
+
     <div class="filters">
+ 
       <!-- left -->
       <div class="filter-left">
         <div class="field">
-          <div class="k">創作タイトル</div>
+          <div class="k">創作タイトル</div> 
           <div class="multi" data-multi="series">
-            <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">未選択</span><span class="caret"></span>
-            </div>
-            <div class="multi-panel"></div>
+          <div class="control multi-btn" role="button" tabindex="0"> 
+            <span class="value placeholder">未選択</span><span class="caret"></span>
+          </div>      
+            <div class="multi-panel"></div>  
           </div>
         </div>
 
-        <div class="field">
+        <div class="field"> 
           <div class="k">キャラジャンル</div>
           <div class="multi" data-multi="genre">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">未選択</span><span class="caret"></span>
-            </div>
+              <span class="value placeholder">未選択</span><span class="caret"></span> 
+            </div>  
             <div class="multi-panel"></div>
           </div>
         </div>
 
         <div class="field">
-          <div class="k">性別</div>
-          <div class="multi" data-multi="gender">
-            <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">未選択</span><span class="caret"></span>
-            </div>
-            <div class="multi-panel"></div>
-          </div>
+          <div class="k">性別</div> 
+          <div class="multi" data-multi="gender"> 
+            <div class="control multi-btn" role="button" tabindex="0"> 
+              <span class="value placeholder">未選択</span><span class="caret"></span> 
+            </div>  
+            <div class="multi-panel"></div> 
+          </div> 
         </div>
-
+ 
         <div class="field">
           <div class="k">年齢</div>
           <div class="range-row suffix-right">
@@ -877,18 +881,19 @@
             <div class="suffix-out">cm</div>
           </div>
         </div>
+      </div><!-- /filter-left -->
 
-        
-      <!-- mid (イメージカラー) -->
+      <!-- mid -->
       <div class="filter-mid">
         <div class="field" style="grid-template-columns:1fr;">
-          <div class="k" style="text-align:left;">イメージカラー</div>
+          <div class="k">イメージカラー</div>
           <div class="color-box" id="colorBox" title="タップで選択">
             <img src="colorwheel.png" alt="color wheel">
           </div>
         </div>
-      </div>
+      </div><!-- /filter-mid -->
 
+ 
       <!-- right -->
       <div class="filter-right">
         <div class="toggle" id="tglHasImage">
@@ -896,21 +901,20 @@
           <span>画像ありのみ</span>
         </div>
 
+  
         <div class="toggle" id="tglHasDoc">
           <span class="radio" id="dotHasDoc"></span>
           <span>資料ありのみ</span>
         </div>
-
         <div class="hits">
           <span>ヒット件数</span>
           <span id="hitCount">0</span><span>名</span>
         </div>
-
         <div class="hitlist">
           <div class="hitgrid" id="hitGrid"></div>
         </div>
-      </div>
-    </div>
+      </div><!-- /filter-right -->
+    </div><!-- /filters -->
 
     <div class="bottom">
       <button class="btn-list" id="btnList">キャラ一覧へ</button>
@@ -948,6 +952,8 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <footer class="credit">© senamagu</footer>
 
   <script>
     /**********************
@@ -1558,7 +1564,7 @@
       applyFilters();
       wireInputs();
     }
+    init();
   </script>
-    <footer class="credit">© senamagu</footer>
 </body>
 </html>
