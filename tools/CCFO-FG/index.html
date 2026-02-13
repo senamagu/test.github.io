@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ココフォリア部屋データ編集：前景サイズ一括変更</title>
+  <title>ココフォリア編集ツール：前景サイズ＆マーカー追従</title>
   <style>
     :root { --bg:#0f1115; --panel:#171a21; --text:#e7e9ee; --muted:#a9b0bf; --line:#2a3040; --acc:#7aa2ff; }
     body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
-    header{ padding:16px 18px; border-bottom:1px solid var(--line); background:rgba(15,17,21,.92); position:sticky; top:0; backdrop-filter: blur(8px); }
+    header{ padding:16px 18px; border-bottom:1px solid var(--line); background:rgba(15,17,21,.92); position:sticky; top:0; backdrop-filter: blur(8px); z-index:5; }
     h1{ margin:0; font-size:16px; }
-    main{ padding:16px 18px; max-width:880px; margin:0 auto; }
+    main{ padding:16px 18px; max-width:980px; margin:0 auto; }
     .card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; }
     .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:end; }
     label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
@@ -17,19 +17,47 @@
       font:inherit; border-radius:10px; border:1px solid var(--line);
       background:#0f131b; color:var(--text); padding:10px 12px;
     }
-    input{ width:140px; }
+    input[type="number"]{ width:140px; }
+    input[type="file"]{ width:100%; }
     .grow{ flex:1; min-width:240px; }
-    button{ background:var(--acc); border-color:transparent; color:#0b1020; font-weight:700; cursor:pointer; }
+    button{ background:var(--acc); border-color:transparent; color:#0b1020; font-weight:800; cursor:pointer; }
     button:disabled{ opacity:.5; cursor:not-allowed; }
-    .sub{ color:var(--muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .ghost{ background:transparent; border-color:var(--line); color:var(--text); font-weight:700; }
+    .sub{ color:var(--muted); font-size:12px; line-height:1.6; margin-top:8px; }
     .ok{ color:#9ee493; }
     .ng{ color:#ff8b8b; }
     .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:12px; white-space:pre-wrap; }
     .hr{ height:1px; background:var(--line); margin:14px 0; }
+
+    #markerList{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+      gap:10px;
+    }
+    .mcard{ padding:10px; border-radius:12px; border:1px solid var(--line); background:#121824; }
+    .mrow{ display:flex; gap:10px; align-items:center; }
+    .thumb{
+      width:56px; height:56px; object-fit:contain;
+      border-radius:10px; border:1px solid var(--line); background:#0f131b;
+      flex:0 0 auto;
+    }
+    .mmeta{ min-width:0; flex:1; }
+    .mtitle{
+      font-weight:800; font-size:13px;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .mmini{ margin-top:4px; }
+    .pill{
+      display:inline-block; padding:2px 8px; border-radius:999px;
+      border:1px solid var(--line); color:var(--muted); font-size:11px;
+      margin-right:6px;
+    }
+    .inline{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
   </style>
 </head>
 <body>
-<header><h1>ココフォリア部屋データ編集：前景サイズ一括変更（zip対応）</h1></header>
+<header><h1>ココフォリア編集ツール：前景サイズ＆マーカー追従（zip対応）</h1></header>
 
 <main>
   <div class="card">
@@ -37,19 +65,16 @@
       <div class="grow">
         <label>room.zip（ココフォリアのエクスポート）</label>
         <input id="file" type="file" accept=".zip" />
-        <div class="sub">zipの中に <span class="mono">__data.json</span> がある前提。画像はそのまま維持してzipを作り直す。</div>
+        <div class="sub">zipの中に <span class="mono">__data.json</span> がある前提。画像は維持してzipを出力する。</div>
       </div>
-
       <div>
         <label>前景 横（fieldWidth）</label>
         <input id="w" type="number" min="1" step="1" value="60" />
       </div>
-
       <div>
         <label>前景 縦（fieldHeight）</label>
         <input id="h" type="number" min="1" step="1" value="52" />
       </div>
-
       <div>
         <label>自動トリミング（fieldObjectFit）</label>
         <select id="fit">
@@ -58,11 +83,47 @@
           <option value="fill">OFF（fill）</option>
         </select>
       </div>
-
       <div>
+        <label>&nbsp;</label>
         <button id="run" disabled>変換してzip出力</button>
       </div>
     </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <div class="grow">
+        <label>マーカー編集：対象シーン</label>
+        <select id="sceneSel" style="width:100%;" disabled>
+          <option value="">（zip読み込み後に選べる）</option>
+        </select>
+        <div class="sub">シーンを選ぶ → そのシーンのマーカーをサムネ付きで表示 → チェックしたものだけ編集。</div>
+      </div>
+
+      <div>
+        <label>マーカーサイズの合わせ先</label>
+        <select id="markerSizeBase" disabled>
+          <option value="input">入力サイズ（W×H）</option>
+          <option value="scene">そのシーンのサイズ</option>
+          <option value="room">Room（全体）のサイズ</option>
+        </select>
+      </div>
+
+      <div>
+        <label>マーカー位置</label>
+        <select id="markerPos" disabled>
+          <option value="keep">位置は触らない</option>
+          <option value="topleft">左上合わせ（x=-width/2, y=-height/2）</option>
+        </select>
+      </div>
+
+      <div class="inline">
+        <button id="selAll" class="ghost" disabled>このシーン：全選択</button>
+        <button id="selNone" class="ghost" disabled>このシーン：全解除</button>
+      </div>
+    </div>
+
+    <div id="markerList"></div>
 
     <div class="hr"></div>
 
@@ -71,27 +132,47 @@
   </div>
 
   <div class="sub" style="margin-top:12px;">
-    仕様：<span class="mono">entities.room</span> と <span class="mono">entities.scenes.*</span> の
+    編集対象：
+    <span class="mono">entities.room</span> と <span class="mono">entities.scenes.*</span> の
     <span class="mono">fieldWidth / fieldHeight</span> を一括変更。
     トリミングは <span class="mono">fieldObjectFit</span>（cover=ON / fill=OFF）。
+    <br>
+    マーカー編集は「選んだシーンでチェックしたマーカーのみ」適用（全部巻き込み事故防止）。
   </div>
 </main>
 
-<!-- JSZip (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
 <script>
   const $ = (id) => document.getElementById(id);
+
   const fileEl = $("file");
   const runBtn = $("run");
   const statusEl = $("status");
   const logEl = $("log");
+
   const wEl = $("w");
   const hEl = $("h");
   const fitEl = $("fit");
 
+  const sceneSel = $("sceneSel");
+  const markerList = $("markerList");
+
+  const markerSizeBaseEl = $("markerSizeBase");
+  const markerPosEl = $("markerPos");
+
+  const selAllBtn = $("selAll");
+  const selNoneBtn = $("selNone");
+
   let loadedZip = null;
   let loadedName = null;
+
+  let parsedData = null;
+
+  // そのシーンで選択されたmarkerIdを保持（シーン切替しても選択を残す）
+  const selectedMarkersByScene = new Map(); // sceneKey -> Set(markerId)
+  // サムネのobjectURL
+  let markerThumbUrls = new Map(); // markerId -> url
 
   function setStatus(text, ok=true){
     statusEl.textContent = text;
@@ -100,12 +181,182 @@
   function log(text){ logEl.textContent += text + "\n"; }
   function clearLog(){ logEl.textContent = ""; }
 
+  function getSceneKey(){
+    return sceneSel.value || "";
+  }
+  function getSelectedSet(sceneKey){
+    if(!selectedMarkersByScene.has(sceneKey)) selectedMarkersByScene.set(sceneKey, new Set());
+    return selectedMarkersByScene.get(sceneKey);
+  }
+
+  function cleanupThumbs(){
+    for(const url of markerThumbUrls.values()){
+      try{ URL.revokeObjectURL(url); }catch{}
+    }
+    markerThumbUrls = new Map();
+  }
+
+  function buildSceneOptions(data){
+    sceneSel.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = "（選択して）";
+    sceneSel.appendChild(opt0);
+
+    const roomOpt = document.createElement("option");
+    roomOpt.value = "__room__";
+    roomOpt.textContent = "Room（全体）";
+    sceneSel.appendChild(roomOpt);
+
+    const scenes = data?.entities?.scenes || {};
+    for(const [sid, sc] of Object.entries(scenes)){
+      const o = document.createElement("option");
+      o.value = sid;
+      o.textContent = sc?.name ? sc.name : `scene:${sid}`;
+      sceneSel.appendChild(o);
+    }
+  }
+
+  function resolveSizeBase(sceneKey, data, W, H){
+    const base = markerSizeBaseEl.value; // input / scene / room
+    if(base === "room"){
+      const rw = Number(data?.entities?.room?.fieldWidth);
+      const rh = Number(data?.entities?.room?.fieldHeight);
+      if(Number.isFinite(rw) && Number.isFinite(rh) && rw > 0 && rh > 0) return {mw: rw, mh: rh};
+      return {mw: W, mh: H};
+    }
+    if(base === "scene"){
+      if(sceneKey === "__room__"){
+        const rw = Number(data?.entities?.room?.fieldWidth);
+        const rh = Number(data?.entities?.room?.fieldHeight);
+        if(Number.isFinite(rw) && Number.isFinite(rh) && rw > 0 && rh > 0) return {mw: rw, mh: rh};
+        return {mw: W, mh: H};
+      } else if(sceneKey){
+        const sw = Number(data?.entities?.scenes?.[sceneKey]?.fieldWidth);
+        const sh = Number(data?.entities?.scenes?.[sceneKey]?.fieldHeight);
+        if(Number.isFinite(sw) && Number.isFinite(sh) && sw > 0 && sh > 0) return {mw: sw, mh: sh};
+        return {mw: W, mh: H};
+      }
+      return {mw: W, mh: H};
+    }
+    // input
+    return {mw: W, mh: H};
+  }
+
+  async function renderMarkersForSelectedScene(){
+    markerList.innerHTML = "";
+    cleanupThumbs();
+
+    if(!parsedData || !loadedZip) return;
+
+    const sceneKey = getSceneKey();
+    if(!sceneKey) return;
+
+    let markers = null;
+
+    if(sceneKey === "__room__"){
+      markers = parsedData?.entities?.room?.markers || {};
+    } else {
+      markers = parsedData?.entities?.scenes?.[sceneKey]?.markers || {};
+    }
+
+    const entries = Object.entries(markers);
+    if(entries.length === 0){
+      const div = document.createElement("div");
+      div.className = "sub";
+      div.textContent = "このシーンにマーカーが無い。";
+      markerList.appendChild(div);
+      return;
+    }
+
+    const selected = getSelectedSet(sceneKey);
+
+    for(const [mid, mk] of entries){
+      const card = document.createElement("div");
+      card.className = "mcard";
+
+      const row = document.createElement("div");
+      row.className = "mrow";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = selected.has(mid);
+      cb.addEventListener("change", () => {
+        if(cb.checked) selected.add(mid);
+        else selected.delete(mid);
+      });
+
+      const img = document.createElement("img");
+      img.className = "thumb";
+      img.alt = "marker";
+
+      // thumb
+      if(mk?.imageUrl && loadedZip.file(mk.imageUrl)){
+        try{
+          const blob = await loadedZip.file(mk.imageUrl).async("blob");
+          const url = URL.createObjectURL(blob);
+          markerThumbUrls.set(mid, url);
+          img.src = url;
+        }catch{
+          // ignore
+        }
+      }
+
+      const meta = document.createElement("div");
+      meta.className = "mmeta";
+
+      const title = document.createElement("div");
+      title.className = "mtitle";
+      const label = mk?.text?.trim()
+        ? mk.text.trim().replace(/\s+/g," ").slice(0, 60)
+        : (mk?.imageUrl ? mk.imageUrl : "marker");
+      title.textContent = label;
+
+      const mini = document.createElement("div");
+      mini.className = "sub mmini";
+      const w = mk?.width ?? "?";
+      const h = mk?.height ?? "?";
+      const x = mk?.x ?? "?";
+      const y = mk?.y ?? "?";
+
+      mini.innerHTML = `
+        <span class="pill">id</span><span class="mono">${mid}</span><br>
+        <span class="pill">size</span><span class="mono">${w}×${h}</span>
+        <span class="pill">pos</span><span class="mono">${x}, ${y}</span>
+      `;
+
+      meta.appendChild(title);
+      meta.appendChild(mini);
+
+      row.appendChild(cb);
+      row.appendChild(img);
+      row.appendChild(meta);
+
+      card.appendChild(row);
+      markerList.appendChild(card);
+    }
+  }
+
+  function enableMarkerUI(on){
+    sceneSel.disabled = !on;
+    markerSizeBaseEl.disabled = !on;
+    markerPosEl.disabled = !on;
+    selAllBtn.disabled = !on;
+    selNoneBtn.disabled = !on;
+  }
+
   fileEl.addEventListener("change", async () => {
     clearLog();
+    cleanupThumbs();
+    markerList.innerHTML = "";
+    selectedMarkersByScene.clear();
+
     const f = fileEl.files?.[0];
     loadedZip = null;
     loadedName = null;
+    parsedData = null;
     runBtn.disabled = true;
+    enableMarkerUI(false);
 
     if(!f){
       setStatus("未読み込み", true);
@@ -120,20 +371,22 @@
       setStatus("zip読み込み中…", true);
       const buf = await f.arrayBuffer();
       const zip = await JSZip.loadAsync(buf);
-      // __data.json 探す
+
       const dataFile = zip.file("__data.json");
       if(!dataFile){
         setStatus("zip内に __data.json が見つからん。ココフォリアのエクスポートzipである必要がある。", false);
         return;
       }
 
-      // JSON parse チェック
       const txt = await dataFile.async("string");
-      JSON.parse(txt);
+      parsedData = JSON.parse(txt);
 
       loadedZip = zip;
       loadedName = f.name.replace(/\.zip$/i, "");
       runBtn.disabled = false;
+      enableMarkerUI(true);
+
+      buildSceneOptions(parsedData);
       setStatus("OK：zip読み込み成功（__data.json確認済み）", true);
       log("Loaded: " + f.name);
       log("Found: __data.json");
@@ -144,12 +397,38 @@
     }
   });
 
+  sceneSel.addEventListener("change", async () => {
+    await renderMarkersForSelectedScene();
+  });
+
+  selAllBtn.addEventListener("click", async () => {
+    const sceneKey = getSceneKey();
+    if(!sceneKey || !parsedData) return;
+
+    let markers = null;
+    if(sceneKey === "__room__") markers = parsedData?.entities?.room?.markers || {};
+    else markers = parsedData?.entities?.scenes?.[sceneKey]?.markers || {};
+
+    const set = getSelectedSet(sceneKey);
+    for(const mid of Object.keys(markers)) set.add(mid);
+
+    await renderMarkersForSelectedScene();
+  });
+
+  selNoneBtn.addEventListener("click", async () => {
+    const sceneKey = getSceneKey();
+    if(!sceneKey) return;
+    getSelectedSet(sceneKey).clear();
+    await renderMarkersForSelectedScene();
+  });
+
   runBtn.addEventListener("click", async () => {
     clearLog();
     if(!loadedZip){
       setStatus("先にzip入れて。", false);
       return;
     }
+
     const W = Number(wEl.value);
     const H = Number(hEl.value);
     const fitMode = fitEl.value;
@@ -164,12 +443,9 @@
 
       const dataFile = loadedZip.file("__data.json");
       const txt = await dataFile.async("string");
-
       const data = JSON.parse(txt);
 
-      let countRoom = 0;
-      let countScenes = 0;
-      let countFit = 0;
+      let countRoom = 0, countScenes = 0, countFit = 0, countMarkers = 0;
 
       // room
       if(data?.entities?.room){
@@ -188,7 +464,7 @@
         throw new Error("entities.scenes が無い");
       }
 
-      for(const [id, scene] of Object.entries(scenes)){
+      for(const scene of Object.values(scenes)){
         if(!scene || typeof scene !== "object") continue;
         scene.fieldWidth = W; countScenes++;
         scene.fieldHeight = H; countScenes++;
@@ -197,29 +473,59 @@
         }
       }
 
-      // JSON書き戻し（UTF-8のまま）
-      const outJson = JSON.stringify(data);
+      // markers（選択したものだけ）
+      const markerPos = markerPosEl.value; // keep / topleft
 
-      // zip上書き
+      function patchMarkersObj(markersObj, targetW, targetH, selectedSet){
+        if(!markersObj || typeof markersObj !== "object" || !selectedSet || selectedSet.size === 0) return 0;
+        let n = 0;
+        for(const id of selectedSet){
+          const mk = markersObj[id];
+          if(!mk || typeof mk !== "object") continue;
+          mk.width = targetW; n++;
+          mk.height = targetH; n++;
+          if(markerPos === "topleft"){
+            mk.x = -targetW/2; n++;
+            mk.y = -targetH/2; n++;
+          }
+        }
+        return n;
+      }
+
+      for(const [sceneKey, selectedSet] of selectedMarkersByScene.entries()){
+        if(!selectedSet || selectedSet.size === 0) continue;
+
+        const {mw, mh} = resolveSizeBase(sceneKey, data, W, H);
+
+        if(sceneKey === "__room__"){
+          countMarkers += patchMarkersObj(data?.entities?.room?.markers, mw, mh, selectedSet);
+        } else {
+          const sc = data?.entities?.scenes?.[sceneKey];
+          countMarkers += patchMarkersObj(sc?.markers, mw, mh, selectedSet);
+        }
+      }
+
+      // JSON書き戻し
+      const outJson = JSON.stringify(data);
       loadedZip.file("__data.json", outJson);
 
-      const outBuf = await loadedZip.generateAsync({ type:"blob" });
+      const outBlob = await loadedZip.generateAsync({ type:"blob" });
 
       const outName = `${loadedName || "room"}_${W}x${H}_${fitMode === "keep" ? "keepFit" : fitMode}.zip`;
 
-      // download
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(outBuf);
+      a.href = URL.createObjectURL(outBlob);
       a.download = outName;
       document.body.appendChild(a);
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 
-      setStatus("完了：zip出力した。ダウンロードからインポートして。", true);
-      log(`Updated room: fieldWidth/Height (${countRoom} writes)`);
-      log(`Updated scenes: fieldWidth/Height (${countScenes} writes)`);
-      log(`Updated fieldObjectFit: ${countFit} writes (${fitMode})`);
+      setStatus("完了：zip出力した。ダウンロードしたzipをココフォリアにインポートして。", true);
+      log(`Updated room field size writes: ${countRoom}`);
+      log(`Updated scenes field size writes: ${countScenes}`);
+      log(`Updated fieldObjectFit writes: ${countFit} (${fitMode})`);
+      log(`Updated selected markers writes: ${countMarkers}`);
       log(`Output: ${outName}`);
     }catch(e){
       console.error(e);
