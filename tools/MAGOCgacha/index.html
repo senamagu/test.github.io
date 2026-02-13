@@ -557,7 +557,9 @@
       border:3px solid var(--card);
       border-radius:14px;
       padding:10px;
-      max-height: 150px;
+
+      max-height: none;     /* ←消す/上書き */
+      min-height: 210px;    /* ←色パネル下まで届く目安（必要なら 230 とかに） */
       overflow:auto;
     }
     .hitgrid{
@@ -1564,6 +1566,13 @@
       applyFilters();
       wireInputs();
     }
+    
+    (async ()=>{
+      try{ await loadCharacters(); }
+      catch(e){ console.error(e); characters=[]; }
+      init();
+    })();
+
   </script>
 </body>
 </html>
