@@ -1,3 +1,226 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ツール一覧</title>
+  <style>
+
+:root{
+  /* palette from your image */
+  --lime: #8cb83c;
+  --deep: #152217;
+  --olive: #4f5740;
+  --mist: #c9cbc5;
+
+  --bg: linear-gradient(180deg, #0e140f 0%, #121a12 55%, #0e140f 100%);
+  --panel: rgba(21, 34, 23, .72);
+  --panel2: rgba(79, 87, 64, .22);
+  --line: rgba(201, 203, 197, .18);
+  --text: #eef1ea;
+  --muted: rgba(238,241,234,.7);
+
+  --r: 18px;
+  --shadow: 0 18px 60px rgba(0,0,0,.35);
+}
+
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  color:var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+}
+
+/* layout */
+.page{
+  width:min(980px, 100%);
+  margin: 0 auto;
+  padding: 18px 14px 40px;
+}
+
+/* top */
+.hero{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  padding: 14px 14px;
+  margin-bottom: 18px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: linear-gradient(135deg, rgba(140,184,60,.16), rgba(21,34,23,.88));
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.title{
+  margin:0;
+  font-size: 20px;
+  letter-spacing: .04em;
+}
+.sub{
+  margin:6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* sections */
+.section{ margin-top: 18px; }
+.section-title{
+  margin: 0 0 10px;
+  font-size: 14px;
+  letter-spacing: .08em;
+  color: rgba(238,241,234,.88);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.section-title::before{
+  content:"";
+  width: 10px; height: 10px;
+  border-radius: 999px;
+  background: var(--lime);
+  box-shadow: 0 0 0 6px rgba(140,184,60,.12);
+}
+
+/* grid of cards (auto scales when you add tools) */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.card{
+  text-decoration:none;
+  color: var(--text);
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+  padding: 14px 14px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background:
+    radial-gradient(1200px 200px at 20% 0%, rgba(140,184,60,.16), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)),
+    var(--panel);
+  box-shadow: 0 10px 36px rgba(0,0,0,.28);
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(140,184,60,.42);
+  background:
+    radial-gradient(1200px 200px at 20% 0%, rgba(140,184,60,.22), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)),
+    rgba(21, 34, 23, .76);
+}
+
+.card-title{
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: .02em;
+}
+
+.card-meta{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: rgba(238,241,234,.86);
+  border: 1px solid rgba(201,203,197,.2);
+  background: var(--panel2);
+}
+.card-meta::before{
+  content:"";
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: rgba(140,184,60,.9);
+  box-shadow: 0 0 0 6px rgba(140,184,60,.10);
+}
+
+/* footer */
+.foot{
+  margin-top: 28px;
+  color: rgba(238,241,234,.45);
+  font-size: 12px;
+  text-align:center;
+}
+
+/* mobile tuning */
+@media (max-width: 420px){
+  .title{ font-size: 18px; }
+  .hero{ padding: 12px; }
+  .card{ padding: 12px; }
+}
+
+    
+  </style>
+</head>
+
+<body>
+<main class="page">
+  <header class="hero">
+    <div>
+      <h1 class="title">ツール一覧</h1>
+      <p class="sub">便利なもの / ミニゲーム / 自己満</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2 class="section-title">便利なもの</h2>
+    <div class="grid">
+      <a class="card" href="./tools/SyntaxCopyGenerator/">
+        <div class="card-title">定期文コピージェネレーター</div>
+        <div class="card-meta">テキスト</div>
+      </a>
+
+      <a class="card" href="./tools/CCFO-FG/">
+        <div class="card-title">ココフォリア前景大きさ一括置換</div>
+        <div class="card-meta">調整中</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">ミニゲーム</h2>
+    <div class="grid">
+      <a class="card" href="./tools/Guessthenumber/">
+        <div class="card-title">数字当てゲーム</div>
+        <div class="card-meta">ミニゲーム</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">自己満</h2>
+    <div class="grid">
+      <a class="card" href="./tools/CSBM-TRPG/">
+        <div class="card-title">自作TRPGキャラシツール beta版</div>
+        <div class="card-meta">TRPG</div>
+      </a>
+
+      <a class="card" href="./tools/test/">
+        <div class="card-title">HTML練習</div>
+        <div class="card-meta">Sandbox</div>
+      </a>
+    </div>
+  </section>
+
+  <footer class="foot">© tools</footer>
+</main>
+</body>
+</html>
+
 <ul>
   <li>便利なもの</li>
   <li><a href="./tools/SyntaxCopyGenerator/">定期文コピージェネレーター</a></li>
