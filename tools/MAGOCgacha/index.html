@@ -387,6 +387,29 @@
       opacity:1;
     }
 
+    /* mid+right を1つの塊にする */
+.filter-side{
+  grid-column: 2 / 4;          /* 2列目〜3列目をまとめて使う */
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:0;
+}
+
+/* 上段（赤線より上の枠） */
+.side-top{
+  display:grid;
+  grid-template-columns: 180px 1fr; /* 左：色 / 右：トグル＋件数 */
+  gap:14px;
+  align-items:start;
+}
+
+/* hitlist はこの塊の下に置く */
+.filter-side .hitlist{
+  min-height: 240px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
+  max-height: none;
+}
+
     /* multi select */
     .multi{ position:relative; }
     .multi-btn{
@@ -885,38 +908,43 @@
         </div>
       </div><!-- /filter-left -->
 
-      <!-- mid -->
-      <div class="filter-mid">
-        <div class="field" style="grid-template-columns:1fr;">
-          <div class="k">イメージカラー</div>
-          <div class="color-box" id="colorBox" title="タップで選択">
-            <img src="colorwheel.png" alt="color wheel">
-          </div>
+<!-- mid + right をまとめる -->
+<div class="filter-side">
+  <div class="side-top">
+    <!-- 左：イメージカラー -->
+    <div class="filter-mid">
+      <div class="field" style="grid-template-columns:1fr;">
+        <div class="k">イメージカラー</div>
+        <div class="color-box" id="colorBox" title="タップで選択">
+          <img src="colorwheel.png" alt="color wheel">
         </div>
-      </div><!-- /filter-mid -->
+      </div>
+    </div>
 
- 
-      <!-- right -->
-      <div class="filter-right">
-        <div class="toggle" id="tglHasImage">
-          <span class="radio on" id="dotHasImage"></span>
-          <span>画像ありのみ</span>
-        </div>
+    <!-- 右：トグル + ヒット件数 -->
+    <div class="filter-right">
+      <div class="toggle" id="tglHasImage">
+        <span class="radio on" id="dotHasImage"></span>
+        <span>画像ありのみ</span>
+      </div>
 
-  
-        <div class="toggle" id="tglHasDoc">
-          <span class="radio" id="dotHasDoc"></span>
-          <span>資料ありのみ</span>
-        </div>
-        <div class="hits">
-          <span>ヒット件数</span>
-          <span id="hitCount">0</span><span>名</span>
-        </div>
-        <div class="hitlist">
-          <div class="hitgrid" id="hitGrid"></div>
-        </div>
-      </div><!-- /filter-right -->
-    </div><!-- /filters -->
+      <div class="toggle" id="tglHasDoc">
+        <span class="radio" id="dotHasDoc"></span>
+        <span>資料ありのみ</span>
+      </div>
+
+      <div class="hits">
+        <span>ヒット件数</span>
+        <span id="hitCount">0</span><span>名</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下：名前リスト（赤線の下） -->
+  <div class="hitlist">
+    <div class="hitgrid" id="hitGrid"></div>
+  </div>
+</div>
 
     <div class="bottom">
       <button class="btn-list" id="btnList">キャラ一覧へ</button>
@@ -968,7 +996,7 @@
     let characters = [];
 
     async function loadCharacters(){ 
-      const res = await fetch("characters.json", {cache:"no-store"});  
+      const res = await fetch("./characters.json", { cache:"no-store" }); 
       if(!res.ok) throw new Error("characters.json 読めない");  
       characters = await res.json();
     }
@@ -1219,8 +1247,10 @@
       for(const v of values){
         const row = document.createElement("div");
         row.className = "opt";
+
         const tick = document.createElement("span");
         tick.className = "tick" + (currentSet.has(v) ? " on":"");
+
         const label = document.createElement("span");
         label.textContent = (kind==="gender") ? genderLabel(v) : v;
 
@@ -1239,11 +1269,8 @@
 
         panel.appendChild(row);
       }
+
       updateMultiValueText(multiEl);
-      const panel = multiEl.querySelector(".multi-panel");
-      panel.addEventListener("click", (e)=> e.stopPropagation());
-      const btn = multiEl.querySelector(".multi-btn");
-      btn.addEventListener("click", (e)=> e.stopPropagation());
     }
 
     function setupMulti(){
