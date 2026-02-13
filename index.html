@@ -18,7 +18,7 @@
   --cardText:#CACBC4;
   --cardSub: #879866;
 
-  --r:18px;
+  --r:8px;
   --gap: clamp(12px, 2.2vw, 24px);
 }
 
@@ -28,13 +28,22 @@ html,body{ height:100%; }
 body{
   margin:0;
   color:var(--text);
+
   font-family:
     "Hiragino Kaku Gothic ProN",
     "Hiragino Sans",
     -apple-system,
     system-ui,
     sans-serif;
-  background: var(--lime);
+
+  font-weight: 700; /* ←W7相当の狙い */
+  background-color: var(--lime);
+
+  /* 背景の丸パターン（前に出ない本物の背景） */
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.10) 0 80%, transparent 81%);
+  background-size: 110px 110px;
+  background-position: 0 0;
 }
 
 /* ====== TOP BAR (画像っぽく) ====== */
@@ -58,6 +67,9 @@ body{
   font-weight: 900;
   color: rgba(21,34,23,.8);
 }
+
+.h1, .card-title{ font-weight: 900; }
+    
 .note{
   margin:0;
   text-align:right;
@@ -75,23 +87,6 @@ body{
   padding: var(--gap) clamp(16px, 3vw, 32px) calc(var(--gap) * 2);
 }
 
-/* 背景パターン（軽量・平面） */
-/* 画面全体に丸パターン */
-body{
-  margin:0;
-    font-family:
-      "Hiragino Kaku Gothic ProN",
-      "Hiragino Sans",
-      sans-serif;
-      font-weight: 700;
-
-  background-color: var(--lime);
-  background-image:
-    radial-gradient(circle, rgb(150,195,73) 0 80%, transparent 57%);
-  background-size: 110px 110px;
-  background-position: 0 0;
-}
-
 /* ====== SECTION ====== */
 .section{
   margin-bottom: calc(var(--gap) * 1.4);
@@ -101,17 +96,17 @@ body{
   display:flex;
   align-items:center;
   gap: 14px;
-  font-size: clamp(18px, 2.4vw, 26px);
-  font-weight: 900;
+  font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: 800;
   letter-spacing:.06em;
-  color: rgba(0,0,0,.85);
+  color: rgb(79, 87, 65);
 }
 .section-title::before{
   content:"";
   width: 14px;
   height: 14px;
   border-radius: 999px;
-  background: #0b120d;
+  background: var(--text);
 }
 
 /* ====== GRID (増えても崩れない) ====== */
@@ -200,11 +195,7 @@ body{
   </header>
 
   <main class="page">
-  <div id="sections"></div>
-        <!-- JSがここにセクションを自動生成する -->
-      </div>
-    </div>
-
+    <div id="sections"></div>
     <footer class="foot">© tools</footer>
 
     <!-- ここにツール追加するだけでOK（増えても崩れない） -->
@@ -212,10 +203,10 @@ body{
       <a data-cat="便利なもの" href="./tools/SyntaxCopyGenerator/" data-title="定型文コピージェネレーター" data-sub="定型文を作りやすくなるツール"></a>
       <a data-cat="便利なもの" href="./tools/CCFO-FG/" data-title="ココフォリア前景大きさ一括置換" data-sub="微調整中"></a>
 
-      <a data-cat="ミニゲーム" href="./tools/Guessthenumber/" data-title="数字当てゲーム" data-sub="ミニゲーム"></a>
+      <a data-cat="ミニゲーム" href="./tools/Guessthenumber/" data-title="数字当てゲーム" data-sub="一瞬出てくる数字を当てるだけ！のゲーム！"></a>
 
-      <a data-cat="自己満" href="./tools/CSBM-TRPG/" data-title="自作TRPGキャラシツール beta版" data-sub="TRPG"></a>
-      <a data-cat="自己満" href="./tools/test/" data-title="HTML練習" data-sub="Sandbox"></a>
+      <a data-cat="自己満" href="./tools/CSBM-TRPG/" data-title="自作TRPGキャラシツール beta版" data-sub="自作TRPGのキャラシを作るツール"></a>
+      <a data-cat="自己満" href="./tools/test/" data-title="HTML練習" data-sub="何も無いよ"></a>
     </template>
   </main>
 
