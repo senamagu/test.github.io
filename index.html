@@ -7,75 +7,77 @@
   <style>
 
 :root{
-  /* palette from your image */
-  --lime: #8cb83c;
-  --deep: #152217;
-  --olive: #4f5740;
-  --mist: #c9cbc5;
+  --lime:#8cb83c;
+  --deep:#152217;
+  --olive:#4f5740;
+  --mist:#c9cbc5;
 
-  --bg: linear-gradient(180deg, #0e140f 0%, #121a12 55%, #0e140f 100%);
-  --panel: rgba(21, 34, 23, .72);
-  --panel2: rgba(79, 87, 64, .22);
-  --line: rgba(201, 203, 197, .18);
-  --text: #eef1ea;
-  --muted: rgba(238,241,234,.7);
+  /* flat theme */
+  --bg: var(--lime);            /* 背景はベタ */
+  --surface: #0f1711;           /* 濃い面 */
+  --surface2: #1a241a;          /* ちょい薄い面 */
+  --card: #121c14;              /* カード面 */
+  --line: rgba(21,34,23,.28);   /* 罫線（濃すぎない） */
+  --text: #0c120d;              /* 背景が明るいので基本は黒寄り */
+  --textOnDark: #e9eee4;        /* 暗い面の文字 */
+  --mutedOnDark: rgba(233,238,228,.72);
 
-  --r: 18px;
-  --shadow: 0 18px 60px rgba(0,0,0,.35);
+  --r:18px;
 }
 
 *{ box-sizing:border-box; }
 body{
   margin:0;
-  color:var(--text);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   background: var(--bg);
+  color: var(--text);
 }
 
-/* layout */
+/* レイアウト */
 .page{
   width:min(980px, 100%);
   margin: 0 auto;
   padding: 18px 14px 40px;
 }
 
-/* top */
+/* 上のヘッダー：ベタ＋線だけ */
 .hero{
   position: sticky;
   top: 0;
   z-index: 10;
+
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
   gap:12px;
+
   padding: 14px 14px;
   margin-bottom: 18px;
 
-  border: 1px solid var(--line);
+  border: 2px solid var(--deep);
   border-radius: var(--r);
-  background: linear-gradient(135deg, rgba(140,184,60,.16), rgba(21,34,23,.88));
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow);
+  background: rgba(255,255,255,.18); /* 明るい緑の上に薄い白で“面”を作る */
 }
 
 .title{
   margin:0;
   font-size: 20px;
   letter-spacing: .04em;
+  color: var(--deep);
 }
 .sub{
   margin:6px 0 0;
-  color: var(--muted);
   font-size: 12px;
+  color: rgba(21,34,23,.78);
 }
 
-/* sections */
+/* セクション見出し */
 .section{ margin-top: 18px; }
 .section-title{
   margin: 0 0 10px;
   font-size: 14px;
   letter-spacing: .08em;
-  color: rgba(238,241,234,.88);
+  color: var(--deep);
   display:flex;
   align-items:center;
   gap:10px;
@@ -84,50 +86,51 @@ body{
   content:"";
   width: 10px; height: 10px;
   border-radius: 999px;
-  background: var(--lime);
-  box-shadow: 0 0 0 6px rgba(140,184,60,.12);
+  background: var(--deep);
 }
 
-/* grid of cards (auto scales when you add tools) */
+/* カードグリッド */
 .grid{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 10px;
 }
 
+/* カード：グラデ無し、影ほぼ無し、線と面で見せる */
 .card{
   text-decoration:none;
-  color: var(--text);
   display:flex;
   flex-direction:column;
   gap: 10px;
-  padding: 14px 14px;
 
-  border: 1px solid var(--line);
+  padding: 14px 14px;
   border-radius: var(--r);
-  background:
-    radial-gradient(1200px 200px at 20% 0%, rgba(140,184,60,.16), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)),
-    var(--panel);
-  box-shadow: 0 10px 36px rgba(0,0,0,.28);
-  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+
+  border: 2px solid var(--deep);
+  background: var(--surface);
+  color: var(--textOnDark);
+
+  /* 影を盛らず“紙”っぽくしたいならコレだけ */
+  box-shadow: 4px 4px 0 var(--deep);
+  transition: transform .12s ease;
 }
 
 .card:hover{
-  transform: translateY(-2px);
-  border-color: rgba(140,184,60,.42);
-  background:
-    radial-gradient(1200px 200px at 20% 0%, rgba(140,184,60,.22), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)),
-    rgba(21, 34, 23, .76);
+  transform: translate(-1px, -1px);
+}
+
+.card:active{
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 var(--deep);
 }
 
 .card-title{
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.25;
   letter-spacing: .02em;
 }
 
+/* メタはピルでフラットに */
 .card-meta{
   display:inline-flex;
   align-items:center;
@@ -135,28 +138,29 @@ body{
   width: fit-content;
   padding: 6px 10px;
   border-radius: 999px;
+
   font-size: 12px;
-  color: rgba(238,241,234,.86);
-  border: 1px solid rgba(201,203,197,.2);
-  background: var(--panel2);
+  color: var(--mutedOnDark);
+
+  border: 2px solid rgba(233,238,228,.22);
+  background: transparent;
 }
 .card-meta::before{
   content:"";
   width: 8px; height: 8px;
   border-radius: 999px;
-  background: rgba(140,184,60,.9);
-  box-shadow: 0 0 0 6px rgba(140,184,60,.10);
+  background: var(--lime);
 }
 
-/* footer */
+/* フッター */
 .foot{
   margin-top: 28px;
-  color: rgba(238,241,234,.45);
   font-size: 12px;
   text-align:center;
+  color: rgba(21,34,23,.8);
 }
 
-/* mobile tuning */
+/* モバイル */
 @media (max-width: 420px){
   .title{ font-size: 18px; }
   .hero{ padding: 12px; }
@@ -220,14 +224,3 @@ body{
 </main>
 </body>
 </html>
-
-<ul>
-  <li>便利なもの</li>
-  <li><a href="./tools/SyntaxCopyGenerator/">定期文コピージェネレーター</a></li>
-  <li><a href="./tools/CCFO-FG/">ココフォリア前景大きさ一括置換(微調整中)</a></li>
-  <li>ミニゲーム</li>
-  <li><a href="./tools/Guessthenumber/">数字当てゲーム</a></li>
-  <li>自己満</li>
-  <li><a href="./tools/CSBM-TRPG/">自作TRPGキャラシツールbeta版</a></li>
-  <li><a href="./tools/test/">HTML練習</a></li>
-</ul>
