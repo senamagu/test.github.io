@@ -76,33 +76,29 @@ body{
 }
 
 /* 背景パターン（軽量・平面） */
-.pattern{
-  position:relative;
-  border-radius: calc(var(--r) + 8px);
-  overflow:hidden;
-}
-.pattern::before{
+/* 画面全体に丸パターン */
+body::before{
   content:"";
-  position:absolute;
-  inset:0;
-  /* 画像の丸模様っぽい：薄い円が並ぶ */
+  position:fixed;
+  inset:-40px; /* はみ出し防止でちょい広げる */
   background:
-    radial-gradient(circle, rgba(255,255,255,.10) 0 56%, transparent 57%) 0 0/120px 120px;
+    radial-gradient(circle, rgba(255,255,255,.10) 0 56%, transparent 57%) 0 0/110px 110px;
   opacity:.55;
   pointer-events:none;
+  z-index:0;
 }
-.pattern::after{
+
+/* 上に乗る要素を前に出す */
+/* ======
+.topbar, .page{ position:relative; z-index:1; }
+ .pattern::after{ 
   content:"";
   position:absolute;
   inset:0;
-  /* 模様を少しだけ沈めるフィルム（見た目崩さず文字だけ読みやすく） */
   background: rgba(0,0,0,.04);
   pointer-events:none;
-}
-.content{
-  position:relative;
-  padding: var(--gap);
-}
+} 
+  ====== */
 
 /* ====== SECTION ====== */
 .section{
@@ -130,9 +126,13 @@ body{
 /* カードは「横長感」出したいので min を少し大きめに */
 .grid{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(520px, 100%), 1fr));
-  gap: var(--gap);
-  align-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.8vw, 18px);
+}
+
+/* 画面が狭い時だけ1列 */
+@media (max-width: 760px){
+  .grid{ grid-template-columns: 1fr; }
 }
 
 /* ====== CARD ====== */
@@ -142,8 +142,8 @@ body{
   color: var(--cardText);
   background: var(--card);
   border-radius: var(--r);
-  padding: clamp(18px, 2.4vw, 26px);
-  min-height: clamp(110px, 12vw, 160px);
+  padding: clamp(14px, 1.8vw, 20px);
+  min-height: clamp(96px, 10vw, 130px);
 
   /* 平面寄りの“板” */
   border: 2px solid rgba(21,34,23,.30);
@@ -156,7 +156,7 @@ body{
 
 .card-title{
   margin:0;
-  font-size: clamp(18px, 2.1vw, 30px);
+  font-size: clamp(16px, 1.8vw, 24px);
   font-weight: 900;
   letter-spacing:.04em;
   line-height:1.2;
@@ -169,8 +169,8 @@ body{
 }
 
 .card-sub{
-  margin: 14px 0 0;
-  font-size: clamp(14px, 1.5vw, 18px);
+  margin-top: 10px;
+  font-size: clamp(13px, 1.3vw, 16px);
   font-weight: 800;
   letter-spacing:.04em;
   color: var(--cardSub);
@@ -208,8 +208,7 @@ body{
   </header>
 
   <main class="page">
-    <div class="pattern">
-      <div class="content" id="sections">
+  <div id="sections"></div>
         <!-- JSがここにセクションを自動生成する -->
       </div>
     </div>
