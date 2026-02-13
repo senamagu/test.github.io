@@ -5,222 +5,290 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ツール一覧</title>
   <style>
-
 :root{
   --lime:#8cb83c;
   --deep:#152217;
   --olive:#4f5740;
   --mist:#c9cbc5;
 
-  /* flat theme */
-  --bg: var(--lime);            /* 背景はベタ */
-  --surface: #0f1711;           /* 濃い面 */
-  --surface2: #1a241a;          /* ちょい薄い面 */
-  --card: #121c14;              /* カード面 */
-  --line: rgba(21,34,23,.28);   /* 罫線（濃すぎない） */
-  --text: #0c120d;              /* 背景が明るいので基本は黒寄り */
-  --textOnDark: #e9eee4;        /* 暗い面の文字 */
-  --mutedOnDark: rgba(233,238,228,.72);
+  --top:#c9cbc5;      /* 画像の上の灰帯 */
+  --text:#152217;
+
+  --card:#4f5740;     /* 画像のカード色 */
+  --cardText:#e9eee4;
+  --cardSub: rgba(233,238,228,.68);
 
   --r:18px;
+  --gap: clamp(12px, 2.2vw, 24px);
 }
 
+/* reset */
 *{ box-sizing:border-box; }
+html,body{ height:100%; }
 body{
   margin:0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* レイアウト */
-.page{
-  width:min(980px, 100%);
-  margin: 0 auto;
-  padding: 18px 14px 40px;
-}
-
-/* 上のヘッダー：ベタ＋線だけ */
-.hero{
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:12px;
-
-  padding: 14px 14px;
-  margin-bottom: 18px;
-
-  border: 2px solid var(--deep);
-  border-radius: var(--r);
-  background: rgba(255,255,255,.18); /* 明るい緑の上に薄い白で“面”を作る */
-}
-
-.title{
-  margin:0;
-  font-size: 20px;
-  letter-spacing: .04em;
-  color: var(--deep);
-}
-.sub{
-  margin:6px 0 0;
-  font-size: 12px;
-  color: rgba(21,34,23,.78);
-}
-
-/* セクション見出し */
-.section{ margin-top: 18px; }
-.section-title{
-  margin: 0 0 10px;
-  font-size: 14px;
-  letter-spacing: .08em;
-  color: var(--deep);
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.section-title::before{
-  content:"";
-  width: 10px; height: 10px;
-  border-radius: 999px;
-  background: var(--deep);
-}
-
-/* カードグリッド */
-.grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-}
-
-/* カード：グラデ無し、影ほぼ無し、線と面で見せる */
-.card{
-  text-decoration:none;
-  display:flex;
-  flex-direction:column;
-  gap: 10px;
-
-  padding: 14px 14px;
-  border-radius: var(--r);
-
-  border: 2px solid var(--deep);
-  background: var(--surface);
-  color: var(--textOnDark);
-
-  /* 影を盛らず“紙”っぽくしたいならコレだけ */
-  box-shadow: 4px 4px 0 var(--deep);
-  transition: transform .12s ease;
-}
-
-.card:hover{
-  transform: translate(-1px, -1px);
-}
-
-.card:active{
-  transform: translate(1px, 1px);
-  box-shadow: 2px 2px 0 var(--deep);
-}
-
-.card-title{
-  font-weight: 800;
-  line-height: 1.25;
-  letter-spacing: .02em;
-}
-
-/* メタはピルでフラットに */
-.card-meta{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  width: fit-content;
-  padding: 6px 10px;
-  border-radius: 999px;
-
-  font-size: 12px;
-  color: var(--mutedOnDark);
-
-  border: 2px solid rgba(233,238,228,.22);
-  background: transparent;
-}
-.card-meta::before{
-  content:"";
-  width: 8px; height: 8px;
-  border-radius: 999px;
+  color:var(--text);
+  font-family:
+    "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans",
+    -apple-system,
+    system-ui,
+    sans-serif;
   background: var(--lime);
 }
 
-/* フッター */
-.foot{
-  margin-top: 28px;
-  font-size: 12px;
-  text-align:center;
+/* ====== TOP BAR (画像っぽく) ====== */
+.topbar{
+  background: var(--top);
+  border-bottom: 2px solid rgba(21,34,23,.25);
+}
+.topbar-inner{
+  width:min(1200px, 100%);
+  margin:0 auto;
+  padding: clamp(18px, 3.2vw, 34px) clamp(16px, 3vw, 32px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap: 16px;
+}
+.h1{
+  margin:0;
+  font-size: clamp(34px, 5vw, 54px);
+  letter-spacing:.06em;
+  font-weight: 900;
   color: rgba(21,34,23,.8);
 }
-
-/* モバイル */
-@media (max-width: 420px){
-  .title{ font-size: 18px; }
-  .hero{ padding: 12px; }
-  .card{ padding: 12px; }
+.note{
+  margin:0;
+  text-align:right;
+  font-weight: 800;
+  letter-spacing:.06em;
+  color: rgba(79,87,64,.75);
+  line-height:1.2;
+  font-size: clamp(14px, 1.8vw, 22px);
 }
 
-    
+/* ====== MAIN AREA ====== */
+.page{
+  width:min(1200px, 100%);
+  margin:0 auto;
+  padding: var(--gap) clamp(16px, 3vw, 32px) calc(var(--gap) * 2);
+}
+
+/* 背景パターン（軽量・平面） */
+.pattern{
+  position:relative;
+  border-radius: calc(var(--r) + 8px);
+  overflow:hidden;
+}
+.pattern::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  /* 画像の丸模様っぽい：薄い円が並ぶ */
+  background:
+    radial-gradient(circle, rgba(255,255,255,.10) 0 56%, transparent 57%) 0 0/120px 120px;
+  opacity:.55;
+  pointer-events:none;
+}
+.pattern::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  /* 模様を少しだけ沈めるフィルム（見た目崩さず文字だけ読みやすく） */
+  background: rgba(0,0,0,.04);
+  pointer-events:none;
+}
+.content{
+  position:relative;
+  padding: var(--gap);
+}
+
+/* ====== SECTION ====== */
+.section{
+  margin-bottom: calc(var(--gap) * 1.4);
+}
+.section-title{
+  margin: 0 0 14px;
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  font-size: clamp(18px, 2.4vw, 26px);
+  font-weight: 900;
+  letter-spacing:.06em;
+  color: rgba(0,0,0,.85);
+}
+.section-title::before{
+  content:"";
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #0b120d;
+}
+
+/* ====== GRID (増えても崩れない) ====== */
+/* カードは「横長感」出したいので min を少し大きめに */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(520px, 100%), 1fr));
+  gap: var(--gap);
+  align-items: stretch;
+}
+
+/* ====== CARD ====== */
+.card{
+  display:block;
+  text-decoration:none;
+  color: var(--cardText);
+  background: var(--card);
+  border-radius: var(--r);
+  padding: clamp(18px, 2.4vw, 26px);
+  min-height: clamp(110px, 12vw, 160px);
+
+  /* 平面寄りの“板” */
+  border: 2px solid rgba(21,34,23,.30);
+
+  /* アニメは控えめ（雰囲気壊さない） */
+  transition: transform .12s ease, filter .12s ease;
+}
+.card:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+.card:active{ transform: translateY(0px); }
+
+.card-title{
+  margin:0;
+  font-size: clamp(18px, 2.1vw, 30px);
+  font-weight: 900;
+  letter-spacing:.04em;
+  line-height:1.2;
+
+  /* 長いタイトルの破綻防止 */
+  display:-webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow:hidden;
+}
+
+.card-sub{
+  margin: 14px 0 0;
+  font-size: clamp(14px, 1.5vw, 18px);
+  font-weight: 800;
+  letter-spacing:.04em;
+  color: var(--cardSub);
+
+  display:-webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow:hidden;
+}
+
+/* ====== footer ====== */
+.foot{
+  margin-top: calc(var(--gap) * 1.5);
+  text-align:center;
+  font-size: 12px;
+  color: rgba(21,34,23,.7);
+}
+
+/* small screens: カードを1列固定に寄せる */
+@media (max-width: 640px){
+  .grid{ grid-template-columns: 1fr; }
+  .topbar-inner{ align-items:flex-start; }
+  .note{ text-align:left; }
+}
   </style>
 </head>
 
 <body>
-<main class="page">
-  <header class="hero">
-    <div>
-      <h1 class="title">ツール一覧</h1>
-      <p class="sub">便利なもの / ミニゲーム / 自己満</p>
+  <!-- 上の灰帯 -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1 class="h1">ツール一覧</h1>
+      <p class="note">VibeCodingで作ったもの<br>自己満なので不具合の修正は気まぐれです</p>
     </div>
   </header>
 
-  <section class="section">
-    <h2 class="section-title">便利なもの</h2>
-    <div class="grid">
-      <a class="card" href="./tools/SyntaxCopyGenerator/">
-        <div class="card-title">定期文コピージェネレーター</div>
-        <div class="card-meta">テキスト</div>
-      </a>
-
-      <a class="card" href="./tools/CCFO-FG/">
-        <div class="card-title">ココフォリア前景大きさ一括置換</div>
-        <div class="card-meta">調整中</div>
-      </a>
+  <main class="page">
+    <div class="pattern">
+      <div class="content" id="sections">
+        <!-- JSがここにセクションを自動生成する -->
+      </div>
     </div>
-  </section>
 
-  <section class="section">
-    <h2 class="section-title">ミニゲーム</h2>
-    <div class="grid">
-      <a class="card" href="./tools/Guessthenumber/">
-        <div class="card-title">数字当てゲーム</div>
-        <div class="card-meta">ミニゲーム</div>
-      </a>
-    </div>
-  </section>
+    <footer class="foot">© tools</footer>
 
-  <section class="section">
-    <h2 class="section-title">自己満</h2>
-    <div class="grid">
-      <a class="card" href="./tools/CSBM-TRPG/">
-        <div class="card-title">自作TRPGキャラシツール beta版</div>
-        <div class="card-meta">TRPG</div>
-      </a>
+    <!-- ここにツール追加するだけでOK（増えても崩れない） -->
+    <template id="tool-data">
+      <a data-cat="便利なもの" href="./tools/SyntaxCopyGenerator/" data-title="定型文コピージェネレーター" data-sub="定型文を作りやすくなるツール"></a>
+      <a data-cat="便利なもの" href="./tools/CCFO-FG/" data-title="ココフォリア前景大きさ一括置換" data-sub="微調整中"></a>
 
-      <a class="card" href="./tools/test/">
-        <div class="card-title">HTML練習</div>
-        <div class="card-meta">Sandbox</div>
-      </a>
-    </div>
-  </section>
+      <a data-cat="ミニゲーム" href="./tools/Guessthenumber/" data-title="数字当てゲーム" data-sub="ミニゲーム"></a>
 
-  <footer class="foot">© tools</footer>
-</main>
+      <a data-cat="自己満" href="./tools/CSBM-TRPG/" data-title="自作TRPGキャラシツール beta版" data-sub="TRPG"></a>
+      <a data-cat="自己満" href="./tools/test/" data-title="HTML練習" data-sub="Sandbox"></a>
+    </template>
+  </main>
+
+  <script>
+(() => {
+  const root = document.getElementById("sections");
+  const tpl = document.getElementById("tool-data");
+  const items = [...tpl.content.querySelectorAll("a[data-cat]")];
+
+  // カテゴリ順（ここに新カテゴリ追加してもOK）
+  const order = ["便利なもの", "ミニゲーム", "自己満"];
+
+  // 仕分け
+  const map = new Map();
+  for (const a of items) {
+    const cat = a.dataset.cat?.trim() || "その他";
+    if (!map.has(cat)) map.set(cat, []);
+    map.get(cat).push({
+      href: a.getAttribute("href"),
+      title: a.dataset.title || a.getAttribute("href"),
+      sub: a.dataset.sub || ""
+    });
+  }
+
+  // 表示順：order -> 未定義カテゴリ（アルファベット/辞書順）
+  const cats = [
+    ...order.filter(c => map.has(c)),
+    ...[...map.keys()].filter(c => !order.includes(c)).sort((x,y)=>x.localeCompare(y,"ja"))
+  ];
+
+  // 描画
+  root.innerHTML = "";
+  for (const cat of cats) {
+    const section = document.createElement("section");
+    section.className = "section";
+
+    const h2 = document.createElement("h2");
+    h2.className = "section-title";
+    h2.textContent = cat;
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    for (const it of map.get(cat)) {
+      const card = document.createElement("a");
+      card.className = "card";
+      card.href = it.href;
+
+      const t = document.createElement("p");
+      t.className = "card-title";
+      t.textContent = it.title;
+
+      const s = document.createElement("p");
+      s.className = "card-sub";
+      s.textContent = it.sub;
+
+      card.append(t, s);
+      grid.append(card);
+    }
+
+    section.append(h2, grid);
+    root.append(section);
+  }
+})();
+  </script>
 </body>
 </html>
