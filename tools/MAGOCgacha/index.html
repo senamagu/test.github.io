@@ -852,12 +852,11 @@
       <div class="label">絞り込む</div>
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
-    </div>
 
     <div class="filters">
- 
       <!-- left -->
       <div class="filter-left">
+      <!-- 創作 -->
         <div class="field">
           <div class="k">創作タイトル</div> 
           <div class="multi" data-multi="series">
@@ -867,7 +866,8 @@
             <div class="multi-panel"></div>  
           </div>
         </div>
-
+        
+        <!-- ジャンル -->
         <div class="field"> 
           <div class="k">キャラジャンル</div>
           <div class="multi" data-multi="genre">
@@ -878,6 +878,7 @@
           </div>
         </div>
 
+        <!-- 性別 -->
         <div class="field">
           <div class="k">性別</div> 
           <div class="multi" data-multi="gender"> 
@@ -887,7 +888,8 @@
             <div class="multi-panel"></div> 
           </div> 
         </div>
- 
+
+        <!-- 年齢 -->
         <div class="field">
           <div class="k">年齢</div>
           <div class="range-row suffix-right">
@@ -898,6 +900,7 @@
           </div>
         </div>
 
+        <!-- 身長 -->
         <div class="field">
           <div class="k">身長</div>
           <div class="range-row suffix-right">
@@ -919,39 +922,38 @@
               <div class="color-box" id="colorBox" title="タップで選択">
                 <img src="colorwheel.png" alt="color wheel">
               </div>
+            </div>
+          </div>
+
+          <!-- light -->
+          <div class="filter-right">
+            <div class="toggle" id="tglHasImage">
+              <span class="radio on" id="dotHasImage"></span>
+              <span>画像ありのみ</span>
+          </div>
+
+          <div class="toggle" id="tglHasDoc">
+            <span class="radio" id="dotHasDoc"></span>
+            <span>資料ありのみ</span>
+          </div>
+
+          <div class="hits">
+            <span>ヒット件数</span>
+            <span id="hitCount">0</span><span>名</span>
           </div>
         </div>
-      </div>
+      </div><!-- /side-top -->
 
-    <!-- 右：トグル + ヒット件数 -->
-    <div class="filter-right">
-      <div class="toggle" id="tglHasImage">
-        <span class="radio on" id="dotHasImage"></span>
-        <span>画像ありのみ</span>
+      <!-- bottom list -->
+      <div class="hitlist">
+        <div class="hitgrid" id="hitGrid"></div>
       </div>
-
-      <div class="toggle" id="tglHasDoc">
-        <span class="radio" id="dotHasDoc"></span>
-        <span>資料ありのみ</span>
-      </div>
-
-      <div class="hits">
-        <span>ヒット件数</span>
-        <span id="hitCount">0</span><span>名</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 下：名前リスト（赤線の下） -->
-  <div class="hitlist">
-    <div class="hitgrid" id="hitGrid"></div>
-  </div>
+   </div>
 </div>
 
-    <div class="bottom">
-      <button class="btn-list" id="btnList">キャラ一覧へ</button>
-    </div>
-  </div>
+<div class="bottom">
+  <button class="btn-list" id="btnList">キャラ一覧へ</button>
+</div>
 
   <!-- Color modal -->
   <div class="modal" id="colorModal" aria-hidden="true">
