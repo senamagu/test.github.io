@@ -5,36 +5,36 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>フィップス キャラガチャ</title>
 
-  <!-- Font -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@900&display=swap');
   </style>
 
-  <!-- html2canvas (結果カードを画像保存) / ネット必要。不要なら削除OK -->
+  <!-- 結果カード画像保存に使う（ネット必要）。不要ならこのscriptと save 関連を消してOK -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     :root{
       --bg:#F6FCFA;
       --line:#DDEDF1;
+
       --title:#3D7C8D;
       --muted:#89AFB9;
+      --header:#BCCDD1;
+
       --btn:#34C38E;
       --accent:#F37679;
 
       --card:#3D7C8D;
-      --cardLine:#A0C0C8;
-      --cardName:#DDEDF1;
-      --cardYomi:#89AFB9;
-      --cardDivider:#4F8898;
 
-      --resetBorder:#DDEDF1;
-      --resetText:#89AFB9;
+      --name:#DDEDF1;
+      --yomi:#89AFB9;
+      --nameLine:#4F8898;
 
-      --soft:#DDEDF1;
-      --softText:#89AFB9;
+      --infoLine:#A0C0C8;
+
+      --fieldBg:#DDEDF1;
+      --fieldText:#89AFB9;
       --placeholder:#BBD1D6;
-      --white75: rgba(255,255,255,.75);
     }
 
     *{ box-sizing:border-box; }
@@ -48,21 +48,54 @@
       letter-spacing:.02em;
     }
 
-    /* 1 header */
     header{
-      padding:14px 16px 8px;
       text-align:center;
-      color:#BCCDD1;
+      color:var(--header);
       font-size:18px;
+      padding:14px 16px 10px;
     }
 
     .wrap{
       width:min(980px, 94vw);
       margin:0 auto;
-      padding:6px 0 26px;
+      padding:0 0 28px;
     }
 
-    /* Section lines */
+    .hero{
+      text-align:center;
+      padding-top:10px;
+    }
+    .hero h1{
+      margin:18px 0 8px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height:1.15;
+      color:var(--title);
+    }
+    .hero .total{
+      color:var(--muted);
+      font-size: clamp(18px, 2.6vw, 28px);
+      margin-top: 10px;
+    }
+
+    .cta{
+      display:flex;
+      justify-content:center;
+      margin:26px 0 22px; /* 余白増やした */
+    }
+    .btn-gacha{
+      border:none;
+      border-radius:10px;
+      padding:18px 44px;
+      width:min(520px, 86vw);
+      background:var(--btn);
+      color:var(--bg);
+      font-size: clamp(22px, 3vw, 34px);
+      font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .btn-gacha:active{ transform: translateY(1px); }
+
     .section-line{
       height:2px;
       background:var(--line);
@@ -70,66 +103,21 @@
       margin:18px 0;
     }
 
-    /* 2 title */
-    .hero{
-      text-align:center;
-      padding:8px 0 4px;
-    }
-    .hero h1{
-      margin:10px 0 6px;
-      font-size: clamp(34px, 5vw, 56px);
-      line-height:1.15;
-      color:var(--title);
-    }
-    /* 3 total */
-    .hero .total{
-      color:var(--muted);
-      font-size: clamp(18px, 2.6vw, 28px);
-      margin-top: 6px;
-    }
-
-    /* 4 gacha button */
-    .cta{
-      display:flex;
-      justify-content:center;
-      margin:18px 0 10px;
-    }
-    .btn{
-      border:none;
-      border-radius:10px;
-      padding:18px 44px;
-      font-size: clamp(22px, 3vw, 34px);
-      font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
-      font-weight:900;
-      cursor:pointer;
-      user-select:none;
-      transition: transform .08s ease;
-    }
-    .btn:active{ transform: translateY(1px) scale(.99); }
-    .btn-gacha{
-      background:var(--btn);
-      color:var(--bg);
-      width: min(520px, 86vw);
-      box-shadow:none;
-    }
-
-    /* 5 result card shell */
-    .result-area{ margin-top: 6px; }
+    /* ===== Result Card ===== */
+    .result-area{ margin-top: 18px; }
     .card{
       background:var(--card);
       border-radius:22px;
       padding:16px;
       position:relative;
-      display:grid;
-      grid-template-columns: 260px 1fr;
+
+      /* スマホでも横並び固定 */
+      display:flex;
       gap:16px;
       align-items:stretch;
     }
-    @media (max-width: 720px){
-      .card{ grid-template-columns: 1fr; }
-    }
 
-    /* 18,19 top-right */
+    /* 右上ボタン */
     .card-actions{
       position:absolute;
       right:14px;
@@ -138,8 +126,8 @@
       gap:10px;
       align-items:center;
     }
-    .chip-btn{
-      background:var(--soft);
+    .doc-btn{
+      background:var(--fieldBg);
       color:var(--title);
       border:none;
       border-radius:10px;
@@ -147,59 +135,71 @@
       font-size:16px;
       cursor:pointer;
       line-height:1;
+    }
+
+    .icon-btn{
+      width:44px;
+      height:36px;
+      background:transparent;
+      border:none;
+      cursor:pointer;
       display:flex;
       align-items:center;
-      gap:8px;
+      justify-content:center;
+      padding:0;
     }
-    .chip-btn svg{ width:20px; height:20px; }
-    .chip-btn:active{ transform: translateY(1px); }
+    .icon-btn svg{ width:26px; height:26px; }
 
-    /* 6 image box */
-    .portrait{
-      border-radius:18px;
-      padding:12px;
-      position:relative;
-      overflow:hidden;
+    /* 左（画像+名前） */
+    .left{
+      width: 42%;
+      min-width: 230px; /* これより狭い画面は横スクロールでも崩さない */
       display:flex;
       flex-direction:column;
       gap:10px;
-      min-height: 260px;
     }
-    .portrait::after{
+
+    /* 6 画像枠（ここだけカラーコード背景） */
+    .imgbox{
+      border-radius:18px;
+      padding:12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .imgbox::after{
       content:"";
       position:absolute;
       inset:0;
-      background: linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,.0) 50%, rgba(255,255,255,.12));
+      background: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,0) 55%, rgba(255,255,255,.10));
       pointer-events:none;
     }
-    .portrait-inner{
+    .img-inner{
       position:relative;
       z-index:1;
-      background: rgba(255,255,255,.0);
+      width:100%;
+      aspect-ratio:1/1;
       border-radius:14px;
       display:flex;
       align-items:center;
       justify-content:center;
-      width:100%;
-      aspect-ratio:1/1;
       overflow:hidden;
     }
-    .portrait-inner img{
+    .img-inner img{
       width:100%;
       height:100%;
       object-fit:contain;
       display:block;
 
-      /* 太め縁どり：drop-shadow多段 */
+      /* 太め縁どり（白75%） */
       filter:
-        drop-shadow( 3px  0px 0 var(--white75))
-        drop-shadow(-3px  0px 0 var(--white75))
-        drop-shadow( 0px  3px 0 var(--white75))
-        drop-shadow( 0px -3px 0 var(--white75))
-        drop-shadow( 2px  2px 0 var(--white75))
-        drop-shadow(-2px  2px 0 var(--white75))
-        drop-shadow( 2px -2px 0 var(--white75))
-        drop-shadow(-2px -2px 0 var(--white75));
+        drop-shadow( 3px  0px 0 rgba(255,255,255,.75))
+        drop-shadow(-3px  0px 0 rgba(255,255,255,.75))
+        drop-shadow( 0px  3px 0 rgba(255,255,255,.75))
+        drop-shadow( 0px -3px 0 rgba(255,255,255,.75))
+        drop-shadow( 2px  2px 0 rgba(255,255,255,.75))
+        drop-shadow(-2px  2px 0 rgba(255,255,255,.75))
+        drop-shadow( 2px -2px 0 rgba(255,255,255,.75))
+        drop-shadow(-2px -2px 0 rgba(255,255,255,.75));
     }
     .no-image{
       width:100%;
@@ -209,55 +209,53 @@
       justify-content:center;
       color:var(--bg);
       font-size:24px;
-      opacity:.95;
     }
 
-    /* 7 name block */
+    /* 7 名前 */
     .nameblock{
-      z-index:1;
-      position:relative;
       text-align:center;
+      padding:0 6px;
     }
     .name-yomi{
-      color:var(--cardYomi);
-      font-size: 18px;
+      color:var(--yomi);
+      font-size:18px;
       margin:0 0 8px;
       letter-spacing:.06em;
     }
     .name-divider{
       height:2px;
-      background:var(--cardDivider);
+      background:var(--nameLine);
       border-radius:999px;
       margin:0 auto 8px;
       width:92%;
     }
     .name-main{
-      color:var(--cardName);
-      font-size: 44px; /* JSでフィットさせる */
-      line-height:1.05;
+      color:var(--name);
       margin:0;
+      line-height:1.05;
       white-space:nowrap;
       overflow:hidden;
+      font-size:46px; /* JSでフィット */
     }
 
-    /* right panel */
-    .info{
-      background: rgba(255,255,255,.22);
-      border-radius:18px;
-      padding:14px 14px 12px;
+    /* 右（創作名 + 情報ボックス） */
+    .right{
+      flex:1;
+      min-width: 260px;
       display:flex;
       flex-direction:column;
       gap:10px;
-      overflow:hidden;
+      padding-top: 6px;
     }
 
-    /* 8 series */
+    /* 8 創作名（ボックス外） */
     .series{
       color:var(--muted);
-      font-size: 36px; /* JSでフィット */
-      line-height:1.1;
+      font-size: 44px; /* JSでフィット */
+      line-height:1.05;
       white-space:nowrap;
       overflow:hidden;
+      padding-right: 110px; /* 右上ボタン避け */
     }
     .series small{
       font-size:.55em;
@@ -265,34 +263,38 @@
       opacity:.9;
     }
 
-    /* 9 kv rows */
+    /* 9 情報ボックス */
+    .info{
+      background: rgba(255,255,255,.22); /* 画像の薄い面 */
+      border-radius:18px;
+      padding:14px 14px 12px;
+      overflow:hidden;
+    }
+
     .kv{
       display:grid;
       grid-template-columns: 150px 1fr;
       gap:6px 12px;
       align-items:center;
-      padding-top:6px;
+      margin-bottom: 10px;
     }
     .kv .k{
       color:var(--title);
       font-size:20px;
-      opacity:.95;
     }
     .kv .v{
-      color:var(--cardName);
+      color:var(--name);
       font-size:20px;
-      justify-self:start;
     }
     .kv-line{
       grid-column:1/-1;
       height:2px;
-      background:var(--cardLine);
+      background:var(--infoLine);
       border-radius:999px;
       margin:4px 0;
-      opacity:.9;
     }
+
     .personality{
-      margin-top:6px;
       display:grid;
       grid-template-columns: 150px 1fr;
       gap:8px 12px;
@@ -303,55 +305,63 @@
       font-size:20px;
     }
     .personality .v{
-      color:var(--cardName);
+      color:var(--name);
       font-size:20px;
       line-height:1.35;
+      white-space:pre-wrap;
       display:-webkit-box;
-      -webkit-line-clamp:3;   /* 3行まで */
+      -webkit-line-clamp:3;
       -webkit-box-orient:vertical;
       overflow:hidden;
-      white-space:pre-wrap;
     }
 
-    /* 10 filter header */
+    /* ===== Filters ===== */
     .filters-head{
+      position:relative;
       display:flex;
+      justify-content:center; /* 絞り込む中央 */
       align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      padding:2px 4px;
+      padding:10px 0 2px;
     }
     .filters-head .label{
       color:var(--accent);
-      font-size:32px;
+      font-size:34px;
+      text-align:center;
     }
     .btn-reset{
-      background:var(--accent);
-      color:var(--resetText);
-      border:3px solid var(--resetBorder);
+      position:absolute;
+      right:0;
+      top:6px;
+      background:var(--bg);           /* 指定 #F6FCFA */
+      color:var(--fieldText);         /* #89AFB9 */
+      border:3px solid var(--line);   /* #DDEDF1 */
       border-radius:12px;
       padding:10px 18px;
       font-size:20px;
       cursor:pointer;
     }
 
-    /* Filters layout */
     .filters{
-      display:grid;
-      grid-template-columns: 1.05fr .95fr;
+      display:flex;
       gap:14px;
-      align-items:start;
+      align-items:flex-start;
+      margin-top: 8px;
     }
-    @media (max-width: 820px){
-      .filters{ grid-template-columns:1fr; }
-    }
-
-    /* 11,12 left */
     .filter-left{
+      width: 44%;
+      min-width: 320px;
       display:flex;
       flex-direction:column;
       gap:12px;
     }
+    .filter-right{
+      flex:1;
+      min-width: 320px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
     .field{
       display:grid;
       grid-template-columns: 160px 1fr;
@@ -361,61 +371,60 @@
     .field .k{
       color:var(--muted);
       font-size:22px;
+      text-align:left;
     }
 
-    /* flat input */
     .control{
-      background:var(--soft);
+      background:var(--fieldBg);
       border:none;
       border-radius:10px;
       min-height:48px;
       padding:10px 12px;
-      color:var(--softText);
+      color:var(--fieldText);
       font-size:20px;
       font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
       font-weight:900;
       outline:none;
+      width:100%;
+    }
+    .control::placeholder{
+      color:var(--placeholder);
+      opacity:1;
     }
 
-    /* multi select button */
-    .multi{
-      position:relative;
-    }
+    /* multi select */
+    .multi{ position:relative; }
     .multi-btn{
-      width:100%;
-      text-align:left;
       cursor:pointer;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
     }
-    .multi-btn .placeholder{
-      color:var(--placeholder);
-    }
+    .multi-btn .value.placeholder{ color:var(--placeholder); }
+
     .caret{
       width:0; height:0;
       border-left:8px solid transparent;
       border-right:8px solid transparent;
-      border-top:10px solid var(--btn); /* 11 arrow color */
-      margin-left:auto;
+      border-top:10px solid var(--btn);
       flex:0 0 auto;
     }
     .multi-panel{
       position:absolute;
       left:0; right:0;
       top: calc(100% + 8px);
-      background:var(--soft);
+      background:var(--fieldBg);
       border-radius:12px;
       padding:10px;
       display:none;
       z-index:50;
-      box-shadow:none;
       max-height: 240px;
       overflow:auto;
       border:2px solid rgba(61,124,141,.18);
     }
     .multi.open .multi-panel{ display:block; }
+
     .opt{
       display:flex;
       align-items:center;
@@ -438,9 +447,7 @@
       justify-content:center;
       flex:0 0 auto;
     }
-    .tick.on{
-      background: var(--btn);
-    }
+    .tick.on{ background: var(--btn); }
     .tick.on::after{
       content:"";
       width:10px; height:6px;
@@ -449,66 +456,58 @@
       transform: rotate(-45deg) translateY(-1px);
     }
 
-    /* 12 range */
-    .range-wrap{
+    /* 12 年齢/身長（末尾表示付き） */
+    .range-row{
       display:grid;
       grid-template-columns: 1fr 40px 1fr;
       gap:8px;
       align-items:center;
     }
-    .range-wrap .sep{
+    .sep{
       text-align:center;
       color:var(--placeholder);
       font-size:22px;
     }
-    .control::placeholder{
-      color:var(--placeholder);
-      opacity:1;
+    .suffix-input{
+      position:relative;
+      width:100%;
+    }
+    .suffix-input input{
+      padding-right: 44px;
+    }
+    .suffix{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      color:var(--fieldText);
+      font-size:20px;
+      pointer-events:none;
     }
 
-    /* 13 color picker */
+    /* 13 イメージカラー（正方形） */
     .color-box{
-      background:var(--soft);
+      background:var(--fieldBg);
       border-radius:12px;
       padding:12px;
       display:flex;
       align-items:center;
-      gap:12px;
+      justify-content:center;
+      width: 160px;
+      height: 160px;
       cursor:pointer;
       user-select:none;
     }
     .color-box img{
-      width:90px;
-      height:90px;
+      width:100%;
+      height:100%;
       object-fit:contain;
       display:block;
     }
-    .color-sel{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      align-items:center;
-      color:var(--softText);
-      font-size:18px;
-    }
-    .pill{
-      background: rgba(52,195,142,.15);
-      border:2px solid rgba(52,195,142,.35);
-      color:var(--title);
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:18px;
-      line-height:1;
-    }
 
-    /* 14 toggles + 15/16 right */
-    .filter-right{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
+    /* 14 toggle */
     .toggle{
-      background:var(--soft);
+      background:var(--fieldBg);
       border-radius:12px;
       padding:14px 16px;
       display:flex;
@@ -527,17 +526,15 @@
       flex:0 0 auto;
       background:transparent;
     }
-    .radio.on{
-      background: var(--btn);
-    }
+    .radio.on{ background: var(--btn); }
 
-    /* 15 hits */
+    /* 15 hits（色 #3D7C8D に固定） */
     .hits{
       display:flex;
       align-items:baseline;
       justify-content:flex-end;
       gap:12px;
-      color:var(--btn);
+      color:var(--title);
       font-size:28px;
       padding:2px 4px 0;
     }
@@ -560,18 +557,17 @@
       background: rgba(255,255,255,.10);
       border-radius:10px;
       padding:8px 10px;
-      color:var(--bg); /* ここは見本画像の雰囲気に合わせて読みやすく */
+      color:var(--name); /* #DDEDF1 */
       font-size:18px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    /* スクロールバー(できる範囲で) */
     .hitlist::-webkit-scrollbar{ width:10px; }
     .hitlist::-webkit-scrollbar-track{ background: rgba(255,255,255,.10); border-radius:999px; }
     .hitlist::-webkit-scrollbar-thumb{ background: var(--btn); border-radius:999px; }
 
-    /* 17 bottom button */
+    /* 17 */
     .bottom{
       display:flex;
       justify-content:center;
@@ -579,7 +575,7 @@
     }
     .btn-list{
       background:var(--accent);
-      color:var(--cardName);
+      color:var(--name);
       border:none;
       border-radius:12px;
       padding:18px 34px;
@@ -588,7 +584,7 @@
       cursor:pointer;
     }
 
-    /* simple toast */
+    /* toast */
     .toast{
       position:fixed;
       left:50%;
@@ -603,10 +599,11 @@
       z-index:999;
       max-width:min(560px, 92vw);
       text-align:center;
+      white-space:pre-wrap;
     }
     .toast.show{ display:block; }
 
-    /* modal for color picker */
+    /* modal */
     .modal{
       position:fixed;
       inset:0;
@@ -619,8 +616,8 @@
     }
     .modal.open{ display:flex; }
     .modal-panel{
-      width:min(520px, 92vw);
-      background: var(--soft);
+      width:min(560px, 92vw);
+      background: var(--fieldBg);
       border-radius:16px;
       padding:14px;
       border:2px solid rgba(61,124,141,.18);
@@ -642,6 +639,8 @@
       cursor:pointer;
       padding:6px 10px;
     }
+
+    /* color picker */
     .color-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -705,6 +704,25 @@
     }
     .smallbtn.ok{ background: var(--btn); color: var(--bg); }
     .smallbtn.clear{ background: rgba(255,255,255,.35); color: var(--title); }
+
+    /* share modal preview */
+    .preview{
+      background: rgba(255,255,255,.45);
+      border-radius:14px;
+      padding:12px;
+      color:var(--title);
+      font-size:18px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      margin: 6px;
+    }
+    .share-actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      padding:10px 6px 2px;
+      flex-wrap:wrap;
+    }
   </style>
 </head>
 
@@ -718,35 +736,30 @@
     </div>
 
     <div class="cta">
-      <button class="btn btn-gacha" id="btnGacha">ガチャる</button>
+      <button class="btn-gacha" id="btnGacha">ガチャる</button>
     </div>
 
     <div class="section-line"></div>
 
-    <!-- 5 result card -->
+    <!-- Result -->
     <div class="result-area">
       <div class="card" id="resultCard" style="display:none;">
         <div class="card-actions">
-          <!-- 18資料 -->
-          <button class="chip-btn" id="btnDoc" style="display:none;" title="資料">
-            資料
-          </button>
-          <!-- 19共有 -->
-          <button class="chip-btn" id="btnShare" title="共有">
+          <button class="doc-btn" id="btnDoc" style="display:none;">資料</button>
+
+          <!-- 19 share -->
+          <button class="icon-btn" id="btnShare" title="共有">
+            <!-- clean share icon -->
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M16 7a3 3 0 1 0-2.83-4H13a3 3 0 0 0 3 4Zm-8 10a3 3 0 1 0 2.83 4H11a3 3 0 0 0-3-4Zm8-5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.7 16.3l6.6-3.6m-6.6-5l6.6 3.6" stroke="#3D7C8D" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 3 4ZM6 14a3 3 0 1 0 2.83 4H9a3 3 0 0 0-3-4Zm12 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.6 15.2l7-3.6M8.6 8.4l7 3.6" stroke="#DDEDF1" stroke-width="2.2" stroke-linecap="round"/>
             </svg>
-          </button>
-          <!-- 19(追加)画像保存 -->
-          <button class="chip-btn" id="btnSaveImg" title="画像として保存">
-            保存
           </button>
         </div>
 
         <!-- left -->
-        <div class="portrait" id="portraitBg">
-          <div class="portrait-inner" id="portraitInner">
-            <!-- img or no-image -->
+        <div class="left">
+          <div class="imgbox" id="imgBox">
+            <div class="img-inner" id="imgInner"></div>
           </div>
 
           <div class="nameblock">
@@ -757,16 +770,16 @@
         </div>
 
         <!-- right -->
-        <div class="info">
+        <div class="right">
           <div class="series" id="seriesText"><small>創作</small><span id="seriesName">—</span></div>
 
-          <div class="kv" id="kvArea">
-            <!-- rows inserted -->
-          </div>
+          <div class="info">
+            <div class="kv" id="kvArea"></div>
 
-          <div class="personality">
-            <div class="k">性格</div>
-            <div class="v" id="personalityText">未登録。</div>
+            <div class="personality">
+              <div class="k">性格</div>
+              <div class="v" id="personalityText">未登録。</div>
+            </div>
           </div>
         </div>
       </div>
@@ -774,22 +787,20 @@
 
     <div class="section-line"></div>
 
-    <!-- 10 filters header -->
+    <!-- Filters header -->
     <div class="filters-head">
       <div class="label">絞り込む</div>
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
 
     <div class="filters">
-      <!-- 11/12/13 left -->
+      <!-- left -->
       <div class="filter-left">
-        <!-- 11 multi -->
         <div class="field">
           <div class="k">創作タイトル</div>
           <div class="multi" data-multi="series">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">選択</span>
-              <span class="caret"></span>
+              <span class="value placeholder">選択</span><span class="caret"></span>
             </div>
             <div class="multi-panel"></div>
           </div>
@@ -799,8 +810,7 @@
           <div class="k">キャラジャンル</div>
           <div class="multi" data-multi="genre">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">選択</span>
-              <span class="caret"></span>
+              <span class="value placeholder">選択</span><span class="caret"></span>
             </div>
             <div class="multi-panel"></div>
           </div>
@@ -810,46 +820,53 @@
           <div class="k">性別</div>
           <div class="multi" data-multi="gender">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">選択</span>
-              <span class="caret"></span>
+              <span class="value placeholder">選択</span><span class="caret"></span>
             </div>
             <div class="multi-panel"></div>
           </div>
         </div>
 
-        <!-- 12 range -->
         <div class="field">
           <div class="k">年齢</div>
-          <div class="range-wrap">
-            <input class="control" id="ageMin" inputmode="numeric" placeholder="最小" />
+          <div class="range-row">
+            <div class="suffix-input">
+              <input class="control" id="ageMin" inputmode="numeric" placeholder="最小" />
+              <span class="suffix">歳</span>
+            </div>
             <div class="sep">〜</div>
-            <input class="control" id="ageMax" inputmode="numeric" placeholder="最大" />
+            <div class="suffix-input">
+              <input class="control" id="ageMax" inputmode="numeric" placeholder="最大" />
+              <span class="suffix">歳</span>
+            </div>
           </div>
         </div>
 
         <div class="field">
           <div class="k">身長</div>
-          <div class="range-wrap">
-            <input class="control" id="hMin" inputmode="numeric" placeholder="最小" />
+          <div class="range-row">
+            <div class="suffix-input">
+              <input class="control" id="hMin" inputmode="numeric" placeholder="最小" />
+              <span class="suffix">cm</span>
+            </div>
             <div class="sep">〜</div>
-            <input class="control" id="hMax" inputmode="numeric" placeholder="最大" />
+            <div class="suffix-input">
+              <input class="control" id="hMax" inputmode="numeric" placeholder="最大" />
+              <span class="suffix">cm</span>
+            </div>
           </div>
         </div>
 
-        <!-- 13 color -->
         <div class="field">
           <div class="k">イメージカラー</div>
+          <!-- 13 正方形。文字なし。押したら選択画面 -->
           <div class="color-box" id="colorBox" title="タップで選択">
-            <!-- 後で差し替え：ここに添付のホイール画像を置く -->
-            <img src="https://github.com/senamagu/test.github.io/blob/main/tools/MAGOCgacha/Charamedia/colorwheel.PNG" alt="color wheel" id="colorWheelImg">
-            <div class="color-sel" id="colorSelText">
-              <span class="placeholder" style="color:var(--placeholder);">選択</span>
-            </div>
+            <!-- ここを君のホイール画像に差し替え -->
+            <img src="colorwheel.png" alt="color wheel">
           </div>
         </div>
       </div>
 
-      <!-- 14/15/16 right -->
+      <!-- right -->
       <div class="filter-right">
         <div class="toggle" id="tglHasImage">
           <span class="radio on" id="dotHasImage"></span>
@@ -877,7 +894,7 @@
     </div>
   </div>
 
-  <!-- color modal -->
+  <!-- Color modal -->
   <div class="modal" id="colorModal" aria-hidden="true">
     <div class="modal-panel">
       <div class="modal-title">
@@ -892,20 +909,30 @@
     </div>
   </div>
 
+  <!-- Share modal -->
+  <div class="modal" id="shareModal" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="modal-title">
+        <span>共有</span>
+        <button class="xbtn" id="btnCloseShare" aria-label="close">×</button>
+      </div>
+      <div class="preview" id="sharePreview">—</div>
+      <div class="share-actions">
+        <button class="smallbtn clear" id="btnCopyShare">共有文をコピー</button>
+        <button class="smallbtn ok" id="btnSaveShareImg">画像として保存</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
     /**********************
      * DATA
      **********************/
-    // gender: "male" | "female" | "other"
-    // genre: "人間" など自由
-    // tags: ["棒人間","ケモ"] など自由
-    // color: "#34C38E" or null
-    // colorTag: "赤/青/緑/..."（13の色絞り込み用：難しければこれで運用）
-    // image: "Charamedia/xxx.png"（相対パス）
-    // docUrl: "https://..."（18）
-    // shareQuote: "飯が美味いぜ！"（19）
+    // 画像はローカル相対パス: "Charamedia/xxx.png"
+    // docUrl があれば資料ボタン表示
+    // shareQuote があれば共有文に入れる
     const characters = [
       {
         id:"asano_sana",
@@ -918,15 +945,15 @@
         birthday:"11/11",
         personality:"元気！\n超元気だよ！\nじゃがりこ好きだよ！",
         color:"#34C38E",
-        colorTag:"緑",
+        // colorTag は無くてもOK（colorから自動判定）
+        colorTag:"",
         genre:"人間",
-        tags:["人間"],
-        image:"sanpul.png",
-        docUrl:"https://x.com/senamagu_cs/status/1876245564683432232?s=46",
+        image:"Charamedia/asano_sana.png",
+        docUrl:"",
         shareQuote:"飯が美味いぜ！"
       },
       {
-        id:"sample_noimg",
+        id:"noimg",
         name:"椎野 明",
         yomi:"シイノ アキラ",
         series:"描楽幻想街",
@@ -936,34 +963,14 @@
         birthday:"",
         personality:"",
         color:"#F37679",
-        colorTag:"ピンク",
+        colorTag:"",
         genre:"人間",
-        tags:["人間"],
         image:"",
-        docUrl:"",
+        docUrl:"https://example.com",
         shareQuote:"今日はツイてるな。"
-      },
-      {
-        id:"sample_other",
-        name:"音楽 奏太郎",
-        yomi:"オンガク ソウタロウ",
-        series:"フィップス",
-        gender:"other",
-        age:null,
-        heightCm:null,
-        birthday:"",
-        personality:"未登録。",
-        color:"",
-        colorTag:"青",
-        genre:"棒人間",
-        tags:["棒人間"],
-        image:"",
-        docUrl:"",
-        shareQuote:"よろしく。"
       }
     ];
 
-    // 13 color list
     const COLOR_ITEMS = [
       {key:"赤",   hex:"#F25C5C"},
       {key:"青",   hex:"#4F90FF"},
@@ -989,8 +996,8 @@
       ageMax: null,
       hMin: null,
       hMax: null,
-      selectedColors: new Set(), // uses colorTag
-      hasImageOnly: true, // 14 initial: 画像ありのみが選択状態
+      selectedColors: new Set(), // "赤" など
+      hasImageOnly: true,  // 初期：画像ありのみON
       hasDocOnly: false,
       lastResult: null
     };
@@ -999,36 +1006,24 @@
      * HELPERS
      **********************/
     const $ = (sel)=>document.querySelector(sel);
+
     const toast = (msg)=>{
       const el = $("#toast");
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(toast._t);
-      toast._t = setTimeout(()=>el.classList.remove("show"), 1600);
+      toast._t = setTimeout(()=>el.classList.remove("show"), 1700);
     };
 
     const normNum = (v)=>{
-      if(v===null || v===undefined) return null;
-      const s = String(v).trim();
+      const s = String(v ?? "").trim();
       if(!s) return null;
       const n = Number(s);
       return Number.isFinite(n) ? n : null;
     };
 
-    // JSで文字を横幅にフィット
-    function fitTextToWidth(el, maxPx, minPx){
-      if(!el) return;
-      el.style.fontSize = maxPx + "px";
-      const parent = el.parentElement;
-      const targetW = parent ? parent.clientWidth : el.clientWidth;
-      // 少し余裕
-      const limitW = Math.max(0, targetW - 8);
-      let size = maxPx;
-      // ざっくりループ（短いのでOK）
-      while(size > minPx && el.scrollWidth > limitW){
-        size -= 1;
-        el.style.fontSize = size + "px";
-      }
+    function hasValue(v){
+      return v!==null && v!==undefined && String(v).trim()!=="";
     }
 
     function genderLabel(g){
@@ -1037,8 +1032,76 @@
       return "その他";
     }
 
-    function hasValue(v){
-      return v!==null && v!==undefined && String(v).trim()!=="";
+    // テキスト横幅フィット
+    function fitTextToWidth(el, maxPx, minPx, padding=8){
+      if(!el) return;
+      el.style.fontSize = maxPx + "px";
+      const parent = el.parentElement;
+      const limitW = Math.max(0, (parent ? parent.clientWidth : el.clientWidth) - padding);
+      let size = maxPx;
+      while(size > minPx && el.scrollWidth > limitW){
+        size -= 1;
+        el.style.fontSize = size + "px";
+      }
+    }
+
+    /**********************
+     * COLOR: hex -> tag (範囲で分類)
+     **********************/
+    function hexToRgb(hex){
+      const h = String(hex||"").trim();
+      const m = h.match(/^#?([0-9a-f]{6})$/i);
+      if(!m) return null;
+      const n = parseInt(m[1], 16);
+      return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+    }
+
+    function rgbToHsl(r,g,b){
+      r/=255; g/=255; b/=255;
+      const max=Math.max(r,g,b), min=Math.min(r,g,b);
+      let h=0, s=0;
+      const l=(max+min)/2;
+      const d=max-min;
+      if(d!==0){
+        s = d / (1 - Math.abs(2*l - 1));
+        switch(max){
+          case r: h = ((g-b)/d) % 6; break;
+          case g: h = (b-r)/d + 2; break;
+          case b: h = (r-g)/d + 4; break;
+        }
+        h *= 60;
+        if(h<0) h+=360;
+      }
+      return {h,s,l};
+    }
+
+    function colorToTagByHex(hex){
+      const rgb = hexToRgb(hex);
+      if(!rgb) return "";
+      const {h,s,l} = rgbToHsl(rgb.r,rgb.g,rgb.b);
+
+      // 白/黒/灰（彩度と明度で判定）
+      if(l >= 0.92) return "白";
+      if(l <= 0.12) return "黒";
+      if(s <= 0.12) return "灰色";
+
+      // 色相で分類（ざっくり範囲）
+      // 赤: 345-360 / 0-15
+      if(h >= 345 || h < 15) return "赤";
+      if(h < 45) return "オレンジ";
+      if(h < 75) return "黄色";
+      if(h < 165) return "緑";
+      if(h < 255) return "青";
+      if(h < 300) return "紫";
+      if(h < 345) return "ピンク";
+      return "赤";
+    }
+
+    function getCharColorTag(c){
+      // 明示タグ優先、なければカラーコードから推定
+      if(hasValue(c.colorTag)) return c.colorTag.trim();
+      if(hasValue(c.color)) return colorToTagByHex(c.color.trim());
+      return "";
     }
 
     /**********************
@@ -1049,45 +1112,29 @@
       const hMin = state.hMin, hMax = state.hMax;
 
       const res = characters.filter(c=>{
-        // 11 series multi
-        if(state.selectedSeries.size){
-          if(!state.selectedSeries.has(c.series)) return false;
-        }
-        // 11 genre multi (キャラジャンル)
-        if(state.selectedGenres.size){
-          if(!state.selectedGenres.has(c.genre)) return false;
-        }
-        // 11 gender multi
-        if(state.selectedGenders.size){
-          if(!state.selectedGenders.has(c.gender)) return false;
-        }
+        if(state.selectedSeries.size && !state.selectedSeries.has(c.series)) return false;
+        if(state.selectedGenres.size && !state.selectedGenres.has(c.genre)) return false;
+        if(state.selectedGenders.size && !state.selectedGenders.has(c.gender)) return false;
 
-        // 12 age range
         if(aMin!==null || aMax!==null){
           if(!Number.isFinite(c.age)) return false;
           if(aMin!==null && c.age < aMin) return false;
           if(aMax!==null && c.age > aMax) return false;
         }
-        // 12 height range
         if(hMin!==null || hMax!==null){
           if(!Number.isFinite(c.heightCm)) return false;
           if(hMin!==null && c.heightCm < hMin) return false;
           if(hMax!==null && c.heightCm > hMax) return false;
         }
 
-        // 13 colors (colorTag)
         if(state.selectedColors.size){
-          if(!hasValue(c.colorTag)) return false;
-          if(!state.selectedColors.has(c.colorTag)) return false;
+          const tag = getCharColorTag(c);
+          if(!tag) return false;
+          if(!state.selectedColors.has(tag)) return false;
         }
 
-        // 14 has image/doc
-        if(state.hasImageOnly){
-          if(!hasValue(c.image)) return false;
-        }
-        if(state.hasDocOnly){
-          if(!hasValue(c.docUrl)) return false;
-        }
+        if(state.hasImageOnly && !hasValue(c.image)) return false;
+        if(state.hasDocOnly && !hasValue(c.docUrl)) return false;
 
         return true;
       });
@@ -1097,11 +1144,10 @@
     }
 
     /**********************
-     * RENDER - HIT LIST (15/16)
+     * HIT LIST
      **********************/
     function renderHit(list){
       $("#hitCount").textContent = list.length;
-
       const grid = $("#hitGrid");
       grid.innerHTML = "";
       for(const c of list){
@@ -1113,7 +1159,7 @@
     }
 
     /**********************
-     * RENDER - MULTI SELECT
+     * MULTI SELECT
      **********************/
     function uniqueValues(key){
       const set = new Set();
@@ -1123,6 +1169,26 @@
         if(key==="gender") set.add(c.gender);
       }
       return [...set].filter(Boolean);
+    }
+
+    function updateMultiValueText(multiEl){
+      const kind = multiEl.dataset.multi;
+      const valEl = multiEl.querySelector(".value");
+
+      const set =
+        kind==="series" ? state.selectedSeries :
+        kind==="genre"  ? state.selectedGenres :
+        kind==="gender" ? state.selectedGenders :
+        new Set();
+
+      if(!set.size){
+        valEl.textContent = "選択";
+        valEl.classList.add("placeholder");
+        return;
+      }
+      const arr = [...set].map(v=> kind==="gender" ? genderLabel(v) : v);
+      valEl.textContent = arr.join("、");
+      valEl.classList.remove("placeholder");
     }
 
     function renderMulti(multiEl){
@@ -1149,8 +1215,10 @@
         row.appendChild(label);
 
         row.addEventListener("click", ()=>{
+          // 選択しても閉じない（外タップまで開きっぱ）
           if(currentSet.has(v)) currentSet.delete(v);
           else currentSet.add(v);
+
           renderMulti(multiEl);
           updateMultiValueText(multiEl);
           applyFilters();
@@ -1158,28 +1226,7 @@
 
         panel.appendChild(row);
       }
-
       updateMultiValueText(multiEl);
-    }
-
-    function updateMultiValueText(multiEl){
-      const kind = multiEl.dataset.multi;
-      const valEl = multiEl.querySelector(".value");
-
-      const set =
-        kind==="series" ? state.selectedSeries :
-        kind==="genre"  ? state.selectedGenres :
-        kind==="gender" ? state.selectedGenders :
-        new Set();
-
-      if(!set.size){
-        valEl.textContent = "選択";
-        valEl.classList.add("placeholder");
-        return;
-      }
-      const arr = [...set].map(v=> kind==="gender" ? genderLabel(v) : v);
-      valEl.textContent = arr.join("、");
-      valEl.classList.remove("placeholder");
     }
 
     function setupMulti(){
@@ -1187,7 +1234,7 @@
         renderMulti(m);
         const btn = m.querySelector(".multi-btn");
         btn.addEventListener("click", ()=>{
-          // close others
+          // 他は閉じる
           document.querySelectorAll(".multi").forEach(x=>{ if(x!==m) x.classList.remove("open"); });
           m.classList.toggle("open");
         });
@@ -1199,7 +1246,6 @@
         });
       });
 
-      // click outside closes
       document.addEventListener("click", (e)=>{
         const inside = e.target.closest(".multi");
         if(!inside){
@@ -1209,18 +1255,10 @@
     }
 
     /**********************
-     * 13 COLOR MODAL
+     * COLOR MODAL
      **********************/
     let tempColors = new Set();
 
-    function openColorModal(){
-      tempColors = new Set(state.selectedColors);
-      renderColorGrid();
-      $("#colorModal").classList.add("open");
-    }
-    function closeColorModal(){
-      $("#colorModal").classList.remove("open");
-    }
     function renderColorGrid(){
       const grid = $("#colorGrid");
       grid.innerHTML = "";
@@ -1252,47 +1290,38 @@
       }
     }
 
-    function renderColorSelText(){
-      const box = $("#colorSelText");
-      box.innerHTML = "";
-      if(!state.selectedColors.size){
-        const sp = document.createElement("span");
-        sp.textContent = "選択";
-        sp.style.color = getComputedStyle(document.documentElement).getPropertyValue("--placeholder");
-        box.appendChild(sp);
-        return;
-      }
-      for(const k of state.selectedColors){
-        const pill = document.createElement("span");
-        pill.className = "pill";
-        pill.textContent = k;
-        box.appendChild(pill);
-      }
+    function openColorModal(){
+      tempColors = new Set(state.selectedColors);
+      renderColorGrid();
+      $("#colorModal").classList.add("open");
+    }
+    function closeColorModal(){
+      $("#colorModal").classList.remove("open");
     }
 
     /**********************
-     * 14 toggles
+     * TOGGLES
      **********************/
     function setToggle(elDot, on){
       elDot.classList.toggle("on", !!on);
     }
 
     /**********************
-     * 5-9 RESULT RENDER
+     * RESULT RENDER
      **********************/
     function renderResult(c){
       state.lastResult = c;
 
-      const card = $("#resultCard");
-      card.style.display = "grid";
+      $("#resultCard").style.display = "flex";
 
-      // 6 portrait bg depends on color code
+      // 6 画像枠背景はカラーコード依存
       const bg = hasValue(c.color) ? c.color : "#89AFB9";
-      $("#portraitBg").style.background = bg;
+      $("#imgBox").style.background = bg;
 
-      // image area
-      const inner = $("#portraitInner");
+      // 画像 or 画像なし
+      const inner = $("#imgInner");
       inner.innerHTML = "";
+      inner.style.background = "transparent";
       if(hasValue(c.image)){
         const img = document.createElement("img");
         img.src = c.image;
@@ -1306,16 +1335,14 @@
         inner.appendChild(div);
       }
 
-      // 7 names
+      // 7 名前
       $("#nameText").textContent = c.name || "—";
       $("#yomiText").textContent = hasValue(c.yomi) ? c.yomi : "—";
 
-      // 8 series
+      // 8 創作
       $("#seriesName").textContent = c.series || "—";
-      // 8 fit
-      fitTextToWidth($("#seriesText"), 44, 22);
 
-      // 9 kv rows: 性別〜カラーコード
+      // 9 rows
       const kv = $("#kvArea");
       kv.innerHTML = "";
 
@@ -1327,39 +1354,33 @@
         ["カラーコード", hasValue(c.color) ? c.color : "未登録。"]
       ];
 
-      for(let i=0;i<rows.length;i++){
-        const [k,v] = rows[i];
+      rows.forEach(([k,v], i)=>{
         const kEl = document.createElement("div");
         kEl.className = "k";
         kEl.textContent = k;
         const vEl = document.createElement("div");
         vEl.className = "v";
         vEl.textContent = v;
-
         kv.appendChild(kEl);
         kv.appendChild(vEl);
-
-        // divider lines between rows
         if(i !== rows.length-1){
           const line = document.createElement("div");
           line.className = "kv-line";
           kv.appendChild(line);
         }
-      }
+      });
 
-      // personality 3 lines max + 未登録
       const p = hasValue(c.personality) ? c.personality : "未登録。";
       $("#personalityText").textContent = p;
 
-      // 7 fit name to same width
+      // fit
       fitTextToWidth($("#nameText"), 52, 22);
-      // also yomi slightly (optional)
-      // fitTextToWidth($("#yomiText"), 20, 14);
+      fitTextToWidth($("#seriesText"), 46, 22, 120);
 
       // 18 doc button
       const btnDoc = $("#btnDoc");
       if(hasValue(c.docUrl)){
-        btnDoc.style.display = "flex";
+        btnDoc.style.display = "inline-flex";
         btnDoc.onclick = ()=> window.open(c.docUrl, "_blank", "noopener");
       }else{
         btnDoc.style.display = "none";
@@ -1367,40 +1388,35 @@
     }
 
     /**********************
-     * 19 SHARE
+     * SHARE MODAL
      **********************/
     function buildShareText(c){
       const base = `あなたはフィップスキャラガチャで${c.name}を出しました！`;
-      const quote = hasValue(c.shareQuote) ? ` ${c.name}「${c.shareQuote}」` : "";
-      return base + quote;
+      if(hasValue(c.shareQuote)) return `${base} ${c.name}「${c.shareQuote}」`;
+      return base;
     }
 
-    async function shareResult(){
-      const c = state.lastResult;
-      if(!c) return;
-      const text = buildShareText(c);
-
-      // Web Share
-      if(navigator.share){
-        try{
-          await navigator.share({ text });
-          return;
-        }catch(e){
-          // cancel ok
-        }
+    function openShareModal(){
+      if(!state.lastResult){
+        toast("先にガチャってくれ");
+        return;
       }
-      // fallback copy
+      $("#sharePreview").textContent = buildShareText(state.lastResult);
+      $("#shareModal").classList.add("open");
+    }
+    function closeShareModal(){
+      $("#shareModal").classList.remove("open");
+    }
+
+    async function copyShare(){
       try{
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText($("#sharePreview").textContent);
         toast("共有文をコピーした");
       }catch(e){
         toast("コピーできなかった");
       }
     }
 
-    /**********************
-     * 19 SAVE CARD IMAGE
-     **********************/
     async function saveCardImage(){
       const card = $("#resultCard");
       if(card.style.display==="none"){
@@ -1417,6 +1433,7 @@
         a.download = "gacha_result.png";
         a.href = canvas.toDataURL("image/png");
         a.click();
+        toast("画像を保存した");
       }catch(e){
         toast("画像保存に失敗した");
       }
@@ -1430,40 +1447,31 @@
     }
 
     function wireInputs(){
-      // 12 ranges
-      const ageMin = $("#ageMin"), ageMax = $("#ageMax");
-      const hMin = $("#hMin"), hMax = $("#hMax");
-
+      // range
       const onRangeChange = ()=>{
-        state.ageMin = normNum(ageMin.value);
-        state.ageMax = normNum(ageMax.value);
-        state.hMin = normNum(hMin.value);
-        state.hMax = normNum(hMax.value);
+        state.ageMin = normNum($("#ageMin").value);
+        state.ageMax = normNum($("#ageMax").value);
+        state.hMin   = normNum($("#hMin").value);
+        state.hMax   = normNum($("#hMax").value);
         applyFilters();
       };
-      [ageMin,ageMax,hMin,hMax].forEach(el=>{
-        el.addEventListener("input", onRangeChange);
-        el.addEventListener("change", onRangeChange);
+      ["#ageMin","#ageMax","#hMin","#hMax"].forEach(sel=>{
+        $(sel).addEventListener("input", onRangeChange);
+        $(sel).addEventListener("change", onRangeChange);
       });
 
-      // 13 color modal open
+      // color
       $("#colorBox").addEventListener("click", openColorModal);
       $("#btnCloseColor").addEventListener("click", closeColorModal);
-      $("#colorModal").addEventListener("click", (e)=>{
-        if(e.target.id==="colorModal") closeColorModal();
-      });
-      $("#btnClearColor").addEventListener("click", ()=>{
-        tempColors.clear();
-        renderColorGrid();
-      });
+      $("#colorModal").addEventListener("click", (e)=>{ if(e.target.id==="colorModal") closeColorModal(); });
+      $("#btnClearColor").addEventListener("click", ()=>{ tempColors.clear(); renderColorGrid(); });
       $("#btnOkColor").addEventListener("click", ()=>{
         state.selectedColors = new Set(tempColors);
-        renderColorSelText();
         closeColorModal();
         applyFilters();
       });
 
-      // 14 toggles
+      // toggles
       $("#tglHasImage").addEventListener("click", ()=>{
         state.hasImageOnly = !state.hasImageOnly;
         setToggle($("#dotHasImage"), state.hasImageOnly);
@@ -1475,9 +1483,18 @@
         applyFilters();
       });
 
-      // 4 gacha
+      // gacha
       $("#btnGacha").addEventListener("click", ()=>{
-        const pool = applyFilters();
+        let pool = applyFilters();
+
+        // 画像URL消して全員画像無しになった時でも、ガチャ押したら自動で画像ありのみOFFして動かす
+        if(!pool.length && state.hasImageOnly){
+          state.hasImageOnly = false;
+          setToggle($("#dotHasImage"), state.hasImageOnly);
+          toast("ヒット0件だったから「画像ありのみ」をOFFにした");
+          pool = applyFilters();
+        }
+
         if(!pool.length){
           toast("ヒット0件。絞り込みを変えて");
           return;
@@ -1486,16 +1503,7 @@
         renderResult(pick);
       });
 
-      // 18/19
-      $("#btnShare").addEventListener("click", shareResult);
-      $("#btnSaveImg").addEventListener("click", saveCardImage);
-
-      // 17 list button (未準備なのでポップ)
-      $("#btnList").addEventListener("click", ()=>{
-        toast("準備中");
-      });
-
-      // 10 reset
+      // reset
       $("#btnReset").addEventListener("click", ()=>{
         state.selectedSeries.clear();
         state.selectedGenres.clear();
@@ -1515,29 +1523,32 @@
 
         document.querySelectorAll(".multi").forEach(m=>{
           renderMulti(m);
-          updateMultiValueText(m);
           m.classList.remove("open");
         });
 
-        renderColorSelText();
         applyFilters();
         toast("リセットした");
       });
+
+      // 17
+      $("#btnList").addEventListener("click", ()=> toast("準備中"));
+
+      // 19 share modal
+      $("#btnShare").addEventListener("click", openShareModal);
+      $("#btnCloseShare").addEventListener("click", closeShareModal);
+      $("#shareModal").addEventListener("click", (e)=>{ if(e.target.id==="shareModal") closeShareModal(); });
+      $("#btnCopyShare").addEventListener("click", copyShare);
+      $("#btnSaveShareImg").addEventListener("click", saveCardImage);
     }
 
     function init(){
       updateCounts();
       setupMulti();
-      renderColorSelText();
       setToggle($("#dotHasImage"), state.hasImageOnly);
       setToggle($("#dotHasDoc"), state.hasDocOnly);
-
-      // 初期ヒット
       applyFilters();
-
       wireInputs();
     }
-
     init();
   </script>
 </body>
