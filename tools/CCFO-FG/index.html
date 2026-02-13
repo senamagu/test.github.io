@@ -272,6 +272,8 @@
     const selected = getSelectedSet(sceneKey);
 
     for(const [mid, mk] of entries){
+      // 追加：マーカーフィルタで絞り込み
+      if(!markerMatches(mk, mid, markerFilterEl.value)) continue;
       const card = document.createElement("div");
       card.className = "mcard";
 
