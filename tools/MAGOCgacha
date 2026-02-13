@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>まぐ自創作キャラガチャ</title>
+  <style>
+    :root{
+      --bg:#f6fdfb;
+      --acc:#34c38e;
+      --ink:#3d7c8d;
+      --hot:#f37679;
+
+      --panel:#ffffff;
+      --line:rgba(61,124,141,.18);
+      --muted:rgba(61,124,141,.75);
+      --shadow:0 10px 24px rgba(61,124,141,.14);
+      --radius:16px;
+      --radius2:12px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background:linear-gradient(180deg, var(--bg), #eefaf6 60%, #ecf7f3);
+      color:var(--ink);
+      font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+    }
+    a{ color:inherit; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:18px; }
+    header{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:12px; padding:8px 2px 14px;
+    }
+    h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:.02em;
+    }
+    .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media (min-width: 920px){
+      .grid{ grid-template-columns: 420px 1fr; align-items:start; }
+    }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .card .hd b{ font-size:14px; letter-spacing:.02em; }
+    .card .bd{ padding:14px; }
+
+    .controls{ display:grid; gap:10px; }
+    .row2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    @media (max-width:520px){
+      .row2,.row3{ grid-template-columns: 1fr; }
+    }
+
+    label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
+    input[type="text"], input[type="number"], select, textarea{
+      width:100%;
+      padding:10px 11px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fbfffe;
+      color:var(--ink);
+      outline:none;
+    }
+    textarea{ min-height:120px; resize:vertical; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    input[type="number"]{ appearance:textfield; }
+    .chk{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 11px;
+      border:1px dashed var(--line);
+      border-radius:12px;
+      background:#fbfffe;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .chk input{ width:18px; height:18px; }
+    .btns{ display:flex; flex-wrap:wrap; gap:10px; }
+    button{
+      border:0;
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+    .primary{ background:var(--acc); color:#ffffff; }
+    .ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+    .danger{ background:var(--hot); color:#ffffff; }
+    .hint{ font-size:12px; color:var(--muted); line-height:1.5; }
+
+    /* Result */
+    .result{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width:520px){
+      .result{ grid-template-columns: 1fr; }
+    }
+    .avatar{
+      width:120px; aspect-ratio:1/1;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:linear-gradient(135deg, rgba(52,195,142,.12), rgba(243,118,121,.10));
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+      position:relative;
+    }
+    .avatar img{
+      width:100%; height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .avatar .ph{
+      font-size:12px;
+      color:rgba(61,124,141,.7);
+      padding:10px;
+      text-align:center;
+    }
+    .name{
+      display:flex; align-items:baseline; flex-wrap:wrap; gap:10px;
+      margin:0 0 6px;
+    }
+    .name .main{ font-size:22px; font-weight:900; }
+    .name .kana{ font-size:13px; color:var(--muted); font-weight:700; }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(52,195,142,.14);
+      color:var(--ink);
+      border:1px solid rgba(52,195,142,.25);
+      font-size:12px;
+      font-weight:800;
+    }
+    .pill.hot{
+      background:rgba(243,118,121,.12);
+      border-color:rgba(243,118,121,.25);
+    }
+
+    .kv{ display:grid; gap:8px; margin-top:10px; }
+    .kv .item{
+      display:grid; grid-template-columns: 120px 1fr;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fbfffe;
+    }
+    @media (max-width:520px){
+      .kv .item{ grid-template-columns: 1fr; }
+    }
+    .k{ color:var(--muted); font-size:12px; font-weight:800; }
+    .v{ color:var(--ink); font-size:14px; font-weight:700; }
+    .meta{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin:8px 0 0;
+    }
+    .count{
+      font-size:12px;
+      color:var(--muted);
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+    }
+    .count b{ color:var(--ink); }
+    .toast{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .sep{ height:1px; background:var(--line); margin:12px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>創作キャラガチャ</h1>
+        <div class="sub">フィルターで絞って、ガチャで1人排出。</div>
+      </div>
+      <div class="count" id="countBox"></div>
+    </header>
+
+    <div class="grid">
+      <!-- Controls -->
+      <section class="card">
+        <div class="hd">
+          <b>ガチャ設定</b>
+          <button class="ghost" id="btnReset">リセット</button>
+        </div>
+        <div class="bd">
+          <div class="controls">
+            <div class="row2">
+              <div>
+                <label>創作タイトル（カテゴリ）</label>
+                <select id="fTitle">
+                  <option value="">すべて</option>
+                </select>
+              </div>
+              <div>
+                <label>性別</label>
+                <select id="fGender">
+                  <option value="">すべて</option>
+                  <option value="male">男性</option>
+                  <option value="female">女性</option>
+                  <option value="other">その他（無性/中性/不明など）</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label>検索（名前 / よみがな / タイトル）</label>
+              <input id="fQuery" type="text" placeholder="例：リサ / ちゃわだ / 終末アーキビスト" />
+            </div>
+
+            <div class="row2">
+              <div>
+                <label>年齢（範囲）</label>
+                <div class="row2">
+                  <input id="fAgeMin" type="number" inputmode="numeric" placeholder="最小" />
+                  <input id="fAgeMax" type="number" inputmode="numeric" placeholder="最大" />
+                </div>
+              </div>
+              <div>
+                <label>身長cm（範囲）</label>
+                <div class="row2">
+                  <input id="fHMin" type="number" inputmode="numeric" placeholder="最小" />
+                  <input id="fHMax" type="number" inputmode="numeric" placeholder="最大" />
+                </div>
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="chk">
+                <input id="fOnlyHasExtra" type="checkbox" />
+                <span>追加情報あり（年齢/身長/誕生日/性格のどれか）だけ</span>
+              </div>
+              <div class="chk">
+                <input id="fOnlyHasImage" type="checkbox" />
+                <span>画像ありだけ</span>
+              </div>
+            </div>
+
+            <div class="btns">
+              <button class="primary" id="btnGacha">ガチャ！</button>
+              <button class="ghost" id="btnCopy">結果をコピー</button>
+            </div>
+
+            <div class="sep"></div>
+
+            <div>
+              <label>キャラデータ（JSON）</label>
+              <textarea id="jsonBox" spellcheck="false"></textarea>
+              <div class="btns" style="margin-top:10px;">
+                <button class="ghost" id="btnExport">JSONを書き出し</button>
+                <button class="primary" id="btnImport">JSONを読み込み</button>
+                <button class="danger" id="btnDemo">デモデータに戻す</button>
+              </div>
+              <div class="hint" style="margin-top:8px;">
+                追加は「JSON」に1人分を足して読み込み、またはこのHTML内の <b>characters</b> 配列を増やす。
+              </div>
+              <div class="toast" id="toast"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Result -->
+      <section class="card">
+        <div class="hd">
+          <b>排出結果</b>
+          <div class="meta" id="metaPills"></div>
+        </div>
+        <div class="bd">
+          <div class="result">
+            <div class="avatar" id="avatar">
+              <div class="ph">画像なし</div>
+            </div>
+
+            <div>
+              <p class="name">
+                <span class="main" id="rName">—</span>
+                <span class="kana" id="rKana"></span>
+              </p>
+              <div class="hint" id="rTitle">—</div>
+
+              <div class="kv" id="kv"></div>
+
+              <div class="sep"></div>
+              <div class="hint">
+                フィルターに一致する候補からランダムで1人出す。条件がきついと0人になる。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+/**
+ * =========================================================
+ * キャラデータ（ここを増やすのが一番ラク）
+ * =========================================================
+ * gender: "male" | "female" | "other"
+ * title: 創作タイトル（カテゴリ）
+ * image: 正方形の画像URL（任意）/ dataURL でもOK
+ * age / heightCm / birthday / personality: 任意（無いなら省略 or null）
+ */
+const demoCharacters = [
+  {
+    id: "ch-0001",
+    name: "終末アーキビスト",
+    kana: "しゅうまつあーきびすと",
+    title: "終末図書館",
+    gender: "other",
+    age: null,
+    heightCm: null,
+    birthday: null,
+    personality: "淡々としているが執念深い",
+    image: "" // 例: "https://example.com/face.png"
+  },
+  {
+    id: "ch-0002",
+    name: "茶和田 リサ",
+    kana: "ちゃわだ りさ",
+    title: "資料館の影",
+    gender: "female",
+    age: 21,
+    heightCm: 160,
+    birthday: "3/14",
+    personality: "好奇心強め、突っ走りがち",
+    image: ""
+  },
+  {
+    id: "ch-0003",
+    name: "白いロングコートの観測者",
+    kana: "しろいろんぐこーとのかんそくしゃ",
+    title: "終末図書館",
+    gender: "male",
+    age: 30,
+    heightCm: 178,
+    birthday: "11/2",
+    personality: "",
+    image: ""
+  }
+];
+
+let characters = structuredClone(demoCharacters);
+let lastResult = null;
+
+/* ---------- helpers ---------- */
+const $ = (sel) => document.querySelector(sel);
+
+function normStr(s){
+  return (s ?? "").toString().trim();
+}
+function toNum(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function hasExtra(c){
+  return [c.age, c.heightCm, c.birthday, c.personality].some(v => normStr(v) !== "" && v !== null && v !== undefined);
+}
+function hasImage(c){
+  return normStr(c.image) !== "";
+}
+function includesQuery(c, q){
+  if(!q) return true;
+  const t = (normStr(c.name) + " " + normStr(c.kana) + " " + normStr(c.title)).toLowerCase();
+  return t.includes(q.toLowerCase());
+}
+function inRange(val, min, max){
+  if(val === null || val === undefined || val === "") return false;
+  if(min !== null && val < min) return false;
+  if(max !== null && val > max) return false;
+  return true;
+}
+function pickRandom(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+function toast(msg){
+  $("#toast").textContent = msg;
+  if(!msg) return;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=> $("#toast").textContent = "", 2000);
+}
+
+/* ---------- filter ---------- */
+function getFilters(){
+  const title = $("#fTitle").value;
+  const gender = $("#fGender").value;
+  const q = normStr($("#fQuery").value);
+  const ageMin = $("#fAgeMin").value === "" ? null : toNum($("#fAgeMin").value);
+  const ageMax = $("#fAgeMax").value === "" ? null : toNum($("#fAgeMax").value);
+  const hMin   = $("#fHMin").value   === "" ? null : toNum($("#fHMin").value);
+  const hMax   = $("#fHMax").value   === "" ? null : toNum($("#fHMax").value);
+  const onlyHasExtra = $("#fOnlyHasExtra").checked;
+  const onlyHasImage = $("#fOnlyHasImage").checked;
+
+  return { title, gender, q, ageMin, ageMax, hMin, hMax, onlyHasExtra, onlyHasImage };
+}
+
+function applyFilters(list){
+  const f = getFilters();
+  return list.filter(c => {
+    if(f.title && normStr(c.title) !== f.title) return false;
+    if(f.gender && normStr(c.gender) !== f.gender) return false;
+    if(f.q && !includesQuery(c, f.q)) return false;
+
+    // range filters:
+    const wantsAgeRange = (f.ageMin !== null || f.ageMax !== null);
+    if(wantsAgeRange){
+      // age情報ないキャラは弾く
+      if(!inRange(toNum(c.age), f.ageMin, f.ageMax)) return false;
+    }
+    const wantsHRange = (f.hMin !== null || f.hMax !== null);
+    if(wantsHRange){
+      if(!inRange(toNum(c.heightCm), f.hMin, f.hMax)) return false;
+    }
+
+    if(f.onlyHasExtra && !hasExtra(c)) return false;
+    if(f.onlyHasImage && !hasImage(c)) return false;
+
+    return true;
+  });
+}
+
+/* ---------- UI build ---------- */
+function rebuildTitleOptions(){
+  const sel = $("#fTitle");
+  const titles = [...new Set(characters.map(c => normStr(c.title)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ja"));
+  // keep current
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">すべて</option>` + titles.map(t => `<option value="${escapeHtmlAttr(t)}">${escapeHtml(t)}</option>`).join("");
+  if(titles.includes(cur)) sel.value = cur;
+}
+
+function updateCounts(){
+  const filtered = applyFilters(characters);
+  $("#countBox").innerHTML = `
+    <span>全体 <b>${characters.length}</b></span>
+    <span>候補 <b>${filtered.length}</b></span>
+  `;
+}
+
+function escapeHtml(s){
+  return (s ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+function escapeHtmlAttr(s){ return escapeHtml(s); }
+
+function setAvatar(url){
+  const box = $("#avatar");
+  box.innerHTML = "";
+  if(normStr(url) === ""){
+    const ph = document.createElement("div");
+    ph.className = "ph";
+    ph.textContent = "画像なし";
+    box.appendChild(ph);
+    return;
+  }
+  const img = document.createElement("img");
+  img.alt = "character image";
+  img.src = url;
+  img.onerror = () => {
+    box.innerHTML = "";
+    const ph = document.createElement("div");
+    ph.className = "ph";
+    ph.textContent = "画像読み込み失敗";
+    box.appendChild(ph);
+  };
+  box.appendChild(img);
+}
+
+function renderResult(c){
+  lastResult = c;
+
+  $("#rName").textContent = normStr(c.name) || "—";
+  $("#rKana").textContent = normStr(c.kana) ? `(${normStr(c.kana)})` : "";
+  $("#rTitle").textContent = normStr(c.title) ? `創作：${normStr(c.title)}` : "—";
+
+  setAvatar(c.image);
+
+  const pills = [];
+  if(normStr(c.gender)) pills.push({ text: genderLabel(c.gender), hot:false });
+  if(hasExtra(c)) pills.push({ text: "追加情報あり", hot:false });
+  if(hasImage(c)) pills.push({ text: "画像あり", hot:true });
+
+  $("#metaPills").innerHTML = pills.map(p =>
+    `<span class="pill ${p.hot?"hot":""}">${escapeHtml(p.text)}</span>`
+  ).join("");
+
+  const kv = [];
+  // 追加情報（あるものだけ）
+  if(normStr(c.gender)) kv.push(["性別", genderLabel(c.gender)]);
+  if(c.age !== null && c.age !== undefined && normStr(c.age) !== "") kv.push(["年齢", `${c.age}`]);
+  if(c.heightCm !== null && c.heightCm !== undefined && normStr(c.heightCm) !== "") kv.push(["身長", `${c.heightCm} cm`]);
+  if(normStr(c.birthday)) kv.push(["誕生日", normStr(c.birthday)]);
+  if(normStr(c.personality)) kv.push(["性格", normStr(c.personality)]);
+
+  $("#kv").innerHTML = kv.length ? kv.map(([k,v]) =>
+    `<div class="item"><div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(v)}</div></div>`
+  ).join("") : `<div class="hint">このキャラは追加情報がまだ無い。</div>`;
+}
+
+function genderLabel(g){
+  if(g==="male") return "男性";
+  if(g==="female") return "女性";
+  return "その他";
+}
+
+/* ---------- actions ---------- */
+function doGacha(){
+  const pool = applyFilters(characters);
+  updateCounts();
+  if(pool.length === 0){
+    toast("候補が0人。条件をゆるめろ。");
+    return;
+  }
+  const c = pickRandom(pool);
+  renderResult(c);
+}
+
+async function copyResult(){
+  if(!lastResult){
+    toast("まだ排出してない。");
+    return;
+  }
+  const c = lastResult;
+  const lines = [];
+  lines.push(`【キャラ】${normStr(c.name) || "—"}`);
+  if(normStr(c.kana)) lines.push(`よみ：${normStr(c.kana)}`);
+  if(normStr(c.title)) lines.push(`創作：${normStr(c.title)}`);
+  if(normStr(c.gender)) lines.push(`性別：${genderLabel(c.gender)}`);
+  if(c.age !== null && c.age !== undefined && normStr(c.age) !== "") lines.push(`年齢：${c.age}`);
+  if(c.heightCm !== null && c.heightCm !== undefined && normStr(c.heightCm) !== "") lines.push(`身長：${c.heightCm}cm`);
+  if(normStr(c.birthday)) lines.push(`誕生日：${normStr(c.birthday)}`);
+  if(normStr(c.personality)) lines.push(`性格：${normStr(c.personality)}`);
+  if(normStr(c.image)) lines.push(`画像：${normStr(c.image)}`);
+
+  const text = lines.join("\n");
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("コピーした。");
+  }catch(e){
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    toast("コピーした（簡易）。");
+  }
+}
+
+function exportJson(){
+  $("#jsonBox").value = JSON.stringify(characters, null, 2);
+  toast("JSONを書き出した。");
+}
+
+function importJson(){
+  const raw = $("#jsonBox").value;
+  try{
+    const data = JSON.parse(raw);
+    if(!Array.isArray(data)) throw new Error("JSONは配列形式にしろ。");
+    // light validation & normalize
+    const cleaned = data.map((c, i) => ({
+      id: normStr(c.id) || `ch-${String(i+1).padStart(4,"0")}`,
+      name: normStr(c.name),
+      kana: normStr(c.kana),
+      title: normStr(c.title),
+      gender: (["male","female","other"].includes(normStr(c.gender)) ? normStr(c.gender) : "other"),
+      age: (c.age === "" || c.age === null || c.age === undefined) ? null : Number(c.age),
+      heightCm: (c.heightCm === "" || c.heightCm === null || c.heightCm === undefined) ? null : Number(c.heightCm),
+      birthday: normStr(c.birthday) || null,
+      personality: normStr(c.personality) || null,
+      image: normStr(c.image) || ""
+    }));
+    // numeric sanitize
+    for(const c of cleaned){
+      if(!Number.isFinite(c.age)) c.age = null;
+      if(!Number.isFinite(c.heightCm)) c.heightCm = null;
+    }
+
+    characters = cleaned;
+    rebuildTitleOptions();
+    updateCounts();
+    toast("JSONを読み込んだ。");
+  }catch(e){
+    toast("JSONが壊れてる。形式見直せ。");
+    console.error(e);
+  }
+}
+
+function resetFilters(){
+  $("#fTitle").value = "";
+  $("#fGender").value = "";
+  $("#fQuery").value = "";
+  $("#fAgeMin").value = "";
+  $("#fAgeMax").value = "";
+  $("#fHMin").value = "";
+  $("#fHMax").value = "";
+  $("#fOnlyHasExtra").checked = false;
+  $("#fOnlyHasImage").checked = false;
+  updateCounts();
+}
+
+function setDemo(){
+  characters = structuredClone(demoCharacters);
+  rebuildTitleOptions();
+  updateCounts();
+  exportJson();
+  renderResult({
+    name:"—", kana:"", title:"", gender:"other",
+    age:null, heightCm:null, birthday:null, personality:null, image:""
+  });
+  toast("デモデータに戻した。");
+}
+
+/* ---------- init ---------- */
+function wire(){
+  $("#btnGacha").addEventListener("click", doGacha);
+  $("#btnCopy").addEventListener("click", copyResult);
+  $("#btnExport").addEventListener("click", exportJson);
+  $("#btnImport").addEventListener("click", importJson);
+  $("#btnReset").addEventListener("click", resetFilters);
+  $("#btnDemo").addEventListener("click", setDemo);
+
+  // reactive counts
+  ["fTitle","fGender","fQuery","fAgeMin","fAgeMax","fHMin","fHMax","fOnlyHasExtra","fOnlyHasImage"]
+    .forEach(id => $("#"+id).addEventListener("input", updateCounts));
+
+  rebuildTitleOptions();
+  updateCounts();
+  exportJson();
+  // 初期表示は空
+  renderResult({
+    name:"—", kana:"", title:"", gender:"other",
+    age:null, heightCm:null, birthday:null, personality:null, image:""
+  });
+}
+wire();
+</script>
+</body>
+</html>
