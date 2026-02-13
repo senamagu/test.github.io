@@ -342,25 +342,16 @@
     }
 
     .filters{
-      display:flex;
+      display:grid;
+      grid-template-columns: 44% 180px 1fr; /* 左 / イメージカラー / 右 */
       gap:14px;
-      align-items:flex-start;
+      align-items:start;
       margin-top: 8px;
     }
-    .filter-left{
-      width: 44%;
-      min-width: 320px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .filter-right{
-      flex:1;
-      min-width: 320px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
+
+    .filter-left{ width:auto; min-width: 320px; display:flex; flex-direction:column; gap:12px; }
+    .filter-mid{ width:auto; display:flex; flex-direction:column; gap:12px; }
+    .filter-right{ width:auto; min-width: 320px; display:flex; flex-direction:column; gap:12px; }
 
     .field{
       display:grid;
@@ -422,8 +413,6 @@
       max-height: 240px;
       overflow:auto;
       border:2px solid rgba(61,124,141,.18);
-      panel.addEventListener("click", (e)=> e.stopPropagation());
-      btn.addEventListener("click", (e)=> { e.stopPropagation();});
     }
     .multi.open .multi-panel{ display:block; }
 
@@ -877,18 +866,19 @@
           </div>
         </div>
 
-        <div class="field">
-          <div class="k">イメージカラー</div>
-          <!-- 13 正方形。文字なし。押したら選択画面 -->
+        
+      <!-- mid (イメージカラー) -->
+      <div class="filter-mid">
+        <div class="field" style="grid-template-columns:1fr;">
+          <div class="k" style="text-align:left;">イメージカラー</div>
           <div class="color-box" id="colorBox" title="タップで選択">
-            <!-- ここを君のホイール画像に差し替え -->
             <img src="colorwheel.png" alt="color wheel">
           </div>
         </div>
       </div>
 
       <!-- right -->
-      <div class="toggles-row">
+      <div class="filter-right">
         <div class="toggle" id="tglHasImage">
           <span class="radio on" id="dotHasImage"></span>
           <span>画像ありのみ</span>
@@ -1217,7 +1207,7 @@
         row.appendChild(tick);
         row.appendChild(label);
 
-        row.addEventListener("click", ()=>{
+        row.addEventListener("click", (e)=>{
           e.stopPropagation();
           if(currentSet.has(v)) currentSet.delete(v);
           else currentSet.add(v);
@@ -1230,6 +1220,10 @@
         panel.appendChild(row);
       }
       updateMultiValueText(multiEl);
+      const panel = multiEl.querySelector(".multi-panel");
+      panel.addEventListener("click", (e)=> e.stopPropagation());
+      const btn = multiEl.querySelector(".multi-btn");
+      btn.addEventListener("click", (e)=> e.stopPropagation());
     }
 
     function setupMulti(){
@@ -1552,7 +1546,6 @@
       applyFilters();
       wireInputs();
     }
-    init();
   </script>
 </body>
 </html>
