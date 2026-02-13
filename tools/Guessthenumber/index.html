@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字当てゲーム</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex; /* [cite: 48] */
+            flex-direction: column; /* [cite: 48] */
+            align-items: center; /* [cite: 48] */
+            justify-content: center; /* [cite: 48] */
+            height: 100vh; /* [cite: 48] */
+            margin: 0; /* [cite: 48] */
+            background-color: #eef2f3; /* [cite: 48] */
+        }
+        #bgm-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 100;
+            background: rgba(248, 249, 250, 0.9); /* 少し背景を明るく */
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+        }
+        #game-container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 350px;
+            position: relative;
+        }
+        .settings {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        #display-area {
+            font-size: 3.5rem;
+            font-weight: bold;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+            color: #333;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        .stats {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .stats div {
+            margin: 2px 0; /* 行間を少し作ると見やすくなります */
+        }
+        input[type="number"] {
+            font-size: 1.5rem;
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        button:hover { background-color: #357abd; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #message { margin-top: 15px; font-weight: bold; min-height: 1.5em; }
+        .success { color: #2ecc71; }
+        .error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+<div id="main-layout" style="display: flex; align-items: flex-start; gap: 20px;">
+
+<audio id="bgm" src="https://senamagu.github.io/Guessthenumber.github.io/追いかけっこキャッハー.mp3" loop></audio>
+    
+<div id="bgm-control-wrapper" style="margin-bottom: 20px;">
+        <div id="bgm-control" style="display: flex; flex-direction: column; align-items: center; background: white; padding: 10px 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 200px;">
+            <button id="bgm-btn" onclick="toggleBGM()" style="background-color: #e74c3c; padding: 5px 10px; font-size: 0.8rem; margin-bottom: 5px; width: 100%;">BGM: ON</button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 0.7rem;">音量</span>
+                <input type="range" id="volume-control" min="0" max="1" step="0.05" value="0.5" style="width: 100px;">
+            </div>
+        </div>
+
+    <div id="setup-section" style="display: flex; flex-direction: column; align-items: center; background: white; padding: 10px 10px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 200px; box-sizing: border-box; border: 1px solid #eee;">
+        <label style="font-size: 0.8rem; color: #333; font-weight: bold;">
+            桁数設定: 
+            <input type="number" id="digit-select" value="4" min="1" max="10" style="width: 50px; font-size: 1rem; padding: 2px; border: 1px solid #ddd; border-radius: 5px; text-align: center;">
+        </label>
+    </div>
+</div>
+
+<div id="game-container">
+    <h2>数字当てゲーム</h2>
+    
+    <div class="score-board">
+         正解: <span id="correct-count">0</span> | 
+         不正解: <span id="wrong-count">0</span>
+    </div>
+    
+    <div class="stats">
+        <div>現在の表示速度: <span id="current-speed">0.20</span>秒</div>
+        <div>現在の桁数: <span id="current-digits">4</span>桁</div>
+    </div>
+
+    <div id="display-area">Ready?</div>
+    
+    <div id="input-section" style="display:none;">
+        <input type="number" id="user-input" placeholder="？" />
+        <br>
+        <button id="submit-btn" onclick="checkAnswer()">回答する</button>
+    </div>
+
+    <button id="back-to-title-btn" onclick="backToTitle()" style="display:none; background-color: #6c757d;">タイトルへ戻る</button>
+    <button id="start-btn" onclick="startGame()">スタート！</button>
+    <div id="message"></div>
+</div>
+
+<script>
+    let correctTotal = 0;// カウント用の変数
+    let wrongTotal = 0;// カウント用の変数
+    let targetNumber = "";
+    let isBgmPlaying = true;
+    let displayTime = 200; // 初期値 0.2秒
+    const MIN_TIME = 1;   // 最速 0.001秒
+
+    const volumeControl = document.getElementById('volume-control');
+    const displayArea = document.getElementById('display-area');
+    const userInput = document.getElementById('user-input');
+    const inputSection = document.getElementById('input-section');
+    const startBtn = document.getElementById('start-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const message = document.getElementById('message');
+    const speedText = document.getElementById('current-speed');
+    const digitInput = document.getElementById('digit-select');
+    const soundCount = new Audio('https://senamagu.github.io/Guessthenumber.github.io/カウント.mp3'); // カウント音
+　　 const soundSuccess = new Audio('https://senamagu.github.io/Guessthenumber.github.io/成功.mp3'); // 正解音
+　　 const soundError = new Audio('https://senamagu.github.io/Guessthenumber.github.io/失敗.mp3'); // 不正解音
+    const soundtap = new Audio('https://senamagu.github.io/Guessthenumber.github.io/タップ音.mp3'); // タップ音
+
+    const bgm = document.getElementById('bgm');
+    const bgmBtn = document.getElementById('bgm-btn');
+
+    function updateVolume() {
+    const vol = volumeControl.value;
+        if (bgm) bgm.volume = vol;
+    }
+
+    function toggleBGM() {
+        if (isBgmPlaying) {
+            bgm.pause();
+            bgmBtn.textContent = "BGM: OFF";
+            bgmBtn.style.backgroundColor = "#858585";
+        } else {
+            bgm.play().catch(e => console.log("BGM再生に失敗:", e));
+            bgmBtn.textContent = "BGM: ON";
+            bgmBtn.style.backgroundColor = "#e74c3c";
+        }
+        isBgmPlaying = !isBgmPlaying;
+    }
+    // スライダーを動かした時に実行されるイベント
+    volumeControl.addEventListener('input', updateVolume);
+
+    // ページ読み込み時に初期音量を反映
+    updateVolume();
+    
+    function startGame() {
+        if (isBgmPlaying) {
+            bgm.play().catch(e => {});
+        }
+        // ★ボタンを再表示し、入力欄の固定を解除する
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.style.display = 'inline-block';
+        userInput.readOnly = false;
+        soundSuccess.pause();
+        soundSuccess.currentTime = 0; 
+        soundError.pause();
+        soundError.currentTime = 0; 
+        soundCount.currentTime = 0; 
+        soundCount.play();
+        startBtn.style.display = 'none';
+        const digits = digitInput.value;
+        document.getElementById('current-digits').textContent = digits;
+        document.getElementById('back-to-title-btn').style.display = 'none';
+        document.getElementById('setup-section').style.display = 'none';
+        inputSection.style.display = 'none';
+        message.textContent = "";
+        userInput.value = "";
+        
+        let timeLeft = 3.0;
+        
+        // カウントダウン
+        const timer = setInterval(() => {
+            displayArea.style.color = "#333";
+            displayArea.textContent = timeLeft.toFixed(1);
+            timeLeft -= 0.1;
+
+            if (timeLeft < 0) {
+                clearInterval(timer);
+                showNumber();
+            }
+        }, 100);
+    }
+
+function backToTitle() {
+    // スコアと速度のリセット
+    correctTotal = 0;
+    wrongTotal = 0;
+    displayTime = 200;
+    document.getElementById('correct-count').textContent = "0";
+    document.getElementById('wrong-count').textContent = "0";
+    document.getElementById('current-speed').textContent = "0.20";
+
+    // 画面表示を初期状態に戻す
+    document.getElementById('setup-section').style.display = 'flex'; // 桁数変更を許可
+    startBtn.style.display = 'inline-block';
+    startBtn.textContent = "スタート！";
+    document.getElementById('back-to-title-btn').style.display = 'none';
+    document.getElementById('setup-section').style.display = 'flex';
+    document.getElementById('current-digits').textContent = digitInput.value;
+    inputSection.style.display = 'none';
+    displayArea.style.color = "#333";
+    displayArea.textContent = "Ready?";
+    message.textContent = "";
+}
+    
+    function showNumber() {
+        // 指定された桁数のランダムな数字を生成
+        soundCount.pause();
+        soundCount.currentTime = 0; 
+        const digits = parseInt(digitInput.value);
+        const min = Math.pow(10, digits - 1);
+        const max = Math.pow(10, digits) - 1;
+        targetNumber = Math.floor(min + Math.random() * (max - min + 1)).toString();
+        displayArea.textContent = targetNumber;
+        displayArea.style.color = "#333";
+
+        // 動的な表示時間で消去
+        setTimeout(() => {
+       　　  displayArea.textContent = "*".repeat(digits);//桁数分だけ「*」を表示する
+            displayArea.style.color = "#333";//「*」の色
+            submitBtn.style.display = 'inline-block';//回答ボタンの表示
+            userInput.style.display = 'inline-block';//解答欄の表示
+            inputSection.style.display = 'block';//たのむ、反応してくれ
+            userInput.focus();//カーソルの移動
+        }, displayTime);
+    }
+
+    function checkAnswer() {
+    // ★回答ボタンだけを非表示にする
+    submitBtn.style.display = 'none';
+    // 入力欄は触れないように固定する（書き換え防止）
+    userInput.readOnly = true;
+        if (userInput.value === targetNumber) {
+            soundSuccess.play();
+            correctTotal++; // 1増やす
+            document.getElementById('correct-count').textContent = correctTotal; // 画面を更新
+            displayArea.textContent = targetNumber;
+            displayArea.style.color = "#2ecc71";
+            message.textContent = "正解！スピードアップ！";
+            message.className = "success";
+            // 正解したら0.02秒ずつ速くする（最低0.05秒まで）
+            displayTime = Math.max(MIN_TIME, displayTime - 20);
+            speedText.textContent = (displayTime / 1000).toFixed(2);
+        } else {
+            soundError.play();
+            wrongTotal++; // 1増やす
+            document.getElementById('wrong-count').textContent = wrongTotal; // 画面を更新
+            displayArea.textContent = targetNumber;
+            displayArea.style.color = "#e74c3c";
+            message.textContent = `不正解！スピードダウン！`;
+            message.className = "error";
+            // 失敗したら少し難易度を戻す
+            displayTime += 50;
+            speedText.textContent = (displayTime / 1000).toFixed(2);
+        }
+        
+        startBtn.style.display = 'inline-block';
+        startBtn.textContent = "次のレベルへ";
+        document.getElementById('back-to-title-btn').style.display = 'inline-block';
+    }
+
+    userInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") checkAnswer();
+    });
+</script>
+
+</body>
+</html>
