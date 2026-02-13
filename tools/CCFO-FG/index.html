@@ -320,7 +320,7 @@
           <div class="field">
             <label>自動トリミング（fieldObjectFit）</label>
             <select id="fit">
-              <option value="keep">変更しない</option>
+              <option value="keep">変更なし</option>
               <option value="cover">ON（cover）</option>
               <option value="fill">OFF（fill）</option>
             </select>
@@ -338,7 +338,7 @@
         <div class="field">
           <label>ログ</label>
           <textarea id="log" class="mono" readonly style="height:240px;"></textarea>
-          <div class="sub">処理結果の件数を表示する。</div>
+          <div class="sub">処理結果の件数を表示</div>
         </div>
       </div>
     </div>
@@ -352,9 +352,9 @@
         <div class="field">
           <label>対象シーン（表示と個別選択）</label>
           <select id="sceneSel" disabled>
-            <option value="">zip読み込み後に選べる</option>
+            <option value="">zip読み込み後に選択</option>
           </select>
-          <div class="sub">このシーンのマーカーを下に表示する。チェックしたものが対象。</div>
+          <div class="sub">このシーンのマーカーを下に表示</div>
         </div>
 
         <div class="row">
@@ -369,7 +369,7 @@
           <div class="field">
             <label>マーカー位置</label>
             <select id="markerPos" disabled>
-              <option value="keep">位置は変更しない</option>
+              <option value="keep">変更なし</option>
               <option value="topleft">左上合わせ（x=-width/2, y=-height/2）</option>
             </select>
           </div>
@@ -377,9 +377,9 @@
 
         <div class="row">
           <div class="field">
-            <label>検索：マーカー（text / 画像名 / id）</label>
-            <input id="markerFilter" type="text" placeholder="例：暗転 / .png / 19c545" disabled />
-            <div class="sub">表示の絞り込みと、一括選択の条件に使う。</div>
+            <label>マーカー検索</label>
+            <input id="markerFilter" type="text" placeholder="例:text / 画像名 / id" disabled />
+            <div class="sub">textはココフォリア上で入力されもののみ</div>
           </div>
           <div class="field">
             <label>このシーンの操作</label>
@@ -397,23 +397,22 @@
 
       <div class="grid">
         <div class="field">
-          <label>検索：シーン名（複数シーンの候補を絞る）</label>
-          <input id="sceneFilter" type="text" placeholder="例：暗転 / OP / 黒" disabled />
+          <label>シーン名検索</label>
+          <input id="sceneFilter" type="text" placeholder="例：暗転" disabled />
         </div>
 
         <div class="field">
-          <label>一括対象シーン（チェックしたシーンへ一括適用）</label>
+          <label>対象シーン</label>
           <div id="sceneMulti"></div>
-          <div class="sub">チェックしたシーンに対して「マーカー検索にヒットしたもの」を全選択/全解除する。</div>
+          <div class="sub"></div>
         </div>
 
         <div class="btnrow">
-          <button id="bulkSel" class="secondary" disabled>チェックしたシーン：検索ヒットを全選択</button>
-          <button id="bulkDesel" class="ghost" disabled>チェックしたシーン：検索ヒットを全解除</button>
+          <button id="bulkSel" class="secondary" disabled>シーン名で全選択</button>
+          <button id="bulkDesel" class="ghost" disabled>シーン名で全解除</button>
         </div>
 
         <div class="sub">
-          例：暗転用の板だけ選びたいなら、マーカー検索に画像名の一部を入れると楽。
         </div>
       </div>
     </div>
@@ -540,7 +539,7 @@
     sceneSel.innerHTML = "";
     const opt0 = document.createElement("option");
     opt0.value = "";
-    opt0.textContent = "選択して";
+    opt0.textContent = "未選択";
     sceneSel.appendChild(opt0);
 
     const roomOpt = document.createElement("option");
