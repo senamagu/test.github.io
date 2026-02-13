@@ -406,7 +406,7 @@
 
     /* hitlist はこの塊の下に置く */
     .filter-side .hitlist{
-      min-height: 240px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
+      height: 60px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
       max-height: none;
     }
 
@@ -582,7 +582,7 @@
       padding:10px;
 
       max-height: none;     /* ←消す/上書き */
-      height: 60px;    /* ←色パネル下まで届く目安（必要なら 230 とかに） */
+      height: none;    /* ←色パネル下まで届く目安（必要なら 230 とかに） */
       overflow:auto;
     }
     .hitgrid{
@@ -787,7 +787,7 @@
 
   <div class="wrap">
     <div class="hero">
-      <h1>フィップス<br>キャラガチャ</h1>
+      <h1>フィップス<br>キャラガチャr</h1>
       <div class="total">総数 <span id="totalCount">0</span>名</div>
     </div>
 
@@ -910,18 +910,19 @@
         </div>
       </div><!-- /filter-left -->
 
-<!-- mid + right をまとめる -->
-<div class="filter-side">
-  <div class="side-top">
-    <!-- 左：イメージカラー -->
-    <div class="filter-mid">
-      <div class="field" style="grid-template-columns:1fr;">
-        <div class="k">イメージカラー</div>
-        <div class="color-box" id="colorBox" title="タップで選択">
-          <img src="colorwheel.png" alt="color wheel">
+      <!-- mid + right をまとめる -->
+      <div class="filter-side">
+        <div class="side-top">
+          <!-- 左：イメージカラー -->
+          <div class="filter-mid">
+            <div class="field" style="grid-template-columns:1fr;">
+              <div class="k">イメージカラー</div>
+              <div class="color-box" id="colorBox" title="タップで選択">
+                <img src="colorwheel.png" alt="color wheel">
+              </div>
+          </div>
         </div>
       </div>
-    </div>
 
     <!-- 右：トグル + ヒット件数 -->
     <div class="filter-right">
@@ -1002,17 +1003,6 @@
       if(!res.ok) throw new Error("characters.json 読めない");  
       characters = await res.json();
     }
-
-    (async ()=>{  
-      try{
-            await loadCharacters();  
-      }catch(e){    
-        console.error(e);   
-        toast("characters.json 読み込み失敗");    
-        characters = [];  
-      }  
-      init(); // ←ここで起動
-    })();
 
     const COLOR_ITEMS = [
       {key:"赤",   hex:"#F25C5C"},
@@ -1596,10 +1586,15 @@
       wireInputs();
     }
     
-    (async ()=>{
-      try{ await loadCharacters(); }
-      catch(e){ console.error(e); characters=[]; }
-      init();
+    (async ()=>{  
+      try{ 
+        await loadCharacters();  
+      }catch(e){    
+        console.error(e);   
+        toast("characters.json 読み込み失敗");    
+        characters = [];  
+      }  
+      init(); // ←ここで起動
     })();
 
   </script>
