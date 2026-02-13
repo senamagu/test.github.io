@@ -6,17 +6,17 @@
   <title>ツール一覧</title>
   <style>
 :root{
-  --lime:#8cb83c;
-  --deep:#152217;
-  --olive:#4f5740;
-  --mist:#c9cbc5;
+  --lime:#96C349;
+  --deep:#4F5741;
+  --olive:#4F5741;
+  --mist:#CACBC4;
 
-  --top:#c9cbc5;      /* 画像の上の灰帯 */
-  --text:#152217;
+  --top:#CACBC4;      /* 画像の上の灰帯 */
+  --text:#4F5741;
 
-  --card:#4f5740;     /* 画像のカード色 */
-  --cardText:#e9eee4;
-  --cardSub: rgba(233,238,228,.68);
+  --card:#4F5741;     /* 画像のカード色 */
+  --cardText:#CACBC4;
+  --cardSub: #879866;
 
   --r:18px;
   --gap: clamp(12px, 2.2vw, 24px);
@@ -40,12 +40,12 @@ body{
 /* ====== TOP BAR (画像っぽく) ====== */
 .topbar{
   background: var(--top);
-  border-bottom: 2px solid rgba(21,34,23,.25);
+  /*border-bottom: 2px solid rgba(21,34,23,.25);*/
 }
 .topbar-inner{
   width:min(1200px, 100%);
   margin:0 auto;
-  padding: clamp(18px, 3.2vw, 34px) clamp(16px, 3vw, 32px);
+  padding: clamp(10px, 2vw, 18px) clamp(16px, 3vw, 32px);
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
@@ -53,7 +53,7 @@ body{
 }
 .h1{
   margin:0;
-  font-size: clamp(34px, 5vw, 54px);
+  font-size: clamp(22px, 3vw, 32px);
   letter-spacing:.06em;
   font-weight: 900;
   color: rgba(21,34,23,.8);
@@ -65,7 +65,7 @@ body{
   letter-spacing:.06em;
   color: rgba(79,87,64,.75);
   line-height:1.2;
-  font-size: clamp(14px, 1.8vw, 22px);
+  font-size: clamp(12px, 1.4vw, 16px);
 }
 
 /* ====== MAIN AREA ====== */
@@ -77,28 +77,20 @@ body{
 
 /* 背景パターン（軽量・平面） */
 /* 画面全体に丸パターン */
-body::before{
-  content:"";
-  position:fixed;
-  inset:-40px; /* はみ出し防止でちょい広げる */
-  background:
-    radial-gradient(circle, rgba(255,255,255,.10) 0 56%, transparent 57%) 0 0/110px 110px;
-  opacity:.55;
-  pointer-events:none;
-  z-index:0;
-}
+body{
+  margin:0;
+    font-family:
+      "Hiragino Kaku Gothic ProN",
+      "Hiragino Sans",
+      sans-serif;
+      font-weight: 700;
 
-/* 上に乗る要素を前に出す */
-/* ======
-.topbar, .page{ position:relative; z-index:1; }
- .pattern::after{ 
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,.04);
-  pointer-events:none;
-} 
-  ====== */
+  background-color: var(--lime);
+  background-image:
+    radial-gradient(circle, rgba(150,195,73) 0 80%, transparent 57%);
+  background-size: 110px 110px;
+  background-position: 0 0;
+}
 
 /* ====== SECTION ====== */
 .section{
@@ -146,7 +138,7 @@ body::before{
   min-height: clamp(96px, 10vw, 130px);
 
   /* 平面寄りの“板” */
-  border: 2px solid rgba(21,34,23,.30);
+ /* border: 2px solid rgba(21,34,23,.30); */
 
   /* アニメは控えめ（雰囲気壊さない） */
   transition: transform .12s ease, filter .12s ease;
