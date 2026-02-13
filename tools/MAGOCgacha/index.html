@@ -422,6 +422,8 @@
       max-height: 240px;
       overflow:auto;
       border:2px solid rgba(61,124,141,.18);
+      panel.addEventListener("click", (e)=> e.stopPropagation());
+      btn.addEventListener("click", (e)=> { e.stopPropagation();});
     }
     .multi.open .multi-panel{ display:block; }
 
@@ -484,6 +486,15 @@
       font-size:20px;
       pointer-events:none;
     }
+    .range-row.suffix-right{
+      grid-template-columns: 1fr 40px 1fr 42px; /* 末尾に suffix */
+      align-items:center;
+    }
+    .suffix-out{
+      color: var(--fieldText);
+      font-size: 20px;
+      text-align:left;
+    }
 
     /* 13 イメージカラー（正方形） */
     .color-box{
@@ -527,6 +538,14 @@
       background:transparent;
     }
     .radio.on{ background: var(--btn); }
+    .toggles-row{
+      display:flex;
+      gap:14px;
+    }
+    .toggles-row .toggle{
+      flex:1;
+    }
+
 
     /* 15 hits（色 #3D7C8D に固定） */
     .hits{
@@ -554,8 +573,8 @@
       gap:8px 10px;
     }
     .hitname{
-      background: rgba(255,255,255,.10);
-      border-radius:10px;
+      background: transparent;
+      border-radius:0px;
       padding:8px 10px;
       color:var(--name); /* #DDEDF1 */
       font-size:18px;
@@ -723,6 +742,13 @@
       padding:10px 6px 2px;
       flex-wrap:wrap;
     }
+
+    /* 画面が狭い時は、崩すんじゃなく横スクロールさせる */
+    @media (max-width: 720px){
+      .wrap{ width: 980px; }
+      body{ overflow-x: auto; }
+    }
+
   </style>
 </head>
 
@@ -749,9 +775,14 @@
 
           <!-- 19 share -->
           <button class="icon-btn" id="btnShare" title="共有">
-            <!-- clean share icon -->
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 3 4ZM6 14a3 3 0 1 0 2.83 4H9a3 3 0 0 0-3-4Zm12 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.6 15.2l7-3.6M8.6 8.4l7 3.6" stroke="#DDEDF1" stroke-width="2.2" stroke-linecap="round"/>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <g fill="none" stroke="#DDEDF1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5.5" r="2.5"/>
+                <circle cx="6" cy="12" r="2.5"/>
+                <circle cx="18" cy="18.5" r="2.5"/>
+                <path d="M8.2 11l7.2-4.2"/>
+                <path d="M8.2 13l7.2 4.2"/>
+              </g>
             </svg>
           </button>
         </div>
@@ -778,7 +809,7 @@
 
             <div class="personality">
               <div class="k">性格</div>
-              <div class="v" id="personalityText">未登録。</div>
+              <div class="v" id="personalityText">未登録</div>
             </div>
           </div>
         </div>
@@ -800,7 +831,7 @@
           <div class="k">創作タイトル</div>
           <div class="multi" data-multi="series">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">選択</span><span class="caret"></span>
+              <span class="value placeholder">未選択</span><span class="caret"></span>
             </div>
             <div class="multi-panel"></div>
           </div>
@@ -810,7 +841,7 @@
           <div class="k">キャラジャンル</div>
           <div class="multi" data-multi="genre">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">選択</span><span class="caret"></span>
+              <span class="value placeholder">未選択</span><span class="caret"></span>
             </div>
             <div class="multi-panel"></div>
           </div>
@@ -820,7 +851,7 @@
           <div class="k">性別</div>
           <div class="multi" data-multi="gender">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">選択</span><span class="caret"></span>
+              <span class="value placeholder">未選択</span><span class="caret"></span>
             </div>
             <div class="multi-panel"></div>
           </div>
@@ -828,31 +859,21 @@
 
         <div class="field">
           <div class="k">年齢</div>
-          <div class="range-row">
-            <div class="suffix-input">
-              <input class="control" id="ageMin" inputmode="numeric" placeholder="最小" />
-              <span class="suffix">歳</span>
-            </div>
+          <div class="range-row suffix-right">
+            <input class="control" id="ageMin" inputmode="numeric" placeholder="最小" />
             <div class="sep">〜</div>
-            <div class="suffix-input">
-              <input class="control" id="ageMax" inputmode="numeric" placeholder="最大" />
-              <span class="suffix">歳</span>
-            </div>
+            <input class="control" id="ageMax" inputmode="numeric" placeholder="最大" />
+            <div class="suffix-out">歳</div>
           </div>
         </div>
 
         <div class="field">
           <div class="k">身長</div>
-          <div class="range-row">
-            <div class="suffix-input">
-              <input class="control" id="hMin" inputmode="numeric" placeholder="最小" />
-              <span class="suffix">cm</span>
-            </div>
+          <div class="range-row suffix-right">
+            <input class="control" id="hMin" inputmode="numeric" placeholder="最小" />
             <div class="sep">〜</div>
-            <div class="suffix-input">
-              <input class="control" id="hMax" inputmode="numeric" placeholder="最大" />
-              <span class="suffix">cm</span>
-            </div>
+            <input class="control" id="hMax" inputmode="numeric" placeholder="最大" />
+            <div class="suffix-out">cm</div>
           </div>
         </div>
 
@@ -867,7 +888,7 @@
       </div>
 
       <!-- right -->
-      <div class="filter-right">
+      <div class="toggles-row">
         <div class="toggle" id="tglHasImage">
           <span class="radio on" id="dotHasImage"></span>
           <span>画像ありのみ</span>
@@ -933,43 +954,25 @@
     // 画像はローカル相対パス: "Charamedia/xxx.png"
     // docUrl があれば資料ボタン表示
     // shareQuote があれば共有文に入れる
-    const characters = [
-      {
-        id:"asano_sana",
-        name:"浅野 醒那",
-        yomi:"アサノ サナ",
-        series:"描楽幻想街",
-        gender:"female",
-        age:21,
-        heightCm:158,
-        birthday:"11/11",
-        personality:"元気！\n超元気だよ！\nじゃがりこ好きだよ！",
-        color:"#34C38E",
-        // colorTag は無くてもOK（colorから自動判定）
-        colorTag:"",
-        genre:"人間",
-        image:"Charamedia/asano_sana.png",
-        docUrl:"https://x.com/senamagu_cs/status/1876245564683432232?s=46",
-        shareQuote:"飯が美味いぜ！"
-      },
-      {
-        id:"noimg",
-        name:"椎野 明",
-        yomi:"シイノ アキラ",
-        series:"描楽幻想街",
-        gender:"male",
-        age:19,
-        heightCm:172,
-        birthday:"",
-        personality:"",
-        color:"#F37679",
-        colorTag:"",
-        genre:"人間",
-        image:"",
-        docUrl:"https://example.com",
-        shareQuote:"今日はツイてるな。"
-      }
-    ];
+
+    let characters = [];
+
+    async function loadCharacters(){ 
+      const res = await fetch("characters.json", {cache:"no-store"});  
+      if(!res.ok) throw new Error("characters.json 読めない");  
+      characters = await res.json();
+    }
+
+    (async ()=>{  
+      try{
+            await loadCharacters();  
+      }catch(e){    
+        console.error(e);   
+        toast("characters.json 読み込み失敗");    
+        characters = [];  
+      }  
+      init(); // ←ここで起動
+    })();
 
     const COLOR_ITEMS = [
       {key:"赤",   hex:"#F25C5C"},
@@ -1215,7 +1218,7 @@
         row.appendChild(label);
 
         row.addEventListener("click", ()=>{
-          // 選択しても閉じない（外タップまで開きっぱ）
+          e.stopPropagation();
           if(currentSet.has(v)) currentSet.delete(v);
           else currentSet.add(v);
 
