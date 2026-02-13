@@ -3,149 +3,429 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ココフォリア編集ツール：前景サイズ＆マーカー追従</title>
+  <title>ココフォリアZip編集ツール</title>
   <style>
-    :root { --bg:#0f1115; --panel:#171a21; --text:#e7e9ee; --muted:#a9b0bf; --line:#2a3040; --acc:#7aa2ff; }
-    body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
-    header{ padding:16px 18px; border-bottom:1px solid var(--line); background:rgba(15,17,21,.92); position:sticky; top:0; backdrop-filter: blur(8px); z-index:5; }
-    h1{ margin:0; font-size:16px; }
-    main{ padding:16px 18px; max-width:980px; margin:0 auto; }
-    .card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; }
-    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:end; }
-    label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
-    input, select, button{
-      font:inherit; border-radius:10px; border:1px solid var(--line);
-      background:#0f131b; color:var(--text); padding:10px 12px;
-    }
-    input[type="number"]{ width:140px; }
-    input[type="file"]{ width:100%; }
-    .grow{ flex:1; min-width:240px; }
-    button{ background:var(--acc); border-color:transparent; color:#0b1020; font-weight:800; cursor:pointer; }
-    button:disabled{ opacity:.5; cursor:not-allowed; }
-    .ghost{ background:transparent; border-color:var(--line); color:var(--text); font-weight:700; }
-    .sub{ color:var(--muted); font-size:12px; line-height:1.6; margin-top:8px; }
-    .ok{ color:#9ee493; }
-    .ng{ color:#ff8b8b; }
-    .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:12px; white-space:pre-wrap; }
-    .hr{ height:1px; background:var(--line); margin:14px 0; }
+    :root{
+      /* Light theme (palette-based) */
+      --bg:#f7f7fc;
+      --panel:#ffffff;
+      --text:#602414;
+      --muted:#7a5b51;
+      --line:#e7d9d4;
+      --acc:#ed4f05;   /* primary */
+      --acc2:#209573;  /* secondary */
+      --ok:#209573;
+      --ng:#b3261e;
 
-    #markerList{
-      margin-top:12px;
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
-      gap:10px;
+      --radius:14px;
+      --pad:14px;
+      --gap:12px;
+      --shadow:0 8px 22px rgba(96,36,20,.10);
     }
-    .mcard{ padding:10px; border-radius:12px; border:1px solid var(--line); background:#121824; }
-    .mrow{ display:flex; gap:10px; align-items:center; }
-    .thumb{
-      width:56px; height:56px; object-fit:contain;
-      border-radius:10px; border:1px solid var(--line); background:#0f131b;
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+      line-height:1.45;
+    }
+
+    header{
+      position:sticky; top:0; z-index:10;
+      background:rgba(247,247,252,.92);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    header .wrap{
+      max-width:1040px;
+      margin:0 auto;
+      padding:14px 16px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    h1{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.2px;
+      font-weight:800;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    main{
+      max-width:1040px;
+      margin:0 auto;
+      padding:16px;
+      display:grid;
+      gap:14px;
+    }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:var(--pad);
+      box-shadow:var(--shadow);
+    }
+
+    .section-title{
+      font-weight:900;
+      font-size:13px;
+      margin:0 0 10px;
+      color:var(--text);
+    }
+
+    .grid{
+      display:grid;
+      gap:var(--gap);
+    }
+    /* Desktop/tablet: 2 columns, Mobile: 1 column */
+    .grid.cols2{
+      grid-template-columns: 1.2fr .8fr;
+      align-items:start;
+    }
+    @media (max-width: 860px){
+      .grid.cols2{ grid-template-columns: 1fr; }
+      h1{ font-size:14px; }
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+    label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    input, select, button, textarea{
+      font:inherit;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      padding:11px 12px;
+      outline:none;
+    }
+    textarea{ resize:vertical; min-height:44px; }
+
+    input[type="file"]{
+      padding:10px 12px;
+    }
+    input[type="number"]{
+      width:100%;
+    }
+
+    .row{
+      display:grid;
+      gap:var(--gap);
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 520px){
+      .row{ grid-template-columns:1fr; }
+    }
+
+    .btnrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    button{
+      border-color:transparent;
+      background:var(--acc);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+      padding:11px 14px;
+    }
+    button.secondary{
+      background:var(--acc2);
+    }
+    button.ghost{
+      background:transparent;
+      border-color:var(--line);
+      color:var(--text);
+      font-weight:800;
+    }
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .sub{
+      color:var(--muted);
+      font-size:12px;
+    }
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12px;
+      white-space:pre-wrap;
+    }
+    .hr{
+      height:1px;
+      background:var(--line);
+      margin:12px 0;
+    }
+
+    .status{
+      font-size:12px;
+      font-weight:800;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:var(--muted);
       flex:0 0 auto;
     }
-    .mmeta{ min-width:0; flex:1; }
+    .status.ok .dot{ background:var(--ok); }
+    .status.ng .dot{ background:var(--ng); }
+
+    /* Marker list */
+    #markerList{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+      gap:10px;
+    }
+    .mcard{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      background:#fff;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      min-width:0;
+    }
+    .thumb{
+      width:58px;
+      height:58px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      object-fit:contain;
+      background:#fff;
+      flex:0 0 auto;
+    }
+    .mmeta{ flex:1; min-width:0; }
     .mtitle{
-      font-weight:800; font-size:13px;
-      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+      font-weight:900;
+      font-size:13px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
-    .mmini{ margin-top:4px; }
+    .mmini{
+      margin-top:4px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+    }
     .pill{
-      display:inline-block; padding:2px 8px; border-radius:999px;
-      border:1px solid var(--line); color:var(--muted); font-size:11px;
-      margin-right:6px;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(247,247,252,.7);
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
     }
-    .inline{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+    /* Multi-scene list */
+    #sceneMulti{
+      max-height:210px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:8px;
+      background:#fff;
+    }
+    .sline{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:8px 6px;
+      border-radius:10px;
+    }
+    .sline:hover{
+      background:rgba(237,79,5,.06);
+    }
+    .sname{
+      flex:1;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-weight:800;
+      color:var(--text);
+      font-size:12px;
+    }
+
+    /* Prevent layout jump when thumbs load */
+    img{ display:block; }
   </style>
 </head>
+
 <body>
-<header><h1>ココフォリア編集ツール：前景サイズ＆マーカー追従（zip対応）</h1></header>
+<header>
+  <div class="wrap">
+    <h1>ココフォリアZip編集ツール</h1>
+    <div class="sub">前景サイズ / トリミング / マーカー追従</div>
+  </div>
+</header>
 
 <main>
   <div class="card">
-    <div class="row">
-      <div class="grow">
-        <label>room.zip（ココフォリアのエクスポート）</label>
-        <input id="file" type="file" accept=".zip" />
-        <div class="sub">zipの中に <span class="mono">__data.json</span> がある前提。画像は維持してzipを出力する。</div>
-      </div>
-      <div>
-        <label>前景 横（fieldWidth）</label>
-        <input id="w" type="number" min="1" step="1" value="60" />
-      </div>
-      <div>
-        <label>前景 縦（fieldHeight）</label>
-        <input id="h" type="number" min="1" step="1" value="52" />
-      </div>
-      <div>
-        <label>自動トリミング（fieldObjectFit）</label>
-        <select id="fit">
-          <option value="keep">変更しない</option>
-          <option value="cover">ON（cover）</option>
-          <option value="fill">OFF（fill）</option>
-        </select>
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button id="run" disabled>変換してzip出力</button>
-      </div>
-    </div>
+    <div class="grid cols2">
+      <div class="grid">
+        <div class="field">
+          <label>room.zip（ココフォリアのエクスポート）</label>
+          <input id="file" type="file" accept=".zip" />
+          <div class="sub">zip内の <span class="mono">__data.json</span> を編集して、画像を含んだままzipを出力する。</div>
+        </div>
 
-    <div class="hr"></div>
+        <div class="row">
+          <div class="field">
+            <label>前景 横（fieldWidth）</label>
+            <input id="w" type="number" min="1" step="1" value="60" />
+          </div>
+          <div class="field">
+            <label>前景 縦（fieldHeight）</label>
+            <input id="h" type="number" min="1" step="1" value="52" />
+          </div>
+        </div>
 
-    <div class="row">
-      <div class="grow">
-        <label>マーカー編集：対象シーン</label>
-        <select id="sceneSel" style="width:100%;" disabled>
-          <option value="">（zip読み込み後に選べる）</option>
-        </select>
-        <div class="sub">シーンを選ぶ → そのシーンのマーカーをサムネ付きで表示 → チェックしたものだけ編集。</div>
+        <div class="row">
+          <div class="field">
+            <label>自動トリミング（fieldObjectFit）</label>
+            <select id="fit">
+              <option value="keep">変更しない</option>
+              <option value="cover">ON（cover）</option>
+              <option value="fill">OFF（fill）</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>出力</label>
+            <button id="run" disabled>変換してzipを出力</button>
+          </div>
+        </div>
+
+        <div id="status" class="status"><span class="dot"></span><span>未読み込み</span></div>
       </div>
 
-      <div>
-        <label>マーカーサイズの合わせ先</label>
-        <select id="markerSizeBase" disabled>
-          <option value="input">入力サイズ（W×H）</option>
-          <option value="scene">そのシーンのサイズ</option>
-          <option value="room">Room（全体）のサイズ</option>
-        </select>
-      </div>
-
-      <div>
-        <label>マーカー位置</label>
-        <select id="markerPos" disabled>
-          <option value="keep">位置は触らない</option>
-          <option value="topleft">左上合わせ（x=-width/2, y=-height/2）</option>
-        </select>
-      </div>
-
-      <div class="inline">
-        <button id="selAll" class="ghost" disabled>このシーン：全選択</button>
-        <button id="selNone" class="ghost" disabled>このシーン：全解除</button>
+      <div class="grid">
+        <div class="field">
+          <label>ログ</label>
+          <textarea id="log" class="mono" readonly style="height:240px;"></textarea>
+          <div class="sub">処理結果の件数を表示する。</div>
+        </div>
       </div>
     </div>
-
-    <div id="markerList"></div>
-
-    <div class="hr"></div>
-
-    <div id="status" class="sub">未読み込み</div>
-    <div id="log" class="mono" style="margin-top:10px;"></div>
   </div>
 
-  <div class="sub" style="margin-top:12px;">
-    編集対象：
-    <span class="mono">entities.room</span> と <span class="mono">entities.scenes.*</span> の
-    <span class="mono">fieldWidth / fieldHeight</span> を一括変更。
-    トリミングは <span class="mono">fieldObjectFit</span>（cover=ON / fill=OFF）。
-    <br>
-    マーカー編集は「選んだシーンでチェックしたマーカーのみ」適用（全部巻き込み事故防止）。
+  <div class="card">
+    <div class="section-title">マーカー追従（選択したものだけ適用）</div>
+
+    <div class="grid cols2">
+      <div class="grid">
+        <div class="field">
+          <label>対象シーン（表示と個別選択）</label>
+          <select id="sceneSel" disabled>
+            <option value="">zip読み込み後に選べる</option>
+          </select>
+          <div class="sub">このシーンのマーカーを下に表示する。チェックしたものが対象。</div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>マーカーサイズの合わせ先</label>
+            <select id="markerSizeBase" disabled>
+              <option value="input">入力サイズ（W×H）</option>
+              <option value="scene">そのシーンのサイズ</option>
+              <option value="room">Room（全体）のサイズ</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>マーカー位置</label>
+            <select id="markerPos" disabled>
+              <option value="keep">位置は変更しない</option>
+              <option value="topleft">左上合わせ（x=-width/2, y=-height/2）</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>検索：マーカー（text / 画像名 / id）</label>
+            <input id="markerFilter" type="text" placeholder="例：暗転 / .png / 19c545" disabled />
+            <div class="sub">表示の絞り込みと、一括選択の条件に使う。</div>
+          </div>
+          <div class="field">
+            <label>このシーンの操作</label>
+            <div class="btnrow">
+              <button id="selAll" class="ghost" disabled>全選択</button>
+              <button id="selNone" class="ghost" disabled>全解除</button>
+              <button id="selFiltered" class="ghost" disabled>表示中だけ全選択</button>
+              <button id="deselFiltered" class="ghost" disabled>表示中だけ全解除</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="markerList"></div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label>検索：シーン名（複数シーンの候補を絞る）</label>
+          <input id="sceneFilter" type="text" placeholder="例：暗転 / OP / 黒" disabled />
+        </div>
+
+        <div class="field">
+          <label>一括対象シーン（チェックしたシーンへ一括適用）</label>
+          <div id="sceneMulti"></div>
+          <div class="sub">チェックしたシーンに対して「マーカー検索にヒットしたもの」を全選択/全解除する。</div>
+        </div>
+
+        <div class="btnrow">
+          <button id="bulkSel" class="secondary" disabled>チェックしたシーン：検索ヒットを全選択</button>
+          <button id="bulkDesel" class="ghost" disabled>チェックしたシーン：検索ヒットを全解除</button>
+        </div>
+
+        <div class="sub">
+          例：暗転用の板だけ選びたいなら、マーカー検索に画像名の一部を入れると楽。
+        </div>
+      </div>
+    </div>
   </div>
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-
 <script>
   const $ = (id) => document.getElementById(id);
 
+  // UI
   const fileEl = $("file");
   const runBtn = $("run");
   const statusEl = $("status");
@@ -161,32 +441,59 @@
   const markerSizeBaseEl = $("markerSizeBase");
   const markerPosEl = $("markerPos");
 
+  const markerFilterEl = $("markerFilter");
+  const sceneFilterEl = $("sceneFilter");
+
+  const sceneMultiEl = $("sceneMulti");
+  const bulkSelBtn = $("bulkSel");
+  const bulkDeselBtn = $("bulkDesel");
+
   const selAllBtn = $("selAll");
   const selNoneBtn = $("selNone");
+  const selFilteredBtn = $("selFiltered");
+  const deselFilteredBtn = $("deselFiltered");
 
+  // Data
   let loadedZip = null;
   let loadedName = null;
-
   let parsedData = null;
 
-  // そのシーンで選択されたmarkerIdを保持（シーン切替しても選択を残す）
-  const selectedMarkersByScene = new Map(); // sceneKey -> Set(markerId)
-  // サムネのobjectURL
-  let markerThumbUrls = new Map(); // markerId -> url
+  // sceneKey -> Set(markerId)
+  const selectedMarkersByScene = new Map();
 
-  function setStatus(text, ok=true){
-    statusEl.textContent = text;
-    statusEl.className = "sub " + (ok ? "ok" : "ng");
-  }
-  function log(text){ logEl.textContent += text + "\n"; }
-  function clearLog(){ logEl.textContent = ""; }
+  // markerId -> objectURL
+  let markerThumbUrls = new Map();
 
-  function getSceneKey(){
-    return sceneSel.value || "";
+  function setStatus(text, ok=null){
+    statusEl.querySelector("span:nth-child(2)").textContent = text;
+    statusEl.classList.remove("ok","ng");
+    if(ok === true) statusEl.classList.add("ok");
+    if(ok === false) statusEl.classList.add("ng");
   }
-  function getSelectedSet(sceneKey){
-    if(!selectedMarkersByScene.has(sceneKey)) selectedMarkersByScene.set(sceneKey, new Set());
-    return selectedMarkersByScene.get(sceneKey);
+
+  function logLine(s){
+    logEl.value += s + "\n";
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function clearLog(){ logEl.value = ""; }
+
+  function enableAll(on){
+    runBtn.disabled = !on;
+
+    sceneSel.disabled = !on;
+    markerSizeBaseEl.disabled = !on;
+    markerPosEl.disabled = !on;
+
+    markerFilterEl.disabled = !on;
+    sceneFilterEl.disabled = !on;
+
+    bulkSelBtn.disabled = !on;
+    bulkDeselBtn.disabled = !on;
+
+    selAllBtn.disabled = !on;
+    selNoneBtn.disabled = !on;
+    selFilteredBtn.disabled = !on;
+    deselFilteredBtn.disabled = !on;
   }
 
   function cleanupThumbs(){
@@ -196,11 +503,44 @@
     markerThumbUrls = new Map();
   }
 
+  function getSceneKey(){
+    return sceneSel.value || "";
+  }
+
+  function getSelectedSet(sceneKey){
+    if(!selectedMarkersByScene.has(sceneKey)) selectedMarkersByScene.set(sceneKey, new Set());
+    return selectedMarkersByScene.get(sceneKey);
+  }
+
+  function norm(s){
+    return (s ?? "").toString().toLowerCase().trim();
+  }
+
+  function markerMatches(mk, markerId, query){
+    const q = norm(query);
+    if(!q) return true;
+    const text = norm(mk?.text);
+    const img  = norm(mk?.imageUrl);
+    const id   = norm(markerId);
+    return text.includes(q) || img.includes(q) || id.includes(q);
+  }
+
+  function sceneMatches(sceneName, sceneId, query){
+    const q = norm(query);
+    if(!q) return true;
+    return norm(sceneName).includes(q) || norm(sceneId).includes(q);
+  }
+
+  function getSceneNameByKey(data, sceneKey){
+    if(sceneKey === "__room__") return "Room（全体）";
+    return data?.entities?.scenes?.[sceneKey]?.name || `scene:${sceneKey}`;
+  }
+
   function buildSceneOptions(data){
     sceneSel.innerHTML = "";
     const opt0 = document.createElement("option");
     opt0.value = "";
-    opt0.textContent = "（選択して）";
+    opt0.textContent = "選択して";
     sceneSel.appendChild(opt0);
 
     const roomOpt = document.createElement("option");
@@ -215,6 +555,47 @@
       o.textContent = sc?.name ? sc.name : `scene:${sid}`;
       sceneSel.appendChild(o);
     }
+  }
+
+  function buildSceneMultiList(data){
+    const q = sceneFilterEl.value || "";
+    sceneMultiEl.innerHTML = "";
+
+    const keys = ["__room__", ...Object.keys(data?.entities?.scenes || {})];
+
+    for(const key of keys){
+      const name = getSceneNameByKey(data, key);
+      if(!sceneMatches(name, key, q)) continue;
+
+      const line = document.createElement("label");
+      line.className = "sline";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.dataset.sceneKey = key;
+
+      const span = document.createElement("span");
+      span.className = "sname";
+      span.textContent = name;
+
+      line.appendChild(cb);
+      line.appendChild(span);
+      sceneMultiEl.appendChild(line);
+    }
+  }
+
+  function getCheckedSceneKeys(){
+    const cbs = sceneMultiEl.querySelectorAll('input[type="checkbox"][data-scene-key]');
+    const keys = [];
+    for(const cb of cbs){
+      if(cb.checked) keys.push(cb.dataset.sceneKey);
+    }
+    return keys;
+  }
+
+  function getMarkersObjBySceneKey(data, sceneKey){
+    if(sceneKey === "__room__") return data?.entities?.room?.markers || {};
+    return data?.entities?.scenes?.[sceneKey]?.markers || {};
   }
 
   function resolveSizeBase(sceneKey, data, W, H){
@@ -239,7 +620,6 @@
       }
       return {mw: W, mh: H};
     }
-    // input
     return {mw: W, mh: H};
   }
 
@@ -252,33 +632,25 @@
     const sceneKey = getSceneKey();
     if(!sceneKey) return;
 
-    let markers = null;
-
-    if(sceneKey === "__room__"){
-      markers = parsedData?.entities?.room?.markers || {};
-    } else {
-      markers = parsedData?.entities?.scenes?.[sceneKey]?.markers || {};
-    }
-
+    const markers = getMarkersObjBySceneKey(parsedData, sceneKey);
     const entries = Object.entries(markers);
+
     if(entries.length === 0){
       const div = document.createElement("div");
       div.className = "sub";
-      div.textContent = "このシーンにマーカーが無い。";
+      div.textContent = "このシーンにマーカーはありません。";
       markerList.appendChild(div);
       return;
     }
 
     const selected = getSelectedSet(sceneKey);
+    const q = markerFilterEl.value || "";
 
     for(const [mid, mk] of entries){
-      // 追加：マーカーフィルタで絞り込み
-      if(!markerMatches(mk, mid, markerFilterEl.value)) continue;
+      if(!markerMatches(mk, mid, q)) continue;
+
       const card = document.createElement("div");
       card.className = "mcard";
-
-      const row = document.createElement("div");
-      row.className = "mrow";
 
       const cb = document.createElement("input");
       cb.type = "checkbox";
@@ -292,16 +664,13 @@
       img.className = "thumb";
       img.alt = "marker";
 
-      // thumb
       if(mk?.imageUrl && loadedZip.file(mk.imageUrl)){
         try{
           const blob = await loadedZip.file(mk.imageUrl).async("blob");
           const url = URL.createObjectURL(blob);
           markerThumbUrls.set(mid, url);
           img.src = url;
-        }catch{
-          // ignore
-        }
+        }catch{}
       }
 
       const meta = document.createElement("div");
@@ -310,19 +679,18 @@
       const title = document.createElement("div");
       title.className = "mtitle";
       const label = mk?.text?.trim()
-        ? mk.text.trim().replace(/\s+/g," ").slice(0, 60)
+        ? mk.text.trim().replace(/\s+/g," ").slice(0, 80)
         : (mk?.imageUrl ? mk.imageUrl : "marker");
       title.textContent = label;
 
       const mini = document.createElement("div");
-      mini.className = "sub mmini";
+      mini.className = "mmini";
       const w = mk?.width ?? "?";
       const h = mk?.height ?? "?";
       const x = mk?.x ?? "?";
       const y = mk?.y ?? "?";
-
       mini.innerHTML = `
-        <span class="pill">id</span><span class="mono">${mid}</span><br>
+        <span class="pill">id</span><span class="mono">${mid}</span>
         <span class="pill">size</span><span class="mono">${w}×${h}</span>
         <span class="pill">pos</span><span class="mono">${x}, ${y}</span>
       `;
@@ -330,90 +698,31 @@
       meta.appendChild(title);
       meta.appendChild(mini);
 
-      row.appendChild(cb);
-      row.appendChild(img);
-      row.appendChild(meta);
+      card.appendChild(cb);
+      card.appendChild(img);
+      card.appendChild(meta);
 
-      card.appendChild(row);
       markerList.appendChild(card);
     }
   }
 
-  function enableMarkerUI(on){
-    sceneSel.disabled = !on;
-    markerSizeBaseEl.disabled = !on;
-    markerPosEl.disabled = !on;
-    selAllBtn.disabled = !on;
-    selNoneBtn.disabled = !on;
-  }
+  // ---- events (registered ONCE) ----
+  sceneSel.addEventListener("change", renderMarkersForSelectedScene);
 
-  fileEl.addEventListener("change", async () => {
-    clearLog();
-    cleanupThumbs();
-    markerList.innerHTML = "";
-    selectedMarkersByScene.clear();
+  markerFilterEl.addEventListener("input", renderMarkersForSelectedScene);
 
-    const f = fileEl.files?.[0];
-    loadedZip = null;
-    loadedName = null;
-    parsedData = null;
-    runBtn.disabled = true;
-    enableMarkerUI(false);
-
-    if(!f){
-      setStatus("未読み込み", true);
-      return;
-    }
-    if(!f.name.toLowerCase().endsWith(".zip")){
-      setStatus("zipじゃないっぽい。room.zipを入れて。", false);
-      return;
-    }
-
-    try{
-      setStatus("zip読み込み中…", true);
-      const buf = await f.arrayBuffer();
-      const zip = await JSZip.loadAsync(buf);
-
-      const dataFile = zip.file("__data.json");
-      if(!dataFile){
-        setStatus("zip内に __data.json が見つからん。ココフォリアのエクスポートzipである必要がある。", false);
-        return;
-      }
-
-      const txt = await dataFile.async("string");
-      parsedData = JSON.parse(txt);
-
-      loadedZip = zip;
-      loadedName = f.name.replace(/\.zip$/i, "");
-      runBtn.disabled = false;
-      enableMarkerUI(true);
-
-      buildSceneOptions(parsedData);
-      setStatus("OK：zip読み込み成功（__data.json確認済み）", true);
-      log("Loaded: " + f.name);
-      log("Found: __data.json");
-    }catch(e){
-      console.error(e);
-      setStatus("読み込み失敗。zipが壊れてるか、JSONが壊れてる。", false);
-      log(String(e));
-    }
-  });
-
-  sceneSel.addEventListener("change", async () => {
-    await renderMarkersForSelectedScene();
+  sceneFilterEl.addEventListener("input", () => {
+    if(!parsedData) return;
+    buildSceneMultiList(parsedData);
   });
 
   selAllBtn.addEventListener("click", async () => {
     const sceneKey = getSceneKey();
     if(!sceneKey || !parsedData) return;
 
-    let markers = null;
-    if(sceneKey === "__room__") markers = parsedData?.entities?.room?.markers || {};
-    else markers = parsedData?.entities?.scenes?.[sceneKey]?.markers || {};
-
+    const markers = getMarkersObjBySceneKey(parsedData, sceneKey);
     const set = getSelectedSet(sceneKey);
     for(const mid of Object.keys(markers)) set.add(mid);
-
     await renderMarkersForSelectedScene();
   });
 
@@ -424,10 +733,129 @@
     await renderMarkersForSelectedScene();
   });
 
+  selFilteredBtn.addEventListener("click", async () => {
+    const sceneKey = getSceneKey();
+    if(!sceneKey || !parsedData) return;
+
+    const markers = getMarkersObjBySceneKey(parsedData, sceneKey);
+    const set = getSelectedSet(sceneKey);
+    const q = markerFilterEl.value || "";
+    for(const [mid, mk] of Object.entries(markers)){
+      if(markerMatches(mk, mid, q)) set.add(mid);
+    }
+    await renderMarkersForSelectedScene();
+  });
+
+  deselFilteredBtn.addEventListener("click", async () => {
+    const sceneKey = getSceneKey();
+    if(!sceneKey || !parsedData) return;
+
+    const markers = getMarkersObjBySceneKey(parsedData, sceneKey);
+    const set = getSelectedSet(sceneKey);
+    const q = markerFilterEl.value || "";
+    for(const [mid, mk] of Object.entries(markers)){
+      if(markerMatches(mk, mid, q)) set.delete(mid);
+    }
+    await renderMarkersForSelectedScene();
+  });
+
+  bulkSelBtn.addEventListener("click", async () => {
+    if(!parsedData) return;
+
+    const keys = getCheckedSceneKeys();
+    const q = markerFilterEl.value || "";
+
+    for(const key of keys){
+      const markers = getMarkersObjBySceneKey(parsedData, key);
+      const set = getSelectedSet(key);
+      for(const [mid, mk] of Object.entries(markers)){
+        if(markerMatches(mk, mid, q)) set.add(mid);
+      }
+    }
+    await renderMarkersForSelectedScene();
+  });
+
+  bulkDeselBtn.addEventListener("click", async () => {
+    if(!parsedData) return;
+
+    const keys = getCheckedSceneKeys();
+    const q = markerFilterEl.value || "";
+
+    for(const key of keys){
+      const markers = getMarkersObjBySceneKey(parsedData, key);
+      const set = getSelectedSet(key);
+      for(const [mid, mk] of Object.entries(markers)){
+        if(markerMatches(mk, mid, q)) set.delete(mid);
+      }
+    }
+    await renderMarkersForSelectedScene();
+  });
+
+  // ---- zip loading ----
+  fileEl.addEventListener("change", async () => {
+    clearLog();
+    cleanupThumbs();
+    markerList.innerHTML = "";
+    selectedMarkersByScene.clear();
+
+    loadedZip = null;
+    loadedName = null;
+    parsedData = null;
+
+    enableAll(false);
+    setStatus("読み込み待ち", null);
+
+    const f = fileEl.files?.[0];
+    if(!f){
+      setStatus("未読み込み", null);
+      return;
+    }
+    if(!f.name.toLowerCase().endsWith(".zip")){
+      setStatus("zipを選択してください。", false);
+      return;
+    }
+
+    try{
+      setStatus("zipを読み込み中…", null);
+      const buf = await f.arrayBuffer();
+      const zip = await JSZip.loadAsync(buf);
+
+      const dataFile = zip.file("__data.json");
+      if(!dataFile){
+        setStatus("__data.json が見つかりません。ココフォリアのエクスポートzipを指定してください。", false);
+        return;
+      }
+
+      const txt = await dataFile.async("string");
+      parsedData = JSON.parse(txt);
+
+      loadedZip = zip;
+      loadedName = f.name.replace(/\.zip$/i, "");
+
+      buildSceneOptions(parsedData);
+
+      // multi-scene list
+      sceneFilterEl.value = "";
+      markerFilterEl.value = "";
+      buildSceneMultiList(parsedData);
+
+      enableAll(true);
+      setStatus("読み込み完了", true);
+
+      logLine("Loaded: " + f.name);
+      logLine("OK: __data.json");
+    }catch(e){
+      console.error(e);
+      setStatus("読み込みに失敗しました。zipまたはJSONが壊れている可能性があります。", false);
+      logLine(String(e));
+    }
+  });
+
+  // ---- convert & export ----
   runBtn.addEventListener("click", async () => {
     clearLog();
     if(!loadedZip){
-      setStatus("先にzip入れて。", false);
+      setStatus("zipを先に読み込んでください。", false);
       return;
     }
 
@@ -436,12 +864,12 @@
     const fitMode = fitEl.value;
 
     if(!Number.isFinite(W) || !Number.isFinite(H) || W <= 0 || H <= 0){
-      setStatus("横/縦の数値がおかしい。", false);
+      setStatus("前景サイズの数値が不正です。", false);
       return;
     }
 
     try{
-      setStatus("変換中…", true);
+      setStatus("変換中…", null);
 
       const dataFile = loadedZip.file("__data.json");
       const txt = await dataFile.async("string");
@@ -457,13 +885,13 @@
           data.entities.room.fieldObjectFit = fitMode; countFit++;
         }
       } else {
-        throw new Error("entities.room が無い");
+        throw new Error("entities.room が見つかりません");
       }
 
       // scenes
       const scenes = data?.entities?.scenes;
       if(!scenes || typeof scenes !== "object"){
-        throw new Error("entities.scenes が無い");
+        throw new Error("entities.scenes が見つかりません");
       }
 
       for(const scene of Object.values(scenes)){
@@ -475,7 +903,7 @@
         }
       }
 
-      // markers（選択したものだけ）
+      // markers (selected only)
       const markerPos = markerPosEl.value; // keep / topleft
 
       function patchMarkersObj(markersObj, targetW, targetH, selectedSet){
@@ -507,12 +935,10 @@
         }
       }
 
-      // JSON書き戻し
-      const outJson = JSON.stringify(data);
-      loadedZip.file("__data.json", outJson);
+      // write back
+      loadedZip.file("__data.json", JSON.stringify(data));
 
       const outBlob = await loadedZip.generateAsync({ type:"blob" });
-
       const outName = `${loadedName || "room"}_${W}x${H}_${fitMode === "keep" ? "keepFit" : fitMode}.zip`;
 
       const a = document.createElement("a");
@@ -523,18 +949,21 @@
       a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 
-      setStatus("完了：zip出力した。ダウンロードしたzipをココフォリアにインポートして。", true);
-      log(`Updated room field size writes: ${countRoom}`);
-      log(`Updated scenes field size writes: ${countScenes}`);
-      log(`Updated fieldObjectFit writes: ${countFit} (${fitMode})`);
-      log(`Updated selected markers writes: ${countMarkers}`);
-      log(`Output: ${outName}`);
+      setStatus("完了：zipを出力しました。", true);
+      logLine(`room size writes: ${countRoom}`);
+      logLine(`scene size writes: ${countScenes}`);
+      logLine(`fieldObjectFit writes: ${countFit} (${fitMode})`);
+      logLine(`marker writes: ${countMarkers}`);
+      logLine(`output: ${outName}`);
     }catch(e){
       console.error(e);
-      setStatus("変換失敗：JSON構造が想定と違うか、zip生成でコケた。", false);
-      log(String(e));
+      setStatus("変換に失敗しました。", false);
+      logLine(String(e));
     }
   });
+
+  // initial state
+  enableAll(false);
 </script>
 </body>
 </html>
