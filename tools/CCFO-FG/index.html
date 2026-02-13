@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ココフォリア部屋データ編集：前景サイズ一括変更</title>
+  <style>
+    :root { --bg:#0f1115; --panel:#171a21; --text:#e7e9ee; --muted:#a9b0bf; --line:#2a3040; --acc:#7aa2ff; }
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+    header{ padding:16px 18px; border-bottom:1px solid var(--line); background:rgba(15,17,21,.92); position:sticky; top:0; backdrop-filter: blur(8px); }
+    h1{ margin:0; font-size:16px; }
+    main{ padding:16px 18px; max-width:880px; margin:0 auto; }
+    .card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; }
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:end; }
+    label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
+    input, select, button{
+      font:inherit; border-radius:10px; border:1px solid var(--line);
+      background:#0f131b; color:var(--text); padding:10px 12px;
+    }
+    input{ width:140px; }
+    .grow{ flex:1; min-width:240px; }
+    button{ background:var(--acc); border-color:transparent; color:#0b1020; font-weight:700; cursor:pointer; }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+    .sub{ color:var(--muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .ok{ color:#9ee493; }
+    .ng{ color:#ff8b8b; }
+    .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:12px; white-space:pre-wrap; }
+    .hr{ height:1px; background:var(--line); margin:14px 0; }
+  </style>
+</head>
+<body>
+<header><h1>ココフォリア部屋データ編集：前景サイズ一括変更（zip対応）</h1></header>
+
+<main>
+  <div class="card">
+    <div class="row">
+      <div class="grow">
+        <label>room.zip（ココフォリアのエクスポート）</label>
+        <input id="file" type="file" accept=".zip" />
+        <div class="sub">zipの中に <span class="mono">__data.json</span> がある前提。画像はそのまま維持してzipを作り直す。</div>
+      </div>
+
+      <div>
+        <label>前景 横（fieldWidth）</label>
+        <input id="w" type="number" min="1" step="1" value="60" />
+      </div>
+
+      <div>
+        <label>前景 縦（fieldHeight）</label>
+        <input id="h" type="number" min="1" step="1" value="52" />
+      </div>
+
+      <div>
+        <label>自動トリミング（fieldObjectFit）</label>
+        <select id="fit">
+          <option value="keep">変更しない</option>
+          <option value="cover">ON（cover）</option>
+          <option value="fill">OFF（fill）</option>
+        </select>
+      </div>
+
+      <div>
+        <button id="run" disabled>変換してzip出力</button>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div id="status" class="sub">未読み込み</div>
+    <div id="log" class="mono" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="sub" style="margin-top:12px;">
+    仕様：<span class="mono">entities.room</span> と <span class="mono">entities.scenes.*</span> の
+    <span class="mono">fieldWidth / fieldHeight</span> を一括変更。
+    トリミングは <span class="mono">fieldObjectFit</span>（cover=ON / fill=OFF）。
+  </div>
+</main>
+
+<!-- JSZip (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const fileEl = $("file");
+  const runBtn = $("run");
+  const statusEl = $("status");
+  const logEl = $("log");
+  const wEl = $("w");
+  const hEl = $("h");
+  const fitEl = $("fit");
+
+  let loadedZip = null;
+  let loadedName = null;
+
+  function setStatus(text, ok=true){
+    statusEl.textContent = text;
+    statusEl.className = "sub " + (ok ? "ok" : "ng");
+  }
+  function log(text){ logEl.textContent += text + "\n"; }
+  function clearLog(){ logEl.textContent = ""; }
+
+  fileEl.addEventListener("change", async () => {
+    clearLog();
+    const f = fileEl.files?.[0];
+    loadedZip = null;
+    loadedName = null;
+    runBtn.disabled = true;
+
+    if(!f){
+      setStatus("未読み込み", true);
+      return;
+    }
+    if(!f.name.toLowerCase().endsWith(".zip")){
+      setStatus("zipじゃないっぽい。room.zipを入れて。", false);
+      return;
+    }
+
+    try{
+      setStatus("zip読み込み中…", true);
+      const buf = await f.arrayBuffer();
+      const zip = await JSZip.loadAsync(buf);
+      // __data.json 探す
+      const dataFile = zip.file("__data.json");
+      if(!dataFile){
+        setStatus("zip内に __data.json が見つからん。ココフォリアのエクスポートzipである必要がある。", false);
+        return;
+      }
+
+      // JSON parse チェック
+      const txt = await dataFile.async("string");
+      JSON.parse(txt);
+
+      loadedZip = zip;
+      loadedName = f.name.replace(/\.zip$/i, "");
+      runBtn.disabled = false;
+      setStatus("OK：zip読み込み成功（__data.json確認済み）", true);
+      log("Loaded: " + f.name);
+      log("Found: __data.json");
+    }catch(e){
+      console.error(e);
+      setStatus("読み込み失敗。zipが壊れてるか、JSONが壊れてる。", false);
+      log(String(e));
+    }
+  });
+
+  runBtn.addEventListener("click", async () => {
+    clearLog();
+    if(!loadedZip){
+      setStatus("先にzip入れて。", false);
+      return;
+    }
+    const W = Number(wEl.value);
+    const H = Number(hEl.value);
+    const fitMode = fitEl.value;
+
+    if(!Number.isFinite(W) || !Number.isFinite(H) || W <= 0 || H <= 0){
+      setStatus("横/縦の数値がおかしい。", false);
+      return;
+    }
+
+    try{
+      setStatus("変換中…", true);
+
+      const dataFile = loadedZip.file("__data.json");
+      const txt = await dataFile.async("string");
+
+      const data = JSON.parse(txt);
+
+      let countRoom = 0;
+      let countScenes = 0;
+      let countFit = 0;
+
+      // room
+      if(data?.entities?.room){
+        data.entities.room.fieldWidth = W; countRoom++;
+        data.entities.room.fieldHeight = H; countRoom++;
+        if(fitMode !== "keep"){
+          data.entities.room.fieldObjectFit = fitMode; countFit++;
+        }
+      } else {
+        throw new Error("entities.room が無い");
+      }
+
+      // scenes
+      const scenes = data?.entities?.scenes;
+      if(!scenes || typeof scenes !== "object"){
+        throw new Error("entities.scenes が無い");
+      }
+
+      for(const [id, scene] of Object.entries(scenes)){
+        if(!scene || typeof scene !== "object") continue;
+        scene.fieldWidth = W; countScenes++;
+        scene.fieldHeight = H; countScenes++;
+        if(fitMode !== "keep"){
+          scene.fieldObjectFit = fitMode; countFit++;
+        }
+      }
+
+      // JSON書き戻し（UTF-8のまま）
+      const outJson = JSON.stringify(data);
+
+      // zip上書き
+      loadedZip.file("__data.json", outJson);
+
+      const outBuf = await loadedZip.generateAsync({ type:"blob" });
+
+      const outName = `${loadedName || "room"}_${W}x${H}_${fitMode === "keep" ? "keepFit" : fitMode}.zip`;
+
+      // download
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(outBuf);
+      a.download = outName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+
+      setStatus("完了：zip出力した。ダウンロードからインポートして。", true);
+      log(`Updated room: fieldWidth/Height (${countRoom} writes)`);
+      log(`Updated scenes: fieldWidth/Height (${countScenes} writes)`);
+      log(`Updated fieldObjectFit: ${countFit} writes (${fitMode})`);
+      log(`Output: ${outName}`);
+    }catch(e){
+      console.error(e);
+      setStatus("変換失敗：JSON構造が想定と違うか、zip生成でコケた。", false);
+      log(String(e));
+    }
+  });
+</script>
+</body>
+</html>
