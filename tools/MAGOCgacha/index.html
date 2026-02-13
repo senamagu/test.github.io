@@ -1347,11 +1347,11 @@
       kv.innerHTML = "";
 
       const rows = [
-        ["性別", hasValue(c.gender) ? genderLabel(c.gender) : "未登録。"],
-        ["年齢", Number.isFinite(c.age) ? (c.age + "歳") : "未登録。"],
-        ["身長", Number.isFinite(c.heightCm) ? (c.heightCm + "cm") : "未登録。"],
-        ["誕生日", hasValue(c.birthday) ? c.birthday : "未登録。"],
-        ["カラーコード", hasValue(c.color) ? c.color : "未登録。"]
+        ["性別", hasValue(c.gender) ? genderLabel(c.gender) : "未登録"],
+        ["年齢", Number.isFinite(c.age) ? (c.age + "歳") : "未登録"],
+        ["身長", Number.isFinite(c.heightCm) ? (c.heightCm + "cm") : "未登録"],
+        ["誕生日", hasValue(c.birthday) ? c.birthday : "未登録"],
+        ["カラーコード", hasValue(c.color) ? c.color : "未登録"]
       ];
 
       rows.forEach(([k,v], i)=>{
@@ -1398,7 +1398,7 @@
 
     function openShareModal(){
       if(!state.lastResult){
-        toast("先にガチャってくれ");
+        toast("先にガチャしてね！");
         return;
       }
       $("#sharePreview").textContent = buildShareText(state.lastResult);
@@ -1411,20 +1411,20 @@
     async function copyShare(){
       try{
         await navigator.clipboard.writeText($("#sharePreview").textContent);
-        toast("共有文をコピーした");
+        toast("共有文をコピーしたよ！");
       }catch(e){
-        toast("コピーできなかった");
+        toast("コピーに失敗したよ！");
       }
     }
 
     async function saveCardImage(){
       const card = $("#resultCard");
       if(card.style.display==="none"){
-        toast("先にガチャってくれ");
+        toast("先にガチャしてね！");
         return;
       }
       if(typeof html2canvas !== "function"){
-        toast("画像保存が使えない（html2canvasなし）");
+        toast("画像保存が使えないかも…");
         return;
       }
       try{
@@ -1433,9 +1433,9 @@
         a.download = "gacha_result.png";
         a.href = canvas.toDataURL("image/png");
         a.click();
-        toast("画像を保存した");
+        toast("画像を保存したよ！");
       }catch(e){
-        toast("画像保存に失敗した");
+        toast("画像保存に失敗したよ！");
       }
     }
 
@@ -1491,12 +1491,12 @@
         if(!pool.length && state.hasImageOnly){
           state.hasImageOnly = false;
           setToggle($("#dotHasImage"), state.hasImageOnly);
-          toast("ヒット0件だったから「画像ありのみ」をOFFにした");
+          toast("ヒット0件だよ！");
           pool = applyFilters();
         }
 
         if(!pool.length){
-          toast("ヒット0件。絞り込みを変えて");
+          toast("ヒット0件！絞り込みを変えてね！");
           return;
         }
         const pick = pool[Math.floor(Math.random()*pool.length)];
@@ -1527,7 +1527,7 @@
         });
 
         applyFilters();
-        toast("リセットした");
+        toast("リセットしたよ！");
       });
 
       // 17
