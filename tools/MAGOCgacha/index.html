@@ -388,27 +388,27 @@
     }
 
     /* mid+right を1つの塊にする */
-.filter-side{
-  grid-column: 2 / 4;          /* 2列目〜3列目をまとめて使う */
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  min-width:0;
-}
+    .filter-side{
+      grid-column: 2 / 4;          /* 2列目〜3列目をまとめて使う */
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-width:0;
+    }
 
-/* 上段（赤線より上の枠） */
-.side-top{
-  display:grid;
-  grid-template-columns: 180px 1fr; /* 左：色 / 右：トグル＋件数 */
-  gap:14px;
-  align-items:start;
-}
+    /* 上段（赤線より上の枠） */
+    .side-top{
+      display:grid;
+      grid-template-columns: 180px 1fr; /* 左：色 / 右：トグル＋件数 */
+      gap:14px;
+      align-items:start;
+    }
 
-/* hitlist はこの塊の下に置く */
-.filter-side .hitlist{
-  min-height: 240px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
-  max-height: none;
-}
+    /* hitlist はこの塊の下に置く */
+    .filter-side .hitlist{
+      min-height: 240px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
+      max-height: none;
+    }
 
     /* multi select */
     .multi{ position:relative; }
@@ -613,6 +613,8 @@
     .btn-list{
       font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
       font-weight:900;
+      display:block;
+      margin: 0 auto;
       background:var(--accent);
       color:var(--name);
       border:none;
