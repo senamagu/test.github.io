@@ -23,976 +23,969 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
   :root{
-              --bg:#F6FCFA;
-              --line:#DDEDF1;
-        
-              --title:#3D7C8D;
-              --muted:#89AFB9;
-              --header:#BCCDD1;
-        
-              --btn:#34C38E;
-              --accent:#F37679;
-        
-              --card:#3D7C8D;
-        
-              --name:#DDEDF1;
-              --yomi:#89AFB9;
-              --nameLine:#4F8898;
-        
-              --infoLine:#A0C0C8;
-        
-              --fieldBg:#DDEDF1;
-              --fieldText:#89AFB9;
-              --placeholder:#BBD1D6;
-        
-              --card-fit-w: 920;
-            }
-        
-            *{ box-sizing:border-box; }
-            html,body{ height:100%; }
-            body{
-              margin:0;
-              background:var(--bg);
-              color:var(--title);
-              font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
-              font-weight:900;
-              letter-spacing:.02em;
-            }
-        
-            header{
-              text-align:center;
-              color:var(--header);
-              font-size:18px;
-              padding:14px 16px 10px;
-            }
-        
-            .wrap{
-              width:min(980px, 94vw);
-              margin:0 auto;
-              padding:0 0 28px;
-            }
-        
-            .hero{
-              text-align:center;
-              padding-top:10px;
-            }
-            .hero h1{
-              margin:18px 0 8px;
-              font-size: clamp(34px, 5vw, 56px);
-              line-height:1.15;
-              color:var(--title);
-            }
-            .hero .total{
-              color:var(--muted);
-              font-size: clamp(18px, 2.6vw, 28px);
-              margin-top: 10px;
-            }
-        
-            .cta{
-              display:flex;
-              justify-content:center;
-              margin:26px 0 22px; /* 余白増やした */
-            }
-            .btn-gacha{
-              border:none;
-              border-radius:10px;
-              padding:18px 44px;
-              width:min(520px, 86vw);
-              background:var(--btn);
-              color:var(--bg);
-              font-size: clamp(22px, 3vw, 34px);
-              font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
-              font-weight:900;
-              cursor:pointer;
-            }
-            .btn-gacha:active{ transform: translateY(1px); }
-        
-            .section-line{
-              height:2px;
-              background:var(--line);
-              border-radius:999px;
-              margin:18px 0;
-            }
-        
-            /* ===== Result Card ===== */
-            .result-area{ margin-top: 18px; }
-            .card{
-              background:var(--card);
-              border-radius:22px;
-              padding:16px;
-              position:relative;
-        
-              /* スマホでも横並び固定 */
-              display:flex;
-              gap:16px;
-              align-items:stretch;
-            }
-        
-            /* 右上ボタン */
-            .card-actions{
-              position:absolute;
-              right:14px;
-              top:12px;
-              display:flex;
-              gap:10px;
-              align-items:center;
-            }
-            .doc-btn{
-              background:var(--fieldBg);
-              color:var(--title);
-              border:none;
-              border-radius:10px;
-              padding:8px 12px;
-              font-size:16px;
-              cursor:pointer;
-              line-height:1;
-            }
-        
-            .icon-btn{
-              width:44px;
-              height:36px;
-              background:transparent;
-              border:none;
-              cursor:pointer;
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              padding:0;
-            }
-            .icon-btn svg{ width:26px; height:26px; }
-        
-            /* 左（画像+名前） */
-            .left{
-              width: 42%;
-              min-width: 230px; /* これより狭い画面は横スクロールでも崩さない */
-              display:flex;
-              flex-direction:column;
-              gap:10px;
-            }
-        
-            /* 6 画像枠（ここだけカラーコード背景） */
-         /* 外側：余白だけ */
-    .imgbox{
-      background: transparent !important;
-      padding: 12px;
-    }
-    
-    /* 内側：ここが「正方形の器」 */
-    .img-inner{
-      width: 100%;
-      aspect-ratio: 1 / 1;        /* ←これが無いと縦に伸びる */
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-    
-      display: flex;               /* ←画像なしも確実に中央寄せ */
-      align-items: center;
-      justify-content: center;
-    
-      background: #89AFB9;         /* JSで上書きされる前の保険 */
-    }
-    
-    /* 画像：器に必ずフィット（縦伸び防止の本丸） */
-    .img-inner img{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      filter: none !important;     /* ←これだけでOK。変な書き方しない */
-    }
-    
-    /* 画像なし文字：ド真ん中固定 */
-    .no-image{
-      position: absolute;
-      inset: 0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      color: var(--bg);
-      font-size: 24px;
-      z-index: 2;
-    }
-  
+                --bg:#F6FCFA;
+                --line:#DDEDF1;
+          
+                --title:#3D7C8D;
+                --muted:#89AFB9;
+                --header:#BCCDD1;
+          
+                --btn:#34C38E;
+                --accent:#F37679;
+          
+                --card:#3D7C8D;
+          
+                --name:#DDEDF1;
+                --yomi:#89AFB9;
+                --nameLine:#4F8898;
+          
+                --infoLine:#A0C0C8;
+          
+                --fieldBg:#DDEDF1;
+                --fieldText:#89AFB9;
+                --placeholder:#BBD1D6;
+          
+                --card-fit-w: 920;
+              }
+          
+              *{ box-sizing:border-box; }
+              html,body{ height:100%; }
+              body{
+                margin:0;
+                background:var(--bg);
+                color:var(--title);
+                font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+                font-weight:900;
+                letter-spacing:.02em;
+              }
+          
+              header{
+                text-align:center;
+                color:var(--header);
+                font-size:18px;
+                padding:14px 16px 10px;
+              }
+          
+              .wrap{
+                width:min(980px, 94vw);
+                margin:0 auto;
+                padding:0 0 28px;
+              }
+          
+              .hero{
+                text-align:center;
+                padding-top:10px;
+              }
+              .hero h1{
+                margin:18px 0 8px;
+                font-size: clamp(34px, 5vw, 56px);
+                line-height:1.15;
+                color:var(--title);
+              }
+              .hero .total{
+                color:var(--muted);
+                font-size: clamp(18px, 2.6vw, 28px);
+                margin-top: 10px;
+              }
+          
+              .cta{
+                display:flex;
+                justify-content:center;
+                margin:26px 0 22px; /* 余白増やした */
+              }
+              .btn-gacha{
+                border:none;
+                border-radius:10px;
+                padding:18px 44px;
+                width:min(520px, 86vw);
+                background:var(--btn);
+                color:var(--bg);
+                font-size: clamp(22px, 3vw, 34px);
+                font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+                font-weight:900;
+                cursor:pointer;
+              }
+              .btn-gacha:active{ transform: translateY(1px); }
+          
+              .section-line{
+                height:2px;
+                background:var(--line);
+                border-radius:999px;
+                margin:18px 0;
+              }
+          
+              /* ===== Result Card ===== */
+              .result-area{ margin-top: 18px; }
+              .card{
+                background:var(--card);
+                border-radius:22px;
+                padding:16px;
+                position:relative;
+          
+                /* スマホでも横並び固定 */
+                display:flex;
+                gap:16px;
+                align-items:stretch;
+              }
+          
+              /* 右上ボタン */
+              .card-actions{
+                position:absolute;
+                right:14px;
+                top:12px;
+                display:flex;
+                gap:10px;
+                align-items:center;
+              }
+              .doc-btn{
+                background:var(--fieldBg);
+                color:var(--title);
+                border:none;
+                border-radius:10px;
+                padding:8px 12px;
+                font-size:16px;
+                cursor:pointer;
+                line-height:1;
+              }
+          
+              .icon-btn{
+                width:44px;
+                height:36px;
+                background:transparent;
+                border:none;
+                cursor:pointer;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                padding:0;
+              }
+              .icon-btn svg{ width:26px; height:26px; }
+          
+              /* 左（画像+名前） */
+              .left{
+                width: 42%;
+                min-width: 230px; /* これより狭い画面は横スクロールでも崩さない */
+                display:flex;
+                flex-direction:column;
+                gap:10px;
+              }
+          
+              /* 6 画像枠（ここだけカラーコード背景） */
+              /* 外側：余白だけ */
+              .imgbox{
+                background: transparent !important;
+                padding: 12px;
+              }
+          
+              /* 内側：ここが「正方形の器」 */
+              .img-inner{
+                width: 100%;
+                aspect-ratio: 1 / 1;        /* ←これが無いと縦に伸びる */
+                border-radius: 16px;
+                overflow: hidden;
+                position: relative;
       
-    /* 縁取りつかわない
-    .img-inner::before{
-      content:"";
-      position:absolute;
-      inset: 0px;
-      border-radius: 16px;
-      box-shadow: inset 0 0 0 3px rgba(255,255,255,.10);
-      pointer-events:none;
-      z-index: 3;
-    }
-      */
-    
-    /* うっすらグラデ（上に乗せる） */
-    .img-inner::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: linear-gradient(to bottom,
-        rgba(255,255,255,0) 55%,
-        rgba(255,255,255,.18) 100%
-      );
-      pointer-events:none;
-      z-index: 4;
-    }
-        
-            /* 7 名前 */
-            .nameblock{
-              text-align:center;
-              padding:0 6px;
+                display: flex;               /* ←画像なしも確実に中央寄せ */
+                align-items: center;
+                justify-content: center;
+      
+                background: #89AFB9;         /* JSで上書きされる前の保険 */
+              }
+      
+              /* 画像：器に必ずフィット（縦伸び防止の本丸） */
+              .img-inner img{
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+                filter: none !important;     /* ←これだけでOK。変な書き方しない */
+              }
+      
+              /* 画像なし文字：ド真ん中固定 */
+             .no-image{
+                position: absolute;
+                inset: 0;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                text-align:center;
+                color: var(--bg);
+                font-size: 24px;
+                z-index: 2;
+              }
+      
+              /* うっすらグラデ（上に乗せる） */
+              .img-inner::after{
+                content:"";
+                position:absolute;
+                inset:0;
+                 background: linear-gradient(to bottom,
+                   rgba(255,255,255,0) 55%,
+                   rgba(255,255,255,.18) 100%
+                );
+                pointer-events:none;
+                z-index: 4;
+              }
+          
+              /* 7 名前 */
+              .nameblock{
+                text-align:center;
+                padding:0 6px;
+              }
+              .name-yomi{
+                color:var(--yomi);
+                font-size:18px;
+                margin:0 0 8px;
+                letter-spacing:.06em;
+              }
+              .name-divider{
+                height:2px;
+                background:var(--nameLine);
+                border-radius:999px;
+                margin:0 auto 8px;
+                width:92%;
+              }
+              .name-main{
+                color:var(--name);
+                margin:0;
+                line-height:1.05;
+                white-space:nowrap;
+                overflow:hidden;
+                font-size:46px; /* JSでフィット */
+              }
+          
+              /* 右（創作名 + 情報ボックス） */
+              .right{
+                flex:1;
+                min-width: 260px;
+                display:flex;
+                flex-direction:column;
+                gap:10px;
+                padding-top: 6px;
+              }
+          
+              /* 8 創作名（ボックス外） */
+              .series{
+                color:var(--muted);
+                font-size: 44px; /* JSでフィット */
+                line-height:1.05;
+                white-space:nowrap;
+                overflow:hidden;
+                padding-right: 110px; /* 右上ボタン避け */
+              }
+              .series small{
+                font-size:.55em;
+                margin-right:10px;
+                opacity:.9;
+              }
+          
+              /* 9 情報ボックス */
+              .info{
+                background: #89AFB9; /* 画像の薄い面 */
+                border-radius:18px;
+                padding:14px 14px 12px;
+                overflow:hidden;
+              }
+          
+              .kv{
+                display:grid;
+                grid-template-columns: 150px 1fr;
+                gap:6px 12px;
+                align-items:center;
+                margin-bottom: 10px;
+              }
+              .kv .k{
+                color:var(--title);
+                font-size:20px;
+              }
+              .kv .v{
+                color:var(--name);
+                font-size:20px;
+              }
+              .kv-line{
+                grid-column:1/-1;
+                height:2px;
+                background:var(--infoLine);
+                border-radius:999px;
+                margin:4px 0;
+              }
+          
+              .personality{
+                display:block;
+                grid-template-columns: 150px 1fr;
+                gap:8px 12px;
+                align-items:start;
+              }
+              .personality .k{
+                color:var(--title);
+                font-size:20px;
+                margin-bottom:8px;
+              }
+              .personality .v{
+                color:var(--name);
+                font-size:20px;
+                line-height:1.35;
+                white-space:pre-wrap;
+                display:block;
+                -webkit-line-clamp:3;
+                /* -webkit-box-orient:vertical; */
+                overflow:hidden;
+              }
+          
+              /* ===== Filters ===== */
+              .filters-head{
+                position:relative;
+                display:flex;
+                justify-content:center; /* 絞り込む中央 */
+                align-items:center;
+                padding:10px 0 2px;
+              }
+              .filters-head .label{
+                color:var(--accent);
+                font-size:34px;
+                text-align:center;
+              }
+              .btn-reset{
+                position:absolute;
+                right:0;
+                top:6px;
+                background:var(--bg);           /* 指定 #F6FCFA */
+                color:var(--fieldText);         /* #89AFB9 */
+                border:3px solid var(--line);   /* #DDEDF1 */
+                border-radius:12px;
+                padding:10px 18px;
+                font-size:20px;
+                cursor:pointer;
+              }
+          
+              .filters{
+                display:grid;
+                grid-template-columns: minmax(320px, 44%) 180px minmax(320px, 1fr);
+                gap:14px;
+                align-items:start;
+                margin-top: 8px;
+              }
+          
+              /* 左/中/右 は width指定いらん。グリッドに任せる */
+              .filter-left, .filter-mid, .filter-right{
+                min-width: 0;
+                display:flex;
+                flex-direction:column;
+                gap:12px;
+              }
+          
+              .field{
+                display:grid;
+                grid-template-columns: 160px 1fr;
+                gap:10px;
+                align-items:center;
+              }
+              .field .k{
+                color:var(--muted);
+                font-size:22px;
+                text-align:left;
+              }
+          
+              .control{
+                background:var(--fieldBg);
+                border:none;
+                border-radius:10px;
+                min-height:48px;
+                padding:10px 12px;
+                color:var(--fieldText);
+                font-size:20px;
+                font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+                font-weight:900;
+                outline:none;
+                width:100%;
+              }
+              .control::placeholder{
+                color:var(--placeholder);
+                opacity:1;
+              }
+          
+              /* mid+right を1つの塊にする */
+              .filter-side{
+                grid-column: 2 / 4;          /* 2列目〜3列目をまとめて使う */
+                display:flex;
+                flex-direction:column;
+                gap:12px;
+                min-width:0;
+              }
+          
+              /* 上段（赤線より上の枠） */
+              .side-top{
+                display:grid;
+                grid-template-columns: 180px 1fr; /* 左：色 / 右：トグル＋件数 */
+                gap:14px;
+                align-items:start;
+              }
+          
+              /* hitlist はこの塊の下に置く */
+              .filter-side .hitlist{
+                min-height: 80px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
+                max-height: 80px;
+              }
+          
+              /* multi select */
+              .multi{ position:relative; }
+              .multi-btn{
+                cursor:pointer;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:10px;
+                flex-wrap: nowrap;
+              }
+              .multi-btn .value.placeholder{ color:var(--placeholder); }
+          
+              /* 省略が効くように「縮めてもOK」にする */
+              .field,
+              .multi,
+              .control,
+              .multi-btn {
+                min-width: 0;
+              }
+          
+              /* multiの表示文字は1行固定 + … */
+              .multi-btn .value{
+                flex: 1 1 auto;
+                min-width: 0;              /* ここも必須 */
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+          
+          
+              .caret{
+                width:0; height:0;
+                border-left:8px solid transparent;
+                border-right:8px solid transparent;
+                border-top:10px solid var(--btn);
+                flex:0 0 auto;
+              }
+              .multi-panel{
+                position:absolute;
+                left:0; right:0;
+                top: calc(100% + 8px);
+                background:var(--fieldBg);
+                border-radius:12px;
+                padding:10px;
+                display:none;
+                z-index:50;
+                max-height: 240px;
+                overflow:auto;
+                border:2px solid rgba(61,124,141,.18);
+              }
+              .multi.open .multi-panel{ display:block; }
+          
+              .opt{
+                display:flex;
+                align-items:center;
+                gap:10px;
+                padding:8px 8px;
+                border-radius:10px;
+                cursor:pointer;
+                user-select:none;
+                color:var(--title);
+                font-size:20px;
+              }
+              .opt:hover{ background: rgba(52,195,142,.15); }
+              .tick{
+                width:22px; height:22px;
+                border-radius:6px;
+                border:3px solid var(--btn);
+                background:transparent;
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                flex:0 0 auto;
+              }
+              .tick.on{ background: var(--btn); }
+              .tick.on::after{
+                content:"";
+                width:10px; height:6px;
+                border-left:3px solid var(--bg);
+                border-bottom:3px solid var(--bg);
+                transform: rotate(-45deg) translateY(-1px);
+              }
+          
+              /* 12 年齢/身長（末尾表示付き） */
+              .range-row{
+                display:grid;
+                grid-template-columns: 1fr 40px 1fr;
+                gap:8px;
+                align-items:center;
+              }
+              .sep{
+                text-align:center;
+                color:var(--placeholder);
+                font-size:22px;
+              }
+              .suffix-input{
+                position:relative;
+                width:100%;
+              }
+              .suffix-input input{
+                padding-right: 44px;
+              }
+              .suffix{
+                position:absolute;
+                right:12px;
+                top:50%;
+                transform:translateY(-50%);
+                color:var(--fieldText);
+                font-size:20px;
+                pointer-events:none;
+              }
+              .range-row.suffix-right{
+                grid-template-columns: 1fr 40px 1fr 42px; /* 末尾に suffix */
+                align-items:center;
+              }
+              .suffix-out{
+                color: var(--fieldText);
+                font-size: 20px;
+                text-align:left;
+              }
+          
+              /* 13 イメージカラー（正方形） */
+              .color-box{
+                background:var(--fieldBg);
+                border-radius:12px;
+                padding:12px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                width: 160px;
+                height: 160px;
+                cursor:pointer;
+                user-select:none;
+              }
+              .color-box img{
+                width:100%;
+                height:100%;
+                object-fit:contain;
+                display:block;
+              }
+          
+              /* 14 toggle */
+              .toggle{
+                background:var(--fieldBg);
+                border-radius:12px;
+                padding:14px 16px;
+                display:flex;
+                align-items:center;
+                gap:12px;
+                cursor:pointer;
+                user-select:none;
+                color:var(--title);
+                font-size:22px;
+              }
+              .radio{
+                width:22px; height:22px;
+                border-radius:999px;
+                border:4px solid var(--btn);
+                display:inline-block;
+                flex:0 0 auto;
+                background:transparent;
+              }
+              .radio.on{ background: var(--btn); }
+              .toggles-row{
+                display:flex;
+                gap:14px;
+              }
+              .toggles-row .toggle{
+                flex:1;
+              }
+          
+          
+              /* 15 hits（色 #3D7C8D に固定） */
+              .hits{
+                display:flex;
+                align-items:baseline;
+                justify-content:flex-end;
+                gap:12px;
+                color:var(--title);
+                font-size:28px;
+                padding:2px 4px 0;
+              }
+          
+              /* 16 list */
+              .hitlist{
+                background:var(--card);
+                border:3px solid var(--card);
+                border-radius:14px;
+                padding:10px;
+          
+                max-height: 80px;     /* ←消す/上書き */
+                min-height: 80px;     /* ←色パネル下まで届く目安（必要なら 230 とかに） */
+                overflow:auto;
+              }
+              .hitgrid{
+                display:grid;
+                grid-template-columns: 1fr 1fr;
+                gap:8px 10px;
+              }
+              .hitname{
+                background: transparent;
+                border-radius:0px;
+                padding:4px 6px;
+                color:var(--name); /* #DDEDF1 */
+                font-size:18px;
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+              }
+              .hitlist::-webkit-scrollbar{ width:10px; }
+              .hitlist::-webkit-scrollbar-track{ background: var(--btn); border-radius:999px; }
+              .hitlist::-webkit-scrollbar-thumb{ background: var(--btn); border-radius:999px; }
+          
+              /* 17 */
+              .bottom{
+                display:flex;
+                justify-content:center;
+                margin-top:16px;
+              }
+              .btn-list{
+                font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+                font-weight:900;
+                display:block;
+                margin: 0 auto;
+                background:var(--accent);
+                color:var(--name);
+                border:none;
+                border-radius:12px;
+                padding:18px 34px;
+                width:min(520px, 86vw);
+                font-size:28px;
+                cursor:pointer;
+              }
+          
+              /* toast */
+              .toast{
+                position:fixed;
+                left:50%;
+                bottom:24px;
+                transform:translateX(-50%);
+                background: rgba(61,124,141,.92);
+                color: var(--bg);
+                padding:12px 16px;
+                border-radius:12px;
+                font-size:18px;
+                display:none;
+                z-index:999;
+                max-width:min(560px, 92vw);
+                text-align:center;
+                white-space:pre-wrap;
+              }
+              .toast.show{ display:block; }
+          
+              /* modal */
+              .modal{
+                position:fixed;
+                inset:0;
+                background: rgba(0,0,0,.25);
+                display:none;
+                z-index:200;
+                align-items:center;
+                justify-content:center;
+                padding:18px;
+              }
+              .modal.open{ display:flex; }
+              .modal-panel{
+                width:min(560px, 92vw);
+                background: var(--fieldBg);
+                border-radius:16px;
+                padding:14px;
+                border:2px solid rgba(61,124,141,.18);
+              }
+              .modal-title{
+                color:var(--title);
+                font-size:22px;
+                margin:6px 6px 10px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:10px;
+              }
+              .xbtn{
+                border:none;
+                background:transparent;
+                color:var(--title);
+                font-size:26px;
+                cursor:pointer;
+                padding:6px 10px;
+              }
+          
+              /* color picker */
+              .color-grid{
+                display:grid;
+                grid-template-columns: 1fr 1fr;
+                gap:10px;
+                padding:6px;
+              }
+              .color-item{
+                display:flex;
+                align-items:center;
+                gap:10px;
+                padding:10px;
+                border-radius:12px;
+                cursor:pointer;
+                user-select:none;
+                background: rgba(255,255,255,.35);
+                border:0px solid rgba(61,124,141,.10);
+              }
+              .swatch{
+                width:22px; height:22px;
+                border-radius:6px;
+                border:2px solid rgba(0,0,0,.08);
+                flex:0 0 auto;
+              }
+              .color-item .name{
+                color:var(--title);
+                font-size:18px;
+                flex:1;
+              }
+              .mark{
+                width:22px; height:22px;
+                border-radius:6px;
+                border:3px solid var(--btn);
+                background:transparent;
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                flex:0 0 auto;
+              }
+              .mark.on{ background: var(--btn); }
+              .mark.on::after{
+                content:"";
+                width:10px; height:6px;
+                border-left:3px solid var(--bg);
+                border-bottom:3px solid var(--bg);
+                transform: rotate(-45deg) translateY(-1px);
+              }
+              .modal-actions{
+                display:flex;
+                justify-content:flex-end;
+                gap:10px;
+                padding:10px 6px 2px;
+              }
+              .smallbtn{
+                border:none;
+                border-radius:12px;
+                padding:10px 14px;
+                font-size:18px;
+                cursor:pointer;
+                font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+                font-weight:900;
+              }
+              .smallbtn.ok{ background: var(--btn); color: var(--bg); }
+              .smallbtn.clear{ background: rgba(255,255,255,.35); color: var(--title); }
+          
+              /* share modal preview */
+              .preview{
+                background: rgba(255,255,255,.45);
+                border-radius:14px;
+                padding:12px;
+                color:var(--title);
+                font-size:18px;
+                line-height:1.35;
+                white-space:pre-wrap;
+                overflow-wrap:anywhere;
+                word-break:break-word;
+                margin: 6px;
+              }
+              .share-actions{
+                display:flex;
+                gap:10px;
+                justify-content:flex-end;
+                padding:10px 6px 2px;
+                flex-wrap:wrap;
+              }
+          
+              /* footer */
+              .credit{
+                text-align:center;
+                color:var(--header);
+                font-size:18px;
+                padding:18px 16px 22px;
+              }
+          
+          
+              /* スマホレイアウト */
+          /* 1) スマホ向け全体の余白調整 */
+          @media (max-width: 600px){
+            header{ font-size:14px; padding:10px 12px 6px; }
+            .wrap{ width: min(980px, 94vw); padding-bottom: 18px; }
+          
+            .hero{ padding-top:6px; }
+            .hero h1{ margin:14px 0 6px; }
+            .cta{ margin:16px 0 16px; }
+            .btn-gacha{ padding:14px 18px; border-radius:12px; }
+          
+            .filters-head .label{ font-size:28px; }
+            .btn-reset{ font-size:16px; padding:8px 12px; border-width:2px; }
+          
+            /* 絞り込みはスマホで縦積み */
+            .filters{
+              grid-template-columns: 1fr;
+              gap:12px;
             }
-            .name-yomi{
-              color:var(--yomi);
-              font-size:18px;
-              margin:0 0 8px;
-              letter-spacing:.06em;
+            .filter-side{
+              grid-column: auto;
             }
-            .name-divider{
-              height:2px;
-              background:var(--nameLine);
-              border-radius:999px;
-              margin:0 auto 8px;
-              width:92%;
+            .side-top{
+              grid-template-columns: 1fr; /* 色+トグルも縦積み */
+              gap:12px;
             }
-            .name-main{
-              color:var(--name);
-              margin:0;
-              line-height:1.05;
-              white-space:nowrap;
-              overflow:hidden;
-              font-size:46px; /* JSでフィット */
-            }
-        
-            /* 右（創作名 + 情報ボックス） */
-            .right{
-              flex:1;
-              min-width: 260px;
+            .color-box{ width: 100%; height: 160px; }
+            .toggles-row{ flex-direction:column; }
+            .hits{ justify-content:space-between; font-size:24px; }
+            .hitgrid{ grid-template-columns: 1fr 1fr; }
+            .hitname{ font-size:16px; }
+          }
+          
+          /* 2) 結果カード：横並び固定 & “全体が見える” を最優先 */
+          @media (max-width: 600px){
+            .result-area{ overflow:hidden; }
+          
+            /* カード自体は横並びのまま */
+            .card{
               display:flex;
-              flex-direction:column;
-              gap:10px;
-              padding-top: 6px;
-            }
-        
-            /* 8 創作名（ボックス外） */
-            .series{
-              color:var(--muted);
-              font-size: 44px; /* JSでフィット */
-              line-height:1.05;
-              white-space:nowrap;
-              overflow:hidden;
-              padding-right: 110px; /* 右上ボタン避け */
-            }
-            .series small{
-              font-size:.55em;
-              margin-right:10px;
-              opacity:.9;
-            }
-        
-            /* 9 情報ボックス */
-            .info{
-              background: #89AFB9; /* 画像の薄い面 */
-              border-radius:18px;
-              padding:14px 14px 12px;
-              overflow:hidden;
-            }
-        
-            .kv{
-              display:grid;
-              grid-template-columns: 150px 1fr;
-              gap:6px 12px;
-              align-items:center;
+              flex-wrap: nowrap;
+              align-items: stretch;
+              gap: 12px;
+          
+              /* 縮小用：基準幅で作って、画面に合わせて scale する */
+              width: calc(var(--card-fit-w) * 1px);
+              transform-origin: top left;
+              transform: scale(calc((100vw - 24px) / (var(--card-fit-w) * 1px)));
+          
+              /* 見た目 */
+              border-radius: 18px;
+              padding: 12px;
+          
+              /* 縮小した分だけ下が詰まるので余白で救う（好みで調整） */
               margin-bottom: 10px;
             }
-            .kv .k{
-              color:var(--title);
-              font-size:20px;
+          
+            /* 縮小時にボタンが押しづらくなるので、位置を少し詰める */
+            .card-actions{
+              right: 10px;
+              top: 10px;
+              gap: 8px;
             }
-            .kv .v{
-              color:var(--name);
-              font-size:20px;
+            .doc-btn{
+              font-size: 14px;
+              padding: 7px 10px;
+              border-radius: 10px;
             }
-            .kv-line{
-              grid-column:1/-1;
-              height:2px;
-              background:var(--infoLine);
-              border-radius:999px;
-              margin:4px 0;
+            .icon-btn{
+              width: 40px;
+              height: 34px;
             }
-        
-            .personality{
-              display:block;
-              grid-template-columns: 150px 1fr;
-              gap:8px 12px;
-              align-items:start;
+            .icon-btn svg{ width: 24px; height: 24px; }
+          
+            /* 左右の比率固定（横幅を%で保持） */
+            .left{
+              width: 42%;
+              min-width: 0; /* ←スマホで横幅を固定したいので min-width を殺す */
+              gap: 8px;
             }
-            .personality .k{
-              color:var(--title);
-              font-size:20px;
-              margin-bottom:8px;
-            }
-            .personality .v{
-              color:var(--name);
-              font-size:20px;
-              line-height:1.35;
-              white-space:pre-wrap;
-              display:block;
-              -webkit-line-clamp:3;
-              /* -webkit-box-orient:vertical; */
-              overflow:hidden;
-            }
-        
-            /* ===== Filters ===== */
-            .filters-head{
-              position:relative;
-              display:flex;
-              justify-content:center; /* 絞り込む中央 */
-              align-items:center;
-              padding:10px 0 2px;
-            }
-            .filters-head .label{
-              color:var(--accent);
-              font-size:34px;
-              text-align:center;
-            }
-            .btn-reset{
-              position:absolute;
-              right:0;
-              top:6px;
-              background:var(--bg);           /* 指定 #F6FCFA */
-              color:var(--fieldText);         /* #89AFB9 */
-              border:3px solid var(--line);   /* #DDEDF1 */
-              border-radius:12px;
-              padding:10px 18px;
-              font-size:20px;
-              cursor:pointer;
-            }
-        
-            .filters{
-              display:grid;
-              grid-template-columns: minmax(320px, 44%) 180px minmax(320px, 1fr);
-              gap:14px;
-              align-items:start;
-              margin-top: 8px;
-            }
-        
-            /* 左/中/右 は width指定いらん。グリッドに任せる */
-            .filter-left, .filter-mid, .filter-right{
-              min-width: 0;
-              display:flex;
-              flex-direction:column;
-              gap:12px;
-            }
-        
-            .field{
-              display:grid;
-              grid-template-columns: 160px 1fr;
-              gap:10px;
-              align-items:center;
-            }
-            .field .k{
-              color:var(--muted);
-              font-size:22px;
-              text-align:left;
-            }
-        
-            .control{
-              background:var(--fieldBg);
-              border:none;
-              border-radius:10px;
-              min-height:48px;
-              padding:10px 12px;
-              color:var(--fieldText);
-              font-size:20px;
-              font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
-              font-weight:900;
-              outline:none;
-              width:100%;
-            }
-            .control::placeholder{
-              color:var(--placeholder);
-              opacity:1;
-            }
-        
-            /* mid+right を1つの塊にする */
-            .filter-side{
-              grid-column: 2 / 4;          /* 2列目〜3列目をまとめて使う */
-              display:flex;
-              flex-direction:column;
-              gap:12px;
-              min-width:0;
-            }
-        
-            /* 上段（赤線より上の枠） */
-            .side-top{
-              display:grid;
-              grid-template-columns: 180px 1fr; /* 左：色 / 右：トグル＋件数 */
-              gap:14px;
-              align-items:start;
-            }
-        
-            /* hitlist はこの塊の下に置く */
-            .filter-side .hitlist{
-              min-height: 80px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
-              max-height: 80px;
-            }
-        
-            /* multi select */
-            .multi{ position:relative; }
-            .multi-btn{
-              cursor:pointer;
-              display:flex;
-              align-items:center;
-              justify-content:space-between;
-              gap:10px;
-              flex-wrap: nowrap;
-            }
-            .multi-btn .value.placeholder{ color:var(--placeholder); }
-        
-            /* 省略が効くように「縮めてもOK」にする */
-            .field,
-            .multi,
-            .control,
-            .multi-btn {
-              min-width: 0;
-            }
-        
-            /* multiの表示文字は1行固定 + … */
-            .multi-btn .value{
+            .right{
               flex: 1 1 auto;
-              min-width: 0;              /* ここも必須 */
-              display: block;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              min-width: 0;
+              gap: 8px;
+              padding-top: 4px;
             }
-        
-        
-            .caret{
-              width:0; height:0;
-              border-left:8px solid transparent;
-              border-right:8px solid transparent;
-              border-top:10px solid var(--btn);
-              flex:0 0 auto;
+          
+  /* ▼▼ ここに置き換え：名前は省略しない ▼▼ */
+  .name-main{
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;      /* 1行固定やめる */
+    overflow-wrap: anywhere;  /* 英数字長い保険 */
+    word-break: keep-all;
+  }
+  
+  /* 創作名は今まで通り1行省略でもOK（好み） */
+  .series{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+          
+            /* 情報欄の見え方 */
+            .kv{ grid-template-columns: 130px 1fr; }
+            .kv .k, .kv .v,
+            .personality .k, .personality .v{
+              font-size: 18px;
             }
-            .multi-panel{
-              position:absolute;
-              left:0; right:0;
-              top: calc(100% + 8px);
-              background:var(--fieldBg);
-              border-radius:12px;
-              padding:10px;
-              display:none;
-              z-index:50;
-              max-height: 240px;
-              overflow:auto;
-              border:2px solid rgba(61,124,141,.18);
-            }
-            .multi.open .multi-panel{ display:block; }
-        
-            .opt{
-              display:flex;
-              align-items:center;
-              gap:10px;
-              padding:8px 8px;
-              border-radius:10px;
-              cursor:pointer;
-              user-select:none;
-              color:var(--title);
-              font-size:20px;
-            }
-            .opt:hover{ background: rgba(52,195,142,.15); }
-            .tick{
-              width:22px; height:22px;
-              border-radius:6px;
-              border:3px solid var(--btn);
-              background:transparent;
-              display:inline-flex;
-              align-items:center;
-              justify-content:center;
-              flex:0 0 auto;
-            }
-            .tick.on{ background: var(--btn); }
-            .tick.on::after{
-              content:"";
-              width:10px; height:6px;
-              border-left:3px solid var(--bg);
-              border-bottom:3px solid var(--bg);
-              transform: rotate(-45deg) translateY(-1px);
-            }
-        
-            /* 12 年齢/身長（末尾表示付き） */
-            .range-row{
-              display:grid;
-              grid-template-columns: 1fr 40px 1fr;
-              gap:8px;
-              align-items:center;
-            }
-            .sep{
-              text-align:center;
-              color:var(--placeholder);
-              font-size:22px;
-            }
-            .suffix-input{
-              position:relative;
-              width:100%;
-            }
-            .suffix-input input{
-              padding-right: 44px;
-            }
-            .suffix{
-              position:absolute;
-              right:12px;
-              top:50%;
-              transform:translateY(-50%);
-              color:var(--fieldText);
-              font-size:20px;
-              pointer-events:none;
-            }
-            .range-row.suffix-right{
-              grid-template-columns: 1fr 40px 1fr 42px; /* 末尾に suffix */
-              align-items:center;
-            }
-            .suffix-out{
-              color: var(--fieldText);
-              font-size: 20px;
-              text-align:left;
-            }
-        
-            /* 13 イメージカラー（正方形） */
-            .color-box{
-              background:var(--fieldBg);
-              border-radius:12px;
-              padding:12px;
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              width: 160px;
-              height: 160px;
-              cursor:pointer;
-              user-select:none;
-            }
-            .color-box img{
-              width:100%;
-              height:100%;
-              object-fit:contain;
-              display:block;
-            }
-        
-            /* 14 toggle */
-            .toggle{
-              background:var(--fieldBg);
-              border-radius:12px;
-              padding:14px 16px;
-              display:flex;
-              align-items:center;
-              gap:12px;
-              cursor:pointer;
-              user-select:none;
-              color:var(--title);
-              font-size:22px;
-            }
-            .radio{
-              width:22px; height:22px;
-              border-radius:999px;
-              border:4px solid var(--btn);
-              display:inline-block;
-              flex:0 0 auto;
-              background:transparent;
-            }
-            .radio.on{ background: var(--btn); }
-            .toggles-row{
-              display:flex;
-              gap:14px;
-            }
-            .toggles-row .toggle{
-              flex:1;
-            }
-        
-        
-            /* 15 hits（色 #3D7C8D に固定） */
-            .hits{
-              display:flex;
-              align-items:baseline;
-              justify-content:flex-end;
-              gap:12px;
-              color:var(--title);
-              font-size:28px;
-              padding:2px 4px 0;
-            }
-        
-            /* 16 list */
-            .hitlist{
-              background:var(--card);
-              border:3px solid var(--card);
-              border-radius:14px;
-              padding:10px;
-        
-              max-height: 80px;     /* ←消す/上書き */
-              min-height: 80px;     /* ←色パネル下まで届く目安（必要なら 230 とかに） */
-              overflow:auto;
-            }
-            .hitgrid{
-              display:grid;
-              grid-template-columns: 1fr 1fr;
-              gap:8px 10px;
-            }
-            .hitname{
-              background: transparent;
-              border-radius:0px;
-              padding:4px 6px;
-              color:var(--name); /* #DDEDF1 */
-              font-size:18px;
-              white-space:nowrap;
-              overflow:hidden;
-              text-overflow:ellipsis;
-            }
-            .hitlist::-webkit-scrollbar{ width:10px; }
-            .hitlist::-webkit-scrollbar-track{ background: var(--btn); border-radius:999px; }
-            .hitlist::-webkit-scrollbar-thumb{ background: var(--btn); border-radius:999px; }
-        
-            /* 17 */
-            .bottom{
-              display:flex;
-              justify-content:center;
-              margin-top:16px;
-            }
-            .btn-list{
-              font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
-              font-weight:900;
-              display:block;
-              margin: 0 auto;
-              background:var(--accent);
-              color:var(--name);
-              border:none;
-              border-radius:12px;
-              padding:18px 34px;
-              width:min(520px, 86vw);
-              font-size:28px;
-              cursor:pointer;
-            }
-        
-            /* toast */
-            .toast{
-              position:fixed;
-              left:50%;
-              bottom:24px;
-              transform:translateX(-50%);
-              background: rgba(61,124,141,.92);
-              color: var(--bg);
-              padding:12px 16px;
-              border-radius:12px;
-              font-size:18px;
-              display:none;
-              z-index:999;
-              max-width:min(560px, 92vw);
-              text-align:center;
-              white-space:pre-wrap;
-            }
-            .toast.show{ display:block; }
-        
-            /* modal */
-            .modal{
-              position:fixed;
-              inset:0;
-              background: rgba(0,0,0,.25);
-              display:none;
-              z-index:200;
-              align-items:center;
-              justify-content:center;
-              padding:18px;
-            }
-            .modal.open{ display:flex; }
-            .modal-panel{
-              width:min(560px, 92vw);
-              background: var(--fieldBg);
-              border-radius:16px;
-              padding:14px;
-              border:2px solid rgba(61,124,141,.18);
-            }
-            .modal-title{
-              color:var(--title);
-              font-size:22px;
-              margin:6px 6px 10px;
-              display:flex;
-              justify-content:space-between;
-              align-items:center;
-              gap:10px;
-            }
-            .xbtn{
-              border:none;
-              background:transparent;
-              color:var(--title);
-              font-size:26px;
-              cursor:pointer;
-              padding:6px 10px;
-            }
-        
-            /* color picker */
-            .color-grid{
-              display:grid;
-              grid-template-columns: 1fr 1fr;
-              gap:10px;
-              padding:6px;
-            }
-            .color-item{
-              display:flex;
-              align-items:center;
-              gap:10px;
-              padding:10px;
-              border-radius:12px;
-              cursor:pointer;
-              user-select:none;
-              background: rgba(255,255,255,.35);
-              border:0px solid rgba(61,124,141,.10);
-            }
-            .swatch{
-              width:22px; height:22px;
-              border-radius:6px;
-              border:2px solid rgba(0,0,0,.08);
-              flex:0 0 auto;
-            }
-            .color-item .name{
-              color:var(--title);
-              font-size:18px;
-              flex:1;
-            }
-            .mark{
-              width:22px; height:22px;
-              border-radius:6px;
-              border:3px solid var(--btn);
-              background:transparent;
-              display:inline-flex;
-              align-items:center;
-              justify-content:center;
-              flex:0 0 auto;
-            }
-            .mark.on{ background: var(--btn); }
-            .mark.on::after{
-              content:"";
-              width:10px; height:6px;
-              border-left:3px solid var(--bg);
-              border-bottom:3px solid var(--bg);
-              transform: rotate(-45deg) translateY(-1px);
-            }
-            .modal-actions{
-              display:flex;
-              justify-content:flex-end;
-              gap:10px;
-              padding:10px 6px 2px;
-            }
-            .smallbtn{
-              border:none;
-              border-radius:12px;
-              padding:10px 14px;
-              font-size:18px;
-              cursor:pointer;
-              font-family:"Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
-              font-weight:900;
-            }
-            .smallbtn.ok{ background: var(--btn); color: var(--bg); }
-            .smallbtn.clear{ background: rgba(255,255,255,.35); color: var(--title); }
-        
-            /* share modal preview */
-            .preview{
-              background: rgba(255,255,255,.45);
-              border-radius:14px;
-              padding:12px;
-              color:var(--title);
-              font-size:18px;
-              line-height:1.35;
-              white-space:pre-wrap;
-              overflow-wrap:anywhere;
-              word-break:break-word;
-              margin: 6px;
-            }
-            .share-actions{
-              display:flex;
-              gap:10px;
-              justify-content:flex-end;
-              padding:10px 6px 2px;
-              flex-wrap:wrap;
-            }
-        
-            /* footer */
-            .credit{
-              text-align:center;
-              color:var(--header);
-              font-size:18px;
-              padding:18px 16px 22px;
-            }
-        
-        
-            /* スマホレイアウト */
-        /* 1) スマホ向け全体の余白調整 */
-        @media (max-width: 600px){
-          header{ font-size:14px; padding:10px 12px 6px; }
-          .wrap{ width: min(980px, 94vw); padding-bottom: 18px; }
-        
-          .hero{ padding-top:6px; }
-          .hero h1{ margin:14px 0 6px; }
-          .cta{ margin:16px 0 16px; }
-          .btn-gacha{ padding:14px 18px; border-radius:12px; }
-        
-          .filters-head .label{ font-size:28px; }
-          .btn-reset{ font-size:16px; padding:8px 12px; border-width:2px; }
-        
-          /* 絞り込みはスマホで縦積み */
-          .filters{
-            grid-template-columns: 1fr;
-            gap:12px;
           }
-          .filter-side{
-            grid-column: auto;
-          }
-          .side-top{
-            grid-template-columns: 1fr; /* 色+トグルも縦積み */
-            gap:12px;
-          }
-          .color-box{ width: 100%; height: 160px; }
-          .toggles-row{ flex-direction:column; }
-          .hits{ justify-content:space-between; font-size:24px; }
-          .hitgrid{ grid-template-columns: 1fr 1fr; }
-          .hitname{ font-size:16px; }
-        }
-        
-        /* 2) 結果カード：横並び固定 & “全体が見える” を最優先 */
-        @media (max-width: 600px){
-          .result-area{ overflow:hidden; }
-        
-          /* カード自体は横並びのまま */
-          .card{
-            display:flex;
-            flex-wrap: nowrap;
-            align-items: stretch;
-            gap: 12px;
-        
-            /* 縮小用：基準幅で作って、画面に合わせて scale する */
-            width: calc(var(--card-fit-w) * 1px);
-            transform-origin: top left;
-            transform: scale(calc((100vw - 24px) / (var(--card-fit-w) * 1px)));
-        
-            /* 見た目 */
-            border-radius: 18px;
-            padding: 12px;
-        
-            /* 縮小した分だけ下が詰まるので余白で救う（好みで調整） */
-            margin-bottom: 10px;
-          }
-        
-          /* 縮小時にボタンが押しづらくなるので、位置を少し詰める */
-          .card-actions{
-            right: 10px;
-            top: 10px;
-            gap: 8px;
-          }
-          .doc-btn{
-            font-size: 14px;
-            padding: 7px 10px;
-            border-radius: 10px;
-          }
-          .icon-btn{
-            width: 40px;
-            height: 34px;
-          }
-          .icon-btn svg{ width: 24px; height: 24px; }
-        
-          /* 左右の比率固定（横幅を%で保持） */
-          .left{
-            width: 42%;
-            min-width: 0; /* ←スマホで横幅を固定したいので min-width を殺す */
-            gap: 8px;
-          }
-          .right{
-            flex: 1 1 auto;
-            min-width: 0;
-            gap: 8px;
-            padding-top: 4px;
-          }
-        
-          /* 文字がはみ出ても崩れない */
-          .series{
-            padding-right: 105px; /* ボタン避けを維持 */
-            text-overflow: ellipsis;
-          }
-          .name-main, .series{
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-        
-          /* 情報欄の見え方 */
-          .kv{ grid-template-columns: 130px 1fr; }
-          .kv .k, .kv .v,
-          .personality .k, .personality .v{
-            font-size: 18px;
-          }
-        }
-        
-        /* =========================
-           Mobile Actions Bar (PC無影響)
-           ========================= */
-        .actions-bar{
-          display:none;           /* PCは出さない */
-          gap:10px;
-          justify-content:flex-end;
-          margin-top:10px;
-        }
-        
-        /* スマホ：カードと絞り込みの間隔を詰める */
-        @media (max-width: 600px){
-          .section-line{ margin:10px 0; }
-          .result-area{ margin-top:8px; }
-          #resultCard{ margin-bottom:6px; }
-        
-          /* スマホ時はカード内の右上ボタンを隠す（JSで外に出す） */
-          .card-actions{ display:none !important; }
-        
-          /* 外側のボタンバーを出す */
+          
+          /* =========================
+             Mobile Actions Bar (PC無影響)
+             ========================= */
           .actions-bar{
-            display:flex;
-            padding:0 2px;
+            display:none;           /* PCは出さない */
+            gap:10px;
+            justify-content:flex-end;
+            margin-top:10px;
           }
-        
-          /* 資料ボタン：反転（緑背景＋白文字） */
-          .actions-bar .doc-btn{
-            background: var(--btn);
-            color: var(--bg);
-            border:none;
-            border-radius:12px;
-            min-height:44px;
-            padding:10px 14px;
-            font-size:16px;
-            line-height:1;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
+          
+          /* スマホ：カードと絞り込みの間隔を詰める */
+          @media (max-width: 600px){
+            .section-line{ margin:10px 0; }
+            .result-area{ margin-top:8px; }
+            #resultCard{ margin-bottom:6px; }
+          
+            /* スマホ時はカード内の右上ボタンを隠す（JSで外に出す） */
+            .card-actions{ display:none !important; }
+          
+            /* 外側のボタンバーを出す */
+            .actions-bar{
+              display:flex;
+              padding:0 2px;
+            }
+          
+            /* 資料ボタン：反転（緑背景＋白文字） */
+            .actions-bar .doc-btn{
+              background: var(--btn);
+              color: var(--bg);
+              border:none;
+              border-radius:12px;
+              min-height:44px;
+              padding:10px 14px;
+              font-size:16px;
+              line-height:1;
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+            }
+          
+            /* 共有ボタンも資料と同じ見た目に（＝“ボタン化”） */
+            .actions-bar .icon-btn{
+              width:auto;
+              height:auto;
+              background: var(--btn);
+              border:none;
+              border-radius:12px;
+              min-height:44px;
+              padding:10px 14px;
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+            }
+            .actions-bar .icon-btn svg{ width:22px; height:22px; }
+          
+            /* アイコン線も白にする */
+            .actions-bar .icon-btn svg g{ stroke: var(--bg) !important; }
+          
+            /* 押し心地 */
+            .actions-bar .doc-btn:active,
+            .actions-bar .icon-btn:active{ transform: translateY(1px); }
           }
-        
-          /* 共有ボタンも資料と同じ見た目に（＝“ボタン化”） */
-          .actions-bar .icon-btn{
-            width:auto;
-            height:auto;
-            background: var(--btn);
-            border:none;
-            border-radius:12px;
-            min-height:44px;
-            padding:10px 14px;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-          }
-          .actions-bar .icon-btn svg{ width:22px; height:22px; }
-        
-          /* アイコン線も白にする */
-          .actions-bar .icon-btn svg g{ stroke: var(--bg) !important; }
-        
-          /* 押し心地 */
-          .actions-bar .doc-btn:active,
-          .actions-bar .icon-btn:active{ transform: translateY(1px); }
-        }
   </style>
 </head>
 
@@ -1214,731 +1207,751 @@
     <footer class="credit">© senamagu</footer>
     <script>
   /**********************
-               * DATA
-               **********************/
-              // 画像はローカル相対パス: "Charamedia/xxx.png"
-              // docUrl があれば資料ボタン表示
-              // shareQuote があれば共有文に入れる
-        
-              let characters = [];
+                 * DATA
+                 **********************/
+                // 画像はローカル相対パス: "Charamedia/xxx.png"
+                // docUrl があれば資料ボタン表示
+                // shareQuote があれば共有文に入れる
           
-              async function loadCharacters(){
-                // 1) 一覧を読む
-                const res = await fetch("./characters/index.json", { cache:"no-store" });
-                if(!res.ok) throw new Error("characters/index.json が読めない");
-                const files = await res.json();
-          
-                if(!Array.isArray(files)) throw new Error("index.json は配列にしてね（例: [\"a.json\",\"b.json\"]）");
-          
-                // 2) それぞれのJSONを読む（並列）
-                const results = await Promise.all(
-                  files.map(async (file)=>{
-                    const url = `./characters/${file}`;
-                    const r = await fetch(url, { cache:"no-store" });
-                    if(!r.ok) throw new Error(`${url} が読めないよ！`);
-                    const data = await r.json();
-          
-                    // 各ファイルは「キャラ配列」で統一しろ
-                    if(!Array.isArray(data)) throw new Error(`${url} の中身はキャラ配列にしてね`);
-                    return data;
-                  })
-                );
-          
-                // 3) 配列を平坦化して characters に
-                characters = results.flat();
-              }
-          
-              const COLOR_ITEMS = [
-                {key:"赤",   hex:"#F37679"},
-                {key:"青",   hex:"#58A8DD"},
-                {key:"緑",   hex:"#34C38E"},
-                {key:"黄色", hex:"#DADD4F"},
-                {key:"オレンジ", hex:"#F08D58"},
-                {key:"ピンク", hex:"#F777B0"},
-                {key:"紫",   hex:"#8C6BFF"},
-                {key:"茶色", hex:"#AD7B74"},
-                {key:"黒",   hex:"#464B51"},
-                {key:"白",   hex:"#F6FCFA"},
-                {key:"灰色", hex:"#7F8389"}
-              ];
-          
-              /**********************
-               * STATE
-               **********************/
-              const state = {
-                selectedSeries: new Set(),
-                selectedGenres: new Set(),
-                selectedGenders: new Set(),
-                ageMin: null,
-                ageMax: null,
-                hMin: null,
-                hMax: null,
-                selectedColors: new Set(), // "赤" など
-                hasImageOnly: false,  // 初期：画像ありのみON
-                hasDocOnly: false,
-                lastResult: null
-              };
-        
-              const SHARE_URL = "https://senamagu.github.io/test.github.io/tools/MAGOCgacha/";
-          
-              /**********************
-               * HELPERS
-               **********************/
-          
-              function isOtherLabel(kind, v){
-            const s = String(v ?? "").trim().toLowerCase();
-          
-            // 性別：valueは male/female/other のはず
-            if(kind === "gender"){
-              return s === "other";
-            }
-          
-            // 創作名/ジャンル：文字列で "その他" を想定（必要なら追加）
-            return s === "その他" || s === "other" || s === "others";
-          }
-              
-              const $ = (sel)=>document.querySelector(sel);
-          
-              const toast = (msg)=>{
-                const el = $("#toast");
-                el.textContent = msg;
-                el.classList.add("show");
-                clearTimeout(toast._t);
-                toast._t = setTimeout(()=>el.classList.remove("show"), 1700);
-              };
-          
-              const normNum = (v)=>{
-                const s = String(v ?? "").trim();
-                if(!s) return null;
-                const n = Number(s);
-                return Number.isFinite(n) ? n : null;
-              };
-          
-              function hasValue(v){
-                return v!==null && v!==undefined && String(v).trim()!=="";
-              }
-          
-            function genderLabel(c){
-              if(c.genderLabel) return c.genderLabel;
-              if(c.gender==="male") return "男性";
-              if(c.gender==="female") return "女性";
-              return "その他";
-            }
-          
-              // テキスト横幅フィット
-              function fitTextToWidth(el, maxPx, minPx, padding=8){
-                if(!el) return;
-                el.style.fontSize = maxPx + "px";
-                const parent = el.parentElement;
-                const limitW = Math.max(0, (parent ? parent.clientWidth : el.clientWidth) - padding);
-                let size = maxPx;
-                while(size > minPx && el.scrollWidth > limitW){
-                  size -= 1;
-                  el.style.fontSize = size + "px";
+                let characters = [];
+            
+                async function loadCharacters(){
+                  // 1) 一覧を読む
+                  const res = await fetch("./characters/index.json", { cache:"no-store" });
+                  if(!res.ok) throw new Error("characters/index.json が読めない");
+                  const files = await res.json();
+            
+                  if(!Array.isArray(files)) throw new Error("index.json は配列にしてね（例: [\"a.json\",\"b.json\"]）");
+            
+                  // 2) それぞれのJSONを読む（並列）
+                  const results = await Promise.all(
+                    files.map(async (file)=>{
+                      const url = `./characters/${file}`;
+                      const r = await fetch(url, { cache:"no-store" });
+                      if(!r.ok) throw new Error(`${url} が読めないよ！`);
+                      const data = await r.json();
+            
+                      // 各ファイルは「キャラ配列」で統一しろ
+                      if(!Array.isArray(data)) throw new Error(`${url} の中身はキャラ配列にしてね`);
+                      return data;
+                    })
+                  );
+            
+                  // 3) 配列を平坦化して characters に
+                  characters = results.flat();
                 }
-              }
-          
-              /**********************
-               * COLOR: hex -> tag (範囲で分類)
-               **********************/
-              function hexToRgb(hex){
-                const h = String(hex||"").trim();
-                const m = h.match(/^#?([0-9a-f]{6})$/i);
-                if(!m) return null;
-                const n = parseInt(m[1], 16);
-                return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
-              }
-          
-              function rgbToHsl(r,g,b){
-                r/=255; g/=255; b/=255;
-                const max=Math.max(r,g,b), min=Math.min(r,g,b);
-                let h=0, s=0;
-                const l=(max+min)/2;
-                const d=max-min;
-                if(d!==0){
-                  s = d / (1 - Math.abs(2*l - 1));
-                  switch(max){
-                    case r: h = ((g-b)/d) % 6; break;
-                    case g: h = (b-r)/d + 2; break;
-                    case b: h = (r-g)/d + 4; break;
-                  }
-                  h *= 60;
-                  if(h<0) h+=360;
-                }
-                return {h,s,l};
-              }
-          
-              function colorToTagByHex(hex){
-                const rgb = hexToRgb(hex);
-                if(!rgb) return "";
-                const {h,s,l} = rgbToHsl(rgb.r,rgb.g,rgb.b);
-          
-                // 白/黒/灰（彩度と明度で判定）
-                if(l >= 0.92) return "白";
-                if(l <= 0.12) return "黒";
-                if(s <= 0.12) return "灰色";
-          
-                // 色相で分類（ざっくり範囲）
-                // 赤: 345-360 / 0-15
-                if(h >= 345 || h < 15) return "赤";
-                if(h < 45) return "オレンジ";
-                if(h < 75) return "黄色";
-                if(h < 165) return "緑";
-                if(h < 255) return "青";
-                if(h < 300) return "紫";
-                if(h < 345) return "ピンク";
-                return "赤";
-              }
-          
-              function getCharColorTag(c){
-                // 明示タグ優先、なければカラーコードから推定
-                if(hasValue(c.colorTag)) return c.colorTag.trim();
-                if(hasValue(c.color)) return colorToTagByHex(c.color.trim());
-                return "";
-              }
-          
-              /**********************
-               * FILTERING
-               **********************/
-              function applyFilters(){
-                const aMin = state.ageMin, aMax = state.ageMax;
-                const hMin = state.hMin, hMax = state.hMax;
-          
-                const res = characters.filter(c=>{
-                  if(state.selectedSeries.size && !state.selectedSeries.has(c.series)) return false;
-                  if(state.selectedGenres.size && !state.selectedGenres.has(c.genre)) return false;
-                  if(state.selectedGenders.size && !state.selectedGenders.has(c.gender)) return false;
-          
-                  if(aMin!==null || aMax!==null){
-                    if(!Number.isFinite(c.age)) return false;
-                    if(aMin!==null && c.age < aMin) return false;
-                    if(aMax!==null && c.age > aMax) return false;
-                  }
-                  if(hMin!==null || hMax!==null){
-                    if(!Number.isFinite(c.heightCm)) return false;
-                    if(hMin!==null && c.heightCm < hMin) return false;
-                    if(hMax!==null && c.heightCm > hMax) return false;
-                  }
-          
-                  if(state.selectedColors.size){
-                    const tag = getCharColorTag(c);
-                    if(!tag) return false;
-                    if(!state.selectedColors.has(tag)) return false;
-                  }
-          
-                  if(state.hasImageOnly && !hasValue(c.image)) return false;
-                  if(state.hasDocOnly && !hasValue(c.docUrl)) return false;
-          
-                  return true;
-                });
-          
-                renderHit(res);
-                return res;
-              }
-          
-              /**********************
-               * HIT LIST
-               **********************/
-              function renderHit(list){
-                $("#hitCount").textContent = list.length;
-                const grid = $("#hitGrid");
-                grid.innerHTML = "";
-                for(const c of list){
-                  const div = document.createElement("div");
-                  div.className = "hitname";
-                  div.textContent = c.name;
-                  grid.appendChild(div);
-                }
-              }
-          
-              /**********************
-               * MULTI SELECT
-               **********************/
-              function uniqueValues(key){
-                const set = new Set();
-                for(const c of characters){
-                  if(key==="series") set.add(c.series);
-                  if(key==="genre") set.add(c.genre);
-                  if(key==="gender") set.add(c.gender);
-                }
-                return [...set].filter(Boolean);
-              }
-          
-              function updateMultiValueText(multiEl){
-                const kind = multiEl.dataset.multi;
-                const valEl = multiEl.querySelector(".value");
-          
-                const set =
-                  kind==="series" ? state.selectedSeries :
-                  kind==="genre"  ? state.selectedGenres :
-                  kind==="gender" ? state.selectedGenders :
-                  new Set();
-          
-                if(!set.size){
-                  valEl.textContent = "選択";
-                  valEl.classList.add("placeholder");
-                  return;
-                }
-               const arr = [...set].map(v=>{
-                if(kind!=="gender") return v;
-                return v==="male" ? "男性" :
-                       v==="female" ? "女性" : "その他";
-              });
-                valEl.textContent = arr.join("、");
-                valEl.classList.remove("placeholder");
-              }
-          
-              function renderMulti(multiEl){
-                const kind = multiEl.dataset.multi;
-                const panel = multiEl.querySelector(".multi-panel");
-                panel.innerHTML = "";
-          
-                const values = uniqueValues(kind).sort((a,b)=>{
-            const ao = isOtherLabel(kind, a);
-            const bo = isOtherLabel(kind, b);
-            if(ao !== bo) return ao ? 1 : -1; // その他だけ最後へ
-            return String(a).localeCompare(String(b), "ja");
-          });
-                const currentSet =
-                  kind==="series" ? state.selectedSeries :
-                  kind==="genre"  ? state.selectedGenres :
-                  kind==="gender" ? state.selectedGenders :
-                  new Set();
-          
-                for(const v of values){
-                  const row = document.createElement("div");
-                  row.className = "opt";
-          
-                  const tick = document.createElement("span");
-                  tick.className = "tick" + (currentSet.has(v) ? " on":"");
-          
-                  const label = document.createElement("span");
-                  label.textContent =
-            (kind==="gender")
-              ? (v==="male" ? "男性" : v==="female" ? "女性" : "その他")
-              : v;
-          
-                  row.appendChild(tick);
-                  row.appendChild(label);
-          
-                  row.addEventListener("click", (e)=>{
-                    e.stopPropagation();
-                    if(currentSet.has(v)) currentSet.delete(v);
-                    else currentSet.add(v);
-          
-                    renderMulti(multiEl);
-                    updateMultiValueText(multiEl);
-                    applyFilters();
-                  });
-          
-                  panel.appendChild(row);
-                }
-          
-                updateMultiValueText(multiEl);
-              }
-          
-              function setupMulti(){
-                document.querySelectorAll(".multi").forEach(m=>{
-                  renderMulti(m);
-                  const btn = m.querySelector(".multi-btn");
-                  btn.addEventListener("click", ()=>{
-                    // 他は閉じる
-                    document.querySelectorAll(".multi").forEach(x=>{ if(x!==m) x.classList.remove("open"); });
-                    m.classList.toggle("open");
-                  });
-                  btn.addEventListener("keydown", (e)=>{
-                    if(e.key==="Enter" || e.key===" "){
-                      e.preventDefault();
-                      btn.click();
-                    }
-                  });
-                });
-          
-                document.addEventListener("click", (e)=>{
-                  const inside = e.target.closest(".multi");
-                  if(!inside){
-                    document.querySelectorAll(".multi").forEach(x=>x.classList.remove("open"));
-                  }
-                });
-              }
-          
-              /**********************
-               * COLOR MODAL
-               **********************/
-              let tempColors = new Set();
-          
-              function renderColorGrid(){
-                const grid = $("#colorGrid");
-                grid.innerHTML = "";
-                for(const item of COLOR_ITEMS){
-                  const row = document.createElement("div");
-                  row.className = "color-item";
-                  const sw = document.createElement("span");
-                  sw.className = "swatch";
-                  sw.style.background = item.hex;
-          
-                  const name = document.createElement("div");
-                  name.className = "name";
-                  name.textContent = item.key;
-          
-                  const mark = document.createElement("span");
-                  mark.className = "mark" + (tempColors.has(item.key) ? " on":"");
-          
-                  row.appendChild(sw);
-                  row.appendChild(name);
-                  row.appendChild(mark);
-          
-                  row.addEventListener("click", ()=>{
-                    if(tempColors.has(item.key)) tempColors.delete(item.key);
-                    else tempColors.add(item.key);
-                    renderColorGrid();
-                  });
-          
-                  grid.appendChild(row);
-                }
-              }
-          
-              function openColorModal(){
-                tempColors = new Set(state.selectedColors);
-                renderColorGrid();
-                $("#colorModal").classList.add("open");
-              }
-              function closeColorModal(){
-                $("#colorModal").classList.remove("open");
-              }
-          
-              /**********************
-               * TOGGLES
-               **********************/
-              function setToggle(elDot, on){
-                elDot.classList.toggle("on", !!on);
-              }
-          
-              /**********************
-               * RESULT RENDER
-               **********************/
-              function renderResult(c){
-                state.lastResult = c;
-          
-                $("#resultCard").style.display = "flex";
-          
-                // 6 画像枠背景はカラーコード依存
-                const inner = $("#imgInner");
-        inner.innerHTML = "";
-        
-        const bg = hasValue(c.color) ? c.color : "#89AFB9";
-        inner.style.background = bg;          // ←色はinnerに塗る
-        $("#imgBox").style.background = "transparent"; // 保険（消してもOK）
-                if(hasValue(c.image)){
-                  const img = document.createElement("img");
-                  img.src = c.image;
-                  img.alt = c.name;
-                  inner.appendChild(img);
-                }else{
-                  const fallback = hasValue(c.color) ? c.color : "#89AFB9";
-                  inner.style.background = fallback;
-        
-                  const div = document.createElement("div");
-                  div.className = "no-image";
-                  div.textContent = "画像なし";
-                  inner.appendChild(div);
-                }
-          
-                // 7 名前
-                $("#nameText").textContent = c.name || "—";
-                $("#yomiText").textContent = hasValue(c.yomi) ? c.yomi : "—";
-          
-                // 8 創作
-                $("#seriesName").textContent = c.series || "—";
-          
-                // 9 rows
-                const kv = $("#kvArea");
-                kv.innerHTML = "";
-          
-                const rows = [
-                  ["性別", hasValue(c.gender) ? genderLabel(c) : "未登録"],
-                  ["年齢", Number.isFinite(c.age) ? (c.age + "歳") : "未登録"],
-                  ["身長", Number.isFinite(c.heightCm) ? (c.heightCm + "cm") : "未登録"],
-                  ["誕生日", hasValue(c.birthday) ? c.birthday : "未登録"],
-                  ["カラーコード", hasValue(c.color) ? c.color : "未登録"]
+            
+                const COLOR_ITEMS = [
+                  {key:"赤",   hex:"#F37679"},
+                  {key:"青",   hex:"#58A8DD"},
+                  {key:"緑",   hex:"#34C38E"},
+                  {key:"黄色", hex:"#DADD4F"},
+                  {key:"オレンジ", hex:"#F08D58"},
+                  {key:"ピンク", hex:"#F777B0"},
+                  {key:"紫",   hex:"#8C6BFF"},
+                  {key:"茶色", hex:"#AD7B74"},
+                  {key:"黒",   hex:"#464B51"},
+                  {key:"白",   hex:"#F6FCFA"},
+                  {key:"灰色", hex:"#7F8389"}
                 ];
-          
-                rows.forEach(([k,v], i)=>{
-                  const kEl = document.createElement("div");
-                  kEl.className = "k";
-                  kEl.textContent = k;
-                  const vEl = document.createElement("div");
-                  vEl.className = "v";
-                  vEl.textContent = v;
-                  kv.appendChild(kEl);
-                  kv.appendChild(vEl);
-                  if(i !== rows.length-1){
-                    const line = document.createElement("div");
-                    line.className = "kv-line";
-                    kv.appendChild(line);
-                  }
-                });
-          
-                const p = hasValue(c.personality) ? c.personality : "未登録";
-                $("#personalityText").textContent = p;
-          
-                // fit
-                fitTextToWidth($("#nameText"), 52, 22);
-                fitTextToWidth($("#seriesText"), 46, 22, 120);
-          
-                // 18 doc button
-                const btnDoc = $("#btnDoc");
-                if(hasValue(c.docUrl)){
-                  btnDoc.style.display = "inline-flex";
-                  btnDoc.onclick = ()=> window.open(c.docUrl, "_blank", "noopener");
-                }else{
-                  btnDoc.style.display = "none";
-                }
-                if(setupActionsBar._sync) setupActionsBar._sync();
-              }
-          
-              /**********************
-               * SHARE MODAL
-               **********************/
-              function buildShareText(c, opt = { includeUrl: true }){
-                const spacer = "\n\u2800\n";
-                let text = `あなたはフィップスガチャで\n${c.name}を出しました！`;
-        
-                if(hasValue(c.shareQuote)){
-                  text += `${spacer}${c.name}「${c.shareQuote}」`;
-              }
-                if(opt.includeUrl){
-                  text += `${spacer}${SHARE_URL}`;
-                }
-                return text;
-              }
-        
-              function postToX(){
-                if(!state.lastResult){
-                  toast("先にガチャしてね！");
-                  return;
-                }
-                const text = buildShareText(state.lastResult, { includeUrl:false });
-                const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(SHARE_URL)}`;
-                window.open(intent, "_blank", "noopener,noreferrer");
-              }
-          
-              function openShareModal(){
-                if(!state.lastResult){
-                  toast("先にガチャしてね！");
-                  return;
-                }
-                $("#sharePreview").textContent = buildShareText(state.lastResult);
-                $("#shareModal").classList.add("open");
-              }
-              function closeShareModal(){
-                $("#shareModal").classList.remove("open");
-              }
-          
-              async function copyShare(){
-                try{
-                  await navigator.clipboard.writeText($("#sharePreview").textContent);
-                  toast("共有文をコピーしたよ！");
-                }catch(e){
-                  toast("コピーに失敗したよ！");
-                }
-              }
-          
-              async function saveCardImage(){
-                const card = $("#resultCard");
-                if(card.style.display==="none"){
-                  toast("先にガチャしてね！");
-                  return;
-                }
-                if(typeof html2canvas !== "function"){
-                  toast("画像保存が使えないかも…");
-                  return;
-                }
-                
-                const actionsIn = card.querySelector(".card-actions");
-                const actionsBar = document.getElementById("actionsBar");
-          
-                const prevIn  = actionsIn ? actionsIn.style.display : "";
-                const prevBar = actionsBar ? actionsBar.style.display : "";
-          
-                if(actionsIn) actionsIn.style.display = "none";
-                if(actionsBar) actionsBar.style.display = "none";
-                
-                try{
-                  const canvas = await html2canvas(card, {backgroundColor:null, scale:2});
-                  const a = document.createElement("a");
-                  a.download = "gacha_result.png";
-                  a.href = canvas.toDataURL("image/png");
-                  a.click();
-                  toast("画像を保存したよ！");
-                }catch(e){
-                  toast("画像保存に失敗したよ！");
-                }finally{
-                  if(actionsIn) actionsIn.style.display = prevIn;
-                  if(actionsBar) actionsBar.style.display = prevBar;
-                }
-              }
-          
-              /**********************
-               * INIT + EVENTS
-               **********************/
-              function updateCounts(){
-                $("#totalCount").textContent = characters.length;
-              }
-          
-              function wireInputs(){
-                // range
-                const onRangeChange = ()=>{
-                  state.ageMin = normNum($("#ageMin").value);
-                  state.ageMax = normNum($("#ageMax").value);
-                  state.hMin   = normNum($("#hMin").value);
-                  state.hMax   = normNum($("#hMax").value);
-                  applyFilters();
+            
+                /**********************
+                 * STATE
+                 **********************/
+                const state = {
+                  selectedSeries: new Set(),
+                  selectedGenres: new Set(),
+                  selectedGenders: new Set(),
+                  ageMin: null,
+                  ageMax: null,
+                  hMin: null,
+                  hMax: null,
+                  selectedColors: new Set(), // "赤" など
+                  hasImageOnly: false,  // 初期：画像ありのみON
+                  hasDocOnly: false,
+                  lastResult: null
                 };
-                ["#ageMin","#ageMax","#hMin","#hMax"].forEach(sel=>{
-                  $(sel).addEventListener("input", onRangeChange);
-                  $(sel).addEventListener("change", onRangeChange);
-                });
           
-                // color
-                $("#colorBox").addEventListener("click", openColorModal);
-                $("#btnCloseColor").addEventListener("click", closeColorModal);
-                $("#colorModal").addEventListener("click", (e)=>{ if(e.target.id==="colorModal") closeColorModal(); });
-                $("#btnClearColor").addEventListener("click", ()=>{ tempColors.clear(); renderColorGrid(); });
-                $("#btnOkColor").addEventListener("click", ()=>{
-                  state.selectedColors = new Set(tempColors);
-                  closeColorModal();
-                  applyFilters();
-                });
-          
-                // toggles
-                $("#tglHasImage").addEventListener("click", ()=>{
-                  state.hasImageOnly = !state.hasImageOnly;
-                  setToggle($("#dotHasImage"), state.hasImageOnly);
-                  applyFilters();
-                });
-                $("#tglHasDoc").addEventListener("click", ()=>{
-                  state.hasDocOnly = !state.hasDocOnly;
-                  setToggle($("#dotHasDoc"), state.hasDocOnly);
-                  applyFilters();
-                });
-          
-                // gacha
-                $("#btnGacha").addEventListener("click", ()=>{
-                  let pool = applyFilters();
-          
-                  // 画像URL消して全員画像無しになった時でも、ガチャ押したら自動で画像ありのみOFFして動かす
-                  if(!pool.length && state.hasImageOnly){
-                    state.hasImageOnly = false;
-                    setToggle($("#dotHasImage"), state.hasImageOnly);
-                    toast("ヒット0件だよ！");
-                    pool = applyFilters();
+                const SHARE_URL = "https://senamagu.github.io/test.github.io/tools/MAGOCgacha/";
+            
+                /**********************
+                 * HELPERS
+                 **********************/
+            
+                function isOtherLabel(kind, v){
+              const s = String(v ?? "").trim().toLowerCase();
+            
+              // 性別：valueは male/female/other のはず
+              if(kind === "gender"){
+                return s === "other";
+              }
+            
+              // 創作名/ジャンル：文字列で "その他" を想定（必要なら追加）
+              return s === "その他" || s === "other" || s === "others";
+            }
+                
+                const $ = (sel)=>document.querySelector(sel);
+            
+                const toast = (msg)=>{
+                  const el = $("#toast");
+                  el.textContent = msg;
+                  el.classList.add("show");
+                  clearTimeout(toast._t);
+                  toast._t = setTimeout(()=>el.classList.remove("show"), 1700);
+                };
+            
+                const normNum = (v)=>{
+                  const s = String(v ?? "").trim();
+                  if(!s) return null;
+                  const n = Number(s);
+                  return Number.isFinite(n) ? n : null;
+                };
+            
+                function hasValue(v){
+                  return v!==null && v!==undefined && String(v).trim()!=="";
+                }
+            
+              function genderLabel(c){
+                if(c.genderLabel) return c.genderLabel;
+                if(c.gender==="male") return "男性";
+                if(c.gender==="female") return "女性";
+                return "その他";
+              }
+            
+                // テキスト横幅フィット
+                function fitTextToWidth(el, maxPx, minPx, padding=8){
+                  if(!el) return;
+                  el.style.fontSize = maxPx + "px";
+                  const parent = el.parentElement;
+                  const limitW = Math.max(0, (parent ? parent.clientWidth : el.clientWidth) - padding);
+                  let size = maxPx;
+                  while(size > minPx && el.scrollWidth > limitW){
+                    size -= 1;
+                    el.style.fontSize = size + "px";
                   }
-          
-                  if(!pool.length){
-                    toast("ヒット0件！絞り込みを変えてね！");
+                }
+            
+                /**********************
+                 * COLOR: hex -> tag (範囲で分類)
+                 **********************/
+                function hexToRgb(hex){
+                  const h = String(hex||"").trim();
+                  const m = h.match(/^#?([0-9a-f]{6})$/i);
+                  if(!m) return null;
+                  const n = parseInt(m[1], 16);
+                  return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+                }
+            
+                function rgbToHsl(r,g,b){
+                  r/=255; g/=255; b/=255;
+                  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+                  let h=0, s=0;
+                  const l=(max+min)/2;
+                  const d=max-min;
+                  if(d!==0){
+                    s = d / (1 - Math.abs(2*l - 1));
+                    switch(max){
+                      case r: h = ((g-b)/d) % 6; break;
+                      case g: h = (b-r)/d + 2; break;
+                      case b: h = (r-g)/d + 4; break;
+                    }
+                    h *= 60;
+                    if(h<0) h+=360;
+                  }
+                  return {h,s,l};
+                }
+            
+                function colorToTagByHex(hex){
+                  const rgb = hexToRgb(hex);
+                  if(!rgb) return "";
+                  const {h,s,l} = rgbToHsl(rgb.r,rgb.g,rgb.b);
+            
+                  // 白/黒/灰（彩度と明度で判定）
+                  if(l >= 0.92) return "白";
+                  if(l <= 0.12) return "黒";
+                  if(s <= 0.12) return "灰色";
+            
+                  // 色相で分類（ざっくり範囲）
+                  // 赤: 345-360 / 0-15
+                  if(h >= 345 || h < 15) return "赤";
+                  if(h < 45) return "オレンジ";
+                  if(h < 75) return "黄色";
+                  if(h < 165) return "緑";
+                  if(h < 255) return "青";
+                  if(h < 300) return "紫";
+                  if(h < 345) return "ピンク";
+                  return "赤";
+                }
+            
+                function getCharColorTag(c){
+                  // 明示タグ優先、なければカラーコードから推定
+                  if(hasValue(c.colorTag)) return c.colorTag.trim();
+                  if(hasValue(c.color)) return colorToTagByHex(c.color.trim());
+                  return "";
+                }
+            
+                /**********************
+                 * FILTERING
+                 **********************/
+                function applyFilters(){
+                  const aMin = state.ageMin, aMax = state.ageMax;
+                  const hMin = state.hMin, hMax = state.hMax;
+            
+                  const res = characters.filter(c=>{
+                    if(state.selectedSeries.size && !state.selectedSeries.has(c.series)) return false;
+                    if(state.selectedGenres.size && !state.selectedGenres.has(c.genre)) return false;
+                    if(state.selectedGenders.size && !state.selectedGenders.has(c.gender)) return false;
+            
+                    if(aMin!==null || aMax!==null){
+                      if(!Number.isFinite(c.age)) return false;
+                      if(aMin!==null && c.age < aMin) return false;
+                      if(aMax!==null && c.age > aMax) return false;
+                    }
+                    if(hMin!==null || hMax!==null){
+                      if(!Number.isFinite(c.heightCm)) return false;
+                      if(hMin!==null && c.heightCm < hMin) return false;
+                      if(hMax!==null && c.heightCm > hMax) return false;
+                    }
+            
+                    if(state.selectedColors.size){
+                      const tag = getCharColorTag(c);
+                      if(!tag) return false;
+                      if(!state.selectedColors.has(tag)) return false;
+                    }
+            
+                    if(state.hasImageOnly && !hasValue(c.image)) return false;
+                    if(state.hasDocOnly && !hasValue(c.docUrl)) return false;
+            
+                    return true;
+                  });
+            
+                  renderHit(res);
+                  return res;
+                }
+            
+                /**********************
+                 * HIT LIST
+                 **********************/
+                function renderHit(list){
+                  $("#hitCount").textContent = list.length;
+                  const grid = $("#hitGrid");
+                  grid.innerHTML = "";
+                  for(const c of list){
+                    const div = document.createElement("div");
+                    div.className = "hitname";
+                    div.textContent = c.name;
+                    grid.appendChild(div);
+                  }
+                }
+            
+                /**********************
+                 * MULTI SELECT
+                 **********************/
+                function uniqueValues(key){
+                  const set = new Set();
+                  for(const c of characters){
+                    if(key==="series") set.add(c.series);
+                    if(key==="genre") set.add(c.genre);
+                    if(key==="gender") set.add(c.gender);
+                  }
+                  return [...set].filter(Boolean);
+                }
+            
+                function updateMultiValueText(multiEl){
+                  const kind = multiEl.dataset.multi;
+                  const valEl = multiEl.querySelector(".value");
+            
+                  const set =
+                    kind==="series" ? state.selectedSeries :
+                    kind==="genre"  ? state.selectedGenres :
+                    kind==="gender" ? state.selectedGenders :
+                    new Set();
+            
+                  if(!set.size){
+                    valEl.textContent = "選択";
+                    valEl.classList.add("placeholder");
                     return;
                   }
-                  const pick = pool[Math.floor(Math.random()*pool.length)];
-                  renderResult(pick);
+                 const arr = [...set].map(v=>{
+                  if(kind!=="gender") return v;
+                  return v==="male" ? "男性" :
+                         v==="female" ? "女性" : "その他";
                 });
-          
-                // reset
-                $("#btnReset").addEventListener("click", ()=>{
-                  state.selectedSeries.clear();
-                  state.selectedGenres.clear();
-                  state.selectedGenders.clear();
-                  state.ageMin = state.ageMax = state.hMin = state.hMax = null;
-                  state.selectedColors.clear();
-                  state.hasImageOnly = true;
-                  state.hasDocOnly = false;
-          
-                  $("#ageMin").value = "";
-                  $("#ageMax").value = "";
-                  $("#hMin").value = "";
-                  $("#hMax").value = "";
-          
-                  setToggle($("#dotHasImage"), state.hasImageOnly);
-                  setToggle($("#dotHasDoc"), state.hasDocOnly);
-          
+                  valEl.textContent = arr.join("、");
+                  valEl.classList.remove("placeholder");
+                }
+            
+                function renderMulti(multiEl){
+                  const kind = multiEl.dataset.multi;
+                  const panel = multiEl.querySelector(".multi-panel");
+                  panel.innerHTML = "";
+            
+                  const values = uniqueValues(kind).sort((a,b)=>{
+              const ao = isOtherLabel(kind, a);
+              const bo = isOtherLabel(kind, b);
+              if(ao !== bo) return ao ? 1 : -1; // その他だけ最後へ
+              return String(a).localeCompare(String(b), "ja");
+            });
+                  const currentSet =
+                    kind==="series" ? state.selectedSeries :
+                    kind==="genre"  ? state.selectedGenres :
+                    kind==="gender" ? state.selectedGenders :
+                    new Set();
+            
+                  for(const v of values){
+                    const row = document.createElement("div");
+                    row.className = "opt";
+            
+                    const tick = document.createElement("span");
+                    tick.className = "tick" + (currentSet.has(v) ? " on":"");
+            
+                    const label = document.createElement("span");
+                    label.textContent =
+              (kind==="gender")
+                ? (v==="male" ? "男性" : v==="female" ? "女性" : "その他")
+                : v;
+            
+                    row.appendChild(tick);
+                    row.appendChild(label);
+            
+                    row.addEventListener("click", (e)=>{
+                      e.stopPropagation();
+                      if(currentSet.has(v)) currentSet.delete(v);
+                      else currentSet.add(v);
+            
+                      renderMulti(multiEl);
+                      updateMultiValueText(multiEl);
+                      applyFilters();
+                    });
+            
+                    panel.appendChild(row);
+                  }
+            
+                  updateMultiValueText(multiEl);
+                }
+            
+                function setupMulti(){
                   document.querySelectorAll(".multi").forEach(m=>{
                     renderMulti(m);
-                    m.classList.remove("open");
+                    const btn = m.querySelector(".multi-btn");
+                    btn.addEventListener("click", ()=>{
+                      // 他は閉じる
+                      document.querySelectorAll(".multi").forEach(x=>{ if(x!==m) x.classList.remove("open"); });
+                      m.classList.toggle("open");
+                    });
+                    btn.addEventListener("keydown", (e)=>{
+                      if(e.key==="Enter" || e.key===" "){
+                        e.preventDefault();
+                        btn.click();
+                      }
+                    });
                   });
+            
+                  document.addEventListener("click", (e)=>{
+                    const inside = e.target.closest(".multi");
+                    if(!inside){
+                      document.querySelectorAll(".multi").forEach(x=>x.classList.remove("open"));
+                    }
+                  });
+                }
+            
+                /**********************
+                 * COLOR MODAL
+                 **********************/
+                let tempColors = new Set();
+            
+                function renderColorGrid(){
+                  const grid = $("#colorGrid");
+                  grid.innerHTML = "";
+                  for(const item of COLOR_ITEMS){
+                    const row = document.createElement("div");
+                    row.className = "color-item";
+                    const sw = document.createElement("span");
+                    sw.className = "swatch";
+                    sw.style.background = item.hex;
+            
+                    const name = document.createElement("div");
+                    name.className = "name";
+                    name.textContent = item.key;
+            
+                    const mark = document.createElement("span");
+                    mark.className = "mark" + (tempColors.has(item.key) ? " on":"");
+            
+                    row.appendChild(sw);
+                    row.appendChild(name);
+                    row.appendChild(mark);
+            
+                    row.addEventListener("click", ()=>{
+                      if(tempColors.has(item.key)) tempColors.delete(item.key);
+                      else tempColors.add(item.key);
+                      renderColorGrid();
+                    });
+            
+                    grid.appendChild(row);
+                  }
+                }
+            
+                function openColorModal(){
+                  tempColors = new Set(state.selectedColors);
+                  renderColorGrid();
+                  $("#colorModal").classList.add("open");
+                }
+                function closeColorModal(){
+                  $("#colorModal").classList.remove("open");
+                }
+            
+                /**********************
+                 * TOGGLES
+                 **********************/
+                function setToggle(elDot, on){
+                  elDot.classList.toggle("on", !!on);
+                }
+            
+                /**********************
+                 * RESULT RENDER
+                 **********************/
+                function renderResult(c){
+                  state.lastResult = c;
+            
+                  $("#resultCard").style.display = "flex";
+            
+                  // 6 画像枠背景はカラーコード依存
+                  const inner = $("#imgInner");
+                    inner.innerHTML = "";
           
+                  const bg = hasValue(c.color) ? c.color : "#89AFB9";
+                    inner.style.background = bg;          // ←色はinnerに塗る
+                    $("#imgBox").style.background = "transparent"; // 保険（消してもOK）
+                  if(hasValue(c.image)){
+                    const img = document.createElement("img");
+                    img.src = c.image;
+                    img.alt = c.name;
+                    inner.appendChild(img);
+                  }else{
+                    const fallback = hasValue(c.color) ? c.color : "#89AFB9";
+                    inner.style.background = fallback;
+          
+                    const div = document.createElement("div");
+                    div.className = "no-image";
+                    div.textContent = "画像なし";
+                    inner.appendChild(div);
+                  }
+            
+                  // 7 名前
+                  $("#nameText").textContent = c.name || "—";
+                  $("#yomiText").textContent = hasValue(c.yomi) ? c.yomi : "—";
+            
+                  // 8 創作
+                  $("#seriesName").textContent = c.series || "—";
+            
+                  // 9 rows
+                  const kv = $("#kvArea");
+                  kv.innerHTML = "";
+            
+                  const rows = [
+                    ["性別", hasValue(c.gender) ? genderLabel(c) : "未登録"],
+                    ["年齢", Number.isFinite(c.age) ? (c.age + "歳") : "未登録"],
+                    ["身長", Number.isFinite(c.heightCm) ? (c.heightCm + "cm") : "未登録"],
+                    ["誕生日", hasValue(c.birthday) ? c.birthday : "未登録"],
+                    ["カラーコード", hasValue(c.color) ? c.color : "未登録"]
+                  ];
+            
+                  rows.forEach(([k,v], i)=>{
+                    const kEl = document.createElement("div");
+                    kEl.className = "k";
+                    kEl.textContent = k;
+                    const vEl = document.createElement("div");
+                    vEl.className = "v";
+                    vEl.textContent = v;
+                    kv.appendChild(kEl);
+                    kv.appendChild(vEl);
+                    if(i !== rows.length-1){
+                      const line = document.createElement("div");
+                      line.className = "kv-line";
+                      kv.appendChild(line);
+                    }
+                  });
+            
+                  const p = hasValue(c.personality) ? c.personality : "未登録";
+                  $("#personalityText").textContent = p;
+            
+  // fit（スマホでも確実に効かせる）
+  const fitResultTexts = ()=>{
+    fitTextToWidth($("#nameText"), 52, 16);        // minを16まで許可（長名救済）
+    fitTextToWidth($("#seriesText"), 46, 18, 120);
+  };
+  
+  // 描画が安定してから2段階で当てる
+  requestAnimationFrame(()=>requestAnimationFrame(fitResultTexts));
+  document.fonts?.ready?.then(()=>requestAnimationFrame(fitResultTexts));
+            
+                  // 18 doc button
+                  const btnDoc = $("#btnDoc");
+                  if(hasValue(c.docUrl)){
+                    btnDoc.style.display = "inline-flex";
+                    btnDoc.onclick = ()=> window.open(c.docUrl, "_blank", "noopener");
+                  }else{
+                    btnDoc.style.display = "none";
+                  }
+                  if(setupActionsBar._sync) setupActionsBar._sync();
+                }
+            
+                /**********************
+                 * SHARE MODAL
+                 **********************/
+                function buildShareText(c, opt = { includeUrl: true }){
+                  const spacer = "\n\u2800\n";
+                  let text = `あなたはフィップスガチャで\n${c.name}を出しました！`;
+          
+                  if(hasValue(c.shareQuote)){
+                    text += `${spacer}${c.name}「${c.shareQuote}」`;
+                }
+                  if(opt.includeUrl){
+                    text += `${spacer}${SHARE_URL}`;
+                  }
+                  return text;
+                }
+          
+                function postToX(){
+                  if(!state.lastResult){
+                    toast("先にガチャしてね！");
+                    return;
+                  }
+                  const text = buildShareText(state.lastResult, { includeUrl:false });
+                  const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(SHARE_URL)}`;
+                  window.open(intent, "_blank", "noopener,noreferrer");
+                }
+            
+                function openShareModal(){
+                  if(!state.lastResult){
+                    toast("先にガチャしてね！");
+                    return;
+                  }
+                  $("#sharePreview").textContent = buildShareText(state.lastResult);
+                  $("#shareModal").classList.add("open");
+                }
+                function closeShareModal(){
+                  $("#shareModal").classList.remove("open");
+                }
+            
+                async function copyShare(){
+                  try{
+                    await navigator.clipboard.writeText($("#sharePreview").textContent);
+                    toast("共有文をコピーしたよ！");
+                  }catch(e){
+                    toast("コピーに失敗したよ！");
+                  }
+                }
+            
+                async function saveCardImage(){
+                  const card = $("#resultCard");
+                  if(card.style.display==="none"){
+                    toast("先にガチャしてね！");
+                    return;
+                  }
+                  if(typeof html2canvas !== "function"){
+                    toast("画像保存が使えないかも…");
+                    return;
+                  }
+                  
+                  const actionsIn = card.querySelector(".card-actions");
+                  const actionsBar = document.getElementById("actionsBar");
+            
+                  const prevIn  = actionsIn ? actionsIn.style.display : "";
+                  const prevBar = actionsBar ? actionsBar.style.display : "";
+            
+                  if(actionsIn) actionsIn.style.display = "none";
+                  if(actionsBar) actionsBar.style.display = "none";
+  
+                  const mq = window.matchMedia("(max-width: 600px)");
+  const prevTransform = card.style.transform;
+  const prevWidth = card.style.width;
+  
+  if(mq.matches){
+    card.style.transform = "none";  // 保存時だけtransform解除
+    card.style.width = "920px";     // --card-fit-w と同じ値
+  }
+  
+                  
+                  try{
+                    const canvas = await html2canvas(card, {backgroundColor:null, scale:2});
+                    const a = document.createElement("a");
+                    a.download = "gacha_result.png";
+                    a.href = canvas.toDataURL("image/png");
+                    a.click();
+                    toast("画像を保存したよ！");
+                  }catch(e){
+                    toast("画像保存に失敗したよ！");
+                  }finally{
+    if(mq.matches){
+      card.style.transform = prevTransform;
+      card.style.width = prevWidth;
+    }
+    if(actionsIn) actionsIn.style.display = prevIn;
+    if(actionsBar) actionsBar.style.display = prevBar;
+  }
+                }
+            
+                /**********************
+                 * INIT + EVENTS
+                 **********************/
+                function updateCounts(){
+                  $("#totalCount").textContent = characters.length;
+                }
+            
+                function wireInputs(){
+                  // range
+                  const onRangeChange = ()=>{
+                    state.ageMin = normNum($("#ageMin").value);
+                    state.ageMax = normNum($("#ageMax").value);
+                    state.hMin   = normNum($("#hMin").value);
+                    state.hMax   = normNum($("#hMax").value);
+                    applyFilters();
+                  };
+                  ["#ageMin","#ageMax","#hMin","#hMax"].forEach(sel=>{
+                    $(sel).addEventListener("input", onRangeChange);
+                    $(sel).addEventListener("change", onRangeChange);
+                  });
+            
+                  // color
+                  $("#colorBox").addEventListener("click", openColorModal);
+                  $("#btnCloseColor").addEventListener("click", closeColorModal);
+                  $("#colorModal").addEventListener("click", (e)=>{ if(e.target.id==="colorModal") closeColorModal(); });
+                  $("#btnClearColor").addEventListener("click", ()=>{ tempColors.clear(); renderColorGrid(); });
+                  $("#btnOkColor").addEventListener("click", ()=>{
+                    state.selectedColors = new Set(tempColors);
+                    closeColorModal();
+                    applyFilters();
+                  });
+            
+                  // toggles
+                  $("#tglHasImage").addEventListener("click", ()=>{
+                    state.hasImageOnly = !state.hasImageOnly;
+                    setToggle($("#dotHasImage"), state.hasImageOnly);
+                    applyFilters();
+                  });
+                  $("#tglHasDoc").addEventListener("click", ()=>{
+                    state.hasDocOnly = !state.hasDocOnly;
+                    setToggle($("#dotHasDoc"), state.hasDocOnly);
+                    applyFilters();
+                  });
+            
+                  // gacha
+                  $("#btnGacha").addEventListener("click", ()=>{
+                    let pool = applyFilters();
+            
+                    // 画像URL消して全員画像無しになった時でも、ガチャ押したら自動で画像ありのみOFFして動かす
+                    if(!pool.length && state.hasImageOnly){
+                      state.hasImageOnly = false;
+                      setToggle($("#dotHasImage"), state.hasImageOnly);
+                      toast("ヒット0件だよ！");
+                      pool = applyFilters();
+                    }
+            
+                    if(!pool.length){
+                      toast("ヒット0件！絞り込みを変えてね！");
+                      return;
+                    }
+                    const pick = pool[Math.floor(Math.random()*pool.length)];
+                    renderResult(pick);
+                  });
+            
+                  // reset
+                  $("#btnReset").addEventListener("click", ()=>{
+                    state.selectedSeries.clear();
+                    state.selectedGenres.clear();
+                    state.selectedGenders.clear();
+                    state.ageMin = state.ageMax = state.hMin = state.hMax = null;
+                    state.selectedColors.clear();
+                    state.hasImageOnly = true;
+                    state.hasDocOnly = false;
+            
+                    $("#ageMin").value = "";
+                    $("#ageMax").value = "";
+                    $("#hMin").value = "";
+                    $("#hMax").value = "";
+            
+                    setToggle($("#dotHasImage"), state.hasImageOnly);
+                    setToggle($("#dotHasDoc"), state.hasDocOnly);
+            
+                    document.querySelectorAll(".multi").forEach(m=>{
+                      renderMulti(m);
+                      m.classList.remove("open");
+                    });
+            
+                    applyFilters();
+                    toast("リセットしたよ！");
+                  });
+            
+                  // 17
+                  $("#btnList").addEventListener("click", ()=> toast("準備中"));
+            
+                  // 19 share modal
+                  $("#btnShare").addEventListener("click", openShareModal);
+                  $("#btnCloseShare").addEventListener("click", closeShareModal);
+                  $("#shareModal").addEventListener("click", (e)=>{ if(e.target.id==="shareModal") closeShareModal(); });
+                  $("#btnCopyShare").addEventListener("click", copyShare);
+                  $("#btnSaveShareImg").addEventListener("click", saveCardImage);
+                  $("#btnPostX").addEventListener("click", postToX);
+                }
+            
+                function setupActionsBar(){
+              const bar = document.getElementById("actionsBar");
+              const card = document.getElementById("resultCard");
+              const inside = card ? card.querySelector(".card-actions") : null;
+              if(!bar || !inside) return;
+            
+              const mq = window.matchMedia("(max-width: 600px)");
+            
+              const sync = ()=>{
+                // resultCardが非表示の時はバーも隠す
+                const cardVisible = card.style.display !== "none";
+                bar.style.display = (mq.matches && cardVisible) ? "flex" : "none";
+            
+                // スマホ：外へ移動
+                if(mq.matches){
+                  // btnDoc と btnShare を bar に移す（同じDOMを移動する）
+                  const btnDoc = document.getElementById("btnDoc");
+                  const btnShare = document.getElementById("btnShare");
+                  if(btnDoc && btnDoc.parentElement !== bar) bar.appendChild(btnDoc);
+                  if(btnShare && btnShare.parentElement !== bar) bar.appendChild(btnShare);
+                }else{
+                  // PC：元へ戻す
+                  const btnDoc = document.getElementById("btnDoc");
+                  const btnShare = document.getElementById("btnShare");
+                  if(btnDoc && btnDoc.parentElement !== inside) inside.appendChild(btnDoc);
+                  if(btnShare && btnShare.parentElement !== inside) inside.appendChild(btnShare);
+                }
+              };
+            
+              mq.addEventListener?.("change", sync);
+              window.addEventListener("resize", sync);
+              sync();
+            
+              // ガチャで表示切り替わるので、renderResult後にも追随させたい
+              setupActionsBar._sync = sync;
+            }
+                
+                function init(){
+                  updateCounts();
+                  setupMulti();
+                  setToggle($("#dotHasImage"), state.hasImageOnly);
+                  setToggle($("#dotHasDoc"), state.hasDocOnly);
                   applyFilters();
-                  toast("リセットしたよ！");
-                });
-          
-                // 17
-                $("#btnList").addEventListener("click", ()=> toast("準備中"));
-          
-                // 19 share modal
-                $("#btnShare").addEventListener("click", openShareModal);
-                $("#btnCloseShare").addEventListener("click", closeShareModal);
-                $("#shareModal").addEventListener("click", (e)=>{ if(e.target.id==="shareModal") closeShareModal(); });
-                $("#btnCopyShare").addEventListener("click", copyShare);
-                $("#btnSaveShareImg").addEventListener("click", saveCardImage);
-                $("#btnPostX").addEventListener("click", postToX);
-              }
-          
-              function setupActionsBar(){
-            const bar = document.getElementById("actionsBar");
-            const card = document.getElementById("resultCard");
-            const inside = card ? card.querySelector(".card-actions") : null;
-            if(!bar || !inside) return;
-          
-            const mq = window.matchMedia("(max-width: 600px)");
-          
-            const sync = ()=>{
-              // resultCardが非表示の時はバーも隠す
-              const cardVisible = card.style.display !== "none";
-              bar.style.display = (mq.matches && cardVisible) ? "flex" : "none";
-          
-              // スマホ：外へ移動
-              if(mq.matches){
-                // btnDoc と btnShare を bar に移す（同じDOMを移動する）
-                const btnDoc = document.getElementById("btnDoc");
-                const btnShare = document.getElementById("btnShare");
-                if(btnDoc && btnDoc.parentElement !== bar) bar.appendChild(btnDoc);
-                if(btnShare && btnShare.parentElement !== bar) bar.appendChild(btnShare);
-              }else{
-                // PC：元へ戻す
-                const btnDoc = document.getElementById("btnDoc");
-                const btnShare = document.getElementById("btnShare");
-                if(btnDoc && btnDoc.parentElement !== inside) inside.appendChild(btnDoc);
-                if(btnShare && btnShare.parentElement !== inside) inside.appendChild(btnShare);
-              }
-            };
-          
-            mq.addEventListener?.("change", sync);
-            window.addEventListener("resize", sync);
-            sync();
-          
-            // ガチャで表示切り替わるので、renderResult後にも追随させたい
-            setupActionsBar._sync = sync;
-          }
-              
-              function init(){
-                updateCounts();
-                setupMulti();
-                setToggle($("#dotHasImage"), state.hasImageOnly);
-                setToggle($("#dotHasDoc"), state.hasDocOnly);
-                applyFilters();
-                wireInputs();
-                setupActionsBar();
-              }
-              
-              (async ()=>{  
-                try{ 
-                  await loadCharacters();  
-                }catch(e){    
-                  console.error(e);   
-                  toast("characters/ 読み込み失敗");    
-                  characters = [];  
-                }  
-                init(); // ←ここで起動
-              })();
+                  wireInputs();
+                  setupActionsBar();
+                }
+                
+                (async ()=>{  
+                  try{ 
+                    await loadCharacters();  
+                  }catch(e){    
+                    console.error(e);   
+                    toast("characters/ 読み込み失敗");    
+                    characters = [];  
+                  }  
+                  init(); // ←ここで起動
+                })();
     </script>
   </div>
 </body>
