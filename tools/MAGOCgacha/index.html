@@ -1698,8 +1698,6 @@ document.fonts?.ready?.then(()=>requestAnimationFrame(fitResultTexts));
                  * SHARE MODAL
                  **********************/
                 function buildShareText(c, opt = { includeUrl: true }){
-  const spacer = "\n\u2800\n";
-
   const lines = [];
   lines.push(`あなたはフィップスガチャで\n${c.name}を出しました！`);
 
@@ -1708,11 +1706,13 @@ document.fonts?.ready?.then(()=>requestAnimationFrame(fitResultTexts));
   }
 
   if(opt.includeUrl){
-    lines.push(SHARE_URL);
+    lines.push("");          // ←空行
+    lines.push(SHARE_URL);   // ←URLは単独行
   }
 
-  return lines.join(spacer);
+  return lines.join("\n");
 }
+
           
                 function postToX(){
                   if(!state.lastResult){
