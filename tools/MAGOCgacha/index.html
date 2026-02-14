@@ -902,6 +902,8 @@
           </div>
         </div>
       </div>
+    </div>
+  
 
     <div class="section-line"></div>
 
@@ -916,7 +918,7 @@
       <div class="filter-left">
       <!-- 創作 -->
         <div class="field">
-          <div class="k">創作タイトル</div> 
+          <div class="k">創作名</div> 
           <div class="multi" data-multi="series">
           <div class="control multi-btn" role="button" tabindex="0"> 
             <span class="value placeholder">未選択</span><span class="caret"></span>
@@ -927,7 +929,7 @@
         
         <!-- ジャンル -->
         <div class="field"> 
-          <div class="k">キャラジャンル</div>
+          <div class="k">見た目ジャンル</div>
           <div class="multi" data-multi="genre">
             <div class="control multi-btn" role="button" tabindex="0">
               <span class="value placeholder">未選択</span><span class="caret"></span> 
@@ -978,7 +980,7 @@
             <div class="field" style="grid-template-columns:1fr;">
               <div class="k">イメージカラー</div>
               <div class="color-box" id="colorBox" title="タップで選択">
-                <img src="colorwheel.png" alt="color wheel">
+                <img src="./images/colorwheel.PNG" alt="color wheel">
               </div>
             </div>
           </div>
@@ -1058,7 +1060,7 @@
     let characters = [];
 
     async function loadCharacters(){ 
-      const res = await fetch("./characters.json", { cache:"no-store" }); 
+      const res = await fetch("./characters/index.json", { cache:"no-store" }); 
       if(!res.ok) throw new Error("characters.json 読めない");  
       characters = await res.json();
     }
@@ -1118,11 +1120,12 @@
       return v!==null && v!==undefined && String(v).trim()!=="";
     }
 
-    function genderLabel(g){
-      if(g==="male") return "男性";
-      if(g==="female") return "女性";
-      return "その他";
-    }
+  function genderLabel(c){
+    if(c.genderLabel) return c.genderLabel;
+    if(c.gender==="male") return "男性";
+    if(c.gender==="female") return "女性";
+    return "その他";
+  }
 
     // テキスト横幅フィット
     function fitTextToWidth(el, maxPx, minPx, padding=8){
@@ -1278,7 +1281,11 @@
         valEl.classList.add("placeholder");
         return;
       }
-      const arr = [...set].map(v=> kind==="gender" ? genderLabel(v) : v);
+     const arr = [...set].map(v=>{
+      if(kind!=="gender") return v;
+      return v==="male" ? "男性" :
+             v==="female" ? "女性" : "その他";
+    });
       valEl.textContent = arr.join("、");
       valEl.classList.remove("placeholder");
     }
@@ -1442,7 +1449,7 @@
       kv.innerHTML = "";
 
       const rows = [
-        ["性別", hasValue(c.gender) ? genderLabel(c.gender) : "未登録"],
+        ["性別", hasValue(c.gender) ? genderLabel(c) : "未登録"],
         ["年齢", Number.isFinite(c.age) ? (c.age + "歳") : "未登録"],
         ["身長", Number.isFinite(c.heightCm) ? (c.heightCm + "cm") : "未登録"],
         ["誕生日", hasValue(c.birthday) ? c.birthday : "未登録"],
