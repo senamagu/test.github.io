@@ -1685,14 +1685,14 @@
        * SHARE MODAL
        **********************/
       function buildShareText(c, opt = { includeUrl: true }){
-        const base = `あなたはフィップスガチャで${c.name}を出しました！`;
+        const spacer = "\n\u2800\n";
+        let text = `あなたはフィップスガチャで\n${c.name}を出しました！`;
 
-        let text = base;
         if(hasValue(c.shareQuote)){
-          text += `\n\n${c.name}「${c.shareQuote}」`;
-        }
+          text += `${spacer}${c.name}「${c.shareQuote}」`;
+      }
         if(opt.includeUrl){
-          text += `\n\n${SHARE_URL}`;
+          text += `${spacer}${SHARE_URL}`;
         }
         return text;
       }
