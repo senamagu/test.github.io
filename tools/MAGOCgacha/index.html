@@ -912,75 +912,110 @@
   }
 }
 /* =========================
-   Gap fix + Share button outside (mobile only)
+   Mobile: gap fix + actions outside (usable size)
    ========================= */
 
-/* 1) 「カード↔絞り込む」の余白を詰める */
 @media (max-width: 600px){
-  /* section-line 自体の上下余白を詰める */
-  .section-line{ margin: 10px 0; }
 
-  /* Resultエリアの下余白を詰める */
-  .result-area{ margin-top: 10px; margin-bottom: 6px; }
+  /* --- (A) カードと絞り込み間の“デカ余白”を詰める --- */
+  .section-line{
+    margin: 10px 0;     /* 元: 18px 0 */
+  }
+  .result-area{
+    margin-top: 8px;    /* 元: 18px */
+  }
+  /* resultCard の下も詰める（次の section-line まで近づける） */
+  #resultCard{
+    margin-bottom: 6px;
+  }
 
-  /* 絞り込み見出しの上余白を詰める */
-  .filters-head{ padding: 6px 0 0; }
+  /* --- (B) result card 構造：中身だけ縮小、ボタンは等倍 --- */
+  .card{
+    /* もう card 自体を scale しない */
+    width: auto;
+    transform: none;
+    padding: 0;
+    background: transparent; /* 外枠は透明にして“中身”に任せる */
+  }
+
+  /* カード中身（横並び固定・比率維持・全体表示） */
+  .card-inner{
+    background: var(--card);
+    border-radius: 18px;
+    padding: 12px;
+
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex-wrap: nowrap;
+
+    /* ここだけ縮小する */
+    width: calc(var(--card-fit-w) * 1px);
+    transform-origin: top left;
+    transform: scale(calc((100vw - 24px) / (var(--card-fit-w) * 1px)));
+  }
+
+  /* 左右比率はそのまま */
+  .left{
+    width: 42%;
+    min-width: 0;
+    gap: 8px;
+  }
+  .right{
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  /* --- (C) ボタンをカード外（下）へ：等倍で押しやすく --- */
+  .card-actions{
+    position: static;               /* absolute解除 */
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;               /* “カード外の下” */
+    padding: 0 2px;
+  }
+
+  /* --- (D) “反転”＆視認性：資料・共有を同じ見た目に --- */
+  .doc-btn,
+  .icon-btn{
+    background: var(--btn);         /* 緑 */
+    color: var(--bg);               /* 白系 */
+    border: none;
+    border-radius: 12px;
+    min-height: 44px;
+    padding: 10px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* 共有アイコンも白で見えるように */
+  .icon-btn{
+    width: auto;                    /* 元の固定幅解除 */
+    height: auto;
+    padding: 10px 14px;
+  }
+  .icon-btn svg{ width: 22px; height: 22px; }
+  .icon-btn svg g{ stroke: var(--bg) !important; }
+
+  /* タップ感 */
+  .doc-btn:active,
+  .icon-btn:active{ transform: translateY(1px); }
+
+  /* 右上ボタン避けの padding は不要になる（中身側の series を戻す） */
+  .series{
+    padding-right: 0;
+  }
 }
 
-/* 2) 共有ボタンをカード外に出す（スマホ時だけ）
-   - 既存の #btnShare を “カードの上に固定表示” っぽく見せる
-   - DOMはいじらないけど、見た目だけカード外に出す
-*/
-@media (max-width: 600px){
-  /* カードを囲うエリアを“基準位置”にする */
-  .result-area{ position: relative; }
-
-  /* カード内右上の操作群はスマホ時は隠す（小さすぎ問題） */
-  .card-actions{ display:none; }
-
-  /* 共有ボタンを“カードの外（上）”に移動表示 */
-  #btnShare{
-    position: absolute;
-    right: 8px;
-    top: -46px;              /* ←カードの外側上に出す */
-    width: 54px;
-    height: 44px;
-    border-radius: 14px;
-
-    /* 押しやすい見た目 */
-    background: var(--fieldBg);
-    border: 2px solid rgba(61,124,141,.18);
-    box-shadow: 0 6px 18px rgba(0,0,0,.12);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index: 80;
-  }
-
-  /* アイコン色を見やすく（svgがstroke指定なので上書き） */
-  #btnShare svg g{
-    stroke: var(--title);
-  }
-
-  /* docボタンも同じ外側に出したいなら（任意）
-     → 使うなら #btnDoc を display:block に戻して位置指定 */
-  #btnDoc{
-    position: absolute;
-    right: 70px;
-    top: -44px;
-    display: none; /* 既存挙動優先。資料ありのとき JS が表示するのでOK */
-    z-index: 80;
-  }
-  /* JSで資料あり時にinline-flexにされるので、外側でも整うように */
-  .doc-btn{
-    box-shadow: 0 6px 18px rgba(0,0,0,.12);
-  }
-}
-
-/* 3) さらに小さい端末：上に出す量だけ調整 */
+/* さらに小さい端末の微調整（任意） */
 @media (max-width: 380px){
-  #btnShare{ top: -44px; right: 6px; }
-  #btnDoc{ top: -42px; right: 66px; }
+  .card-actions{ gap: 8px; }
+  .doc-btn,.icon-btn{ padding: 10px 12px; }
 }
     
   </style>
@@ -1020,6 +1055,7 @@
           </button>
         </div>
 
+      <div class="card-inner">
         <!-- left -->
         <div class="left">
           <div class="imgbox" id="imgBox">
@@ -1048,6 +1084,7 @@
         </div>
       </div>
     </div>
+  </div>
   
 
     <div class="section-line"></div>
