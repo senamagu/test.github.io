@@ -424,10 +424,19 @@
     }
     .multi-btn .value.placeholder{ color:var(--placeholder); }
 
-    /* multi の表示文字を1行固定 + … */
+    /* 省略が効くように「縮めてもOK」にする */
+    .field,
+    .multi,
+    .control,
+    .multi-btn {
+      min-width: 0;
+    }
+
+    /* multiの表示文字は1行固定 + … */
     .multi-btn .value{
       flex: 1 1 auto;
-      min-width: 0;              /* ←これ超重要。flex内の省略を効かせる */
+      min-width: 0;              /* ここも必須 */
+      display: block;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -606,7 +615,7 @@
     .hitname{
       background: transparent;
       border-radius:0px;
-      padding:8px 10px;
+      padding:4px 6px;
       color:var(--name); /* #DDEDF1 */
       font-size:18px;
       white-space:nowrap;
@@ -614,7 +623,7 @@
       text-overflow:ellipsis;
     }
     .hitlist::-webkit-scrollbar{ width:10px; }
-    .hitlist::-webkit-scrollbar-track{ background: rgba(255,255,255,.10); border-radius:999px; }
+    .hitlist::-webkit-scrollbar-track{ background: var(--btn); border-radius:999px; }
     .hitlist::-webkit-scrollbar-thumb{ background: var(--btn); border-radius:999px; }
 
     /* 17 */
@@ -902,7 +911,77 @@
     font-size: 17px;
   }
 }
+/* =========================
+   Gap fix + Share button outside (mobile only)
+   ========================= */
 
+/* 1) 「カード↔絞り込む」の余白を詰める */
+@media (max-width: 600px){
+  /* section-line 自体の上下余白を詰める */
+  .section-line{ margin: 10px 0; }
+
+  /* Resultエリアの下余白を詰める */
+  .result-area{ margin-top: 10px; margin-bottom: 6px; }
+
+  /* 絞り込み見出しの上余白を詰める */
+  .filters-head{ padding: 6px 0 0; }
+}
+
+/* 2) 共有ボタンをカード外に出す（スマホ時だけ）
+   - 既存の #btnShare を “カードの上に固定表示” っぽく見せる
+   - DOMはいじらないけど、見た目だけカード外に出す
+*/
+@media (max-width: 600px){
+  /* カードを囲うエリアを“基準位置”にする */
+  .result-area{ position: relative; }
+
+  /* カード内右上の操作群はスマホ時は隠す（小さすぎ問題） */
+  .card-actions{ display:none; }
+
+  /* 共有ボタンを“カードの外（上）”に移動表示 */
+  #btnShare{
+    position: absolute;
+    right: 8px;
+    top: -46px;              /* ←カードの外側上に出す */
+    width: 54px;
+    height: 44px;
+    border-radius: 14px;
+
+    /* 押しやすい見た目 */
+    background: var(--fieldBg);
+    border: 2px solid rgba(61,124,141,.18);
+    box-shadow: 0 6px 18px rgba(0,0,0,.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index: 80;
+  }
+
+  /* アイコン色を見やすく（svgがstroke指定なので上書き） */
+  #btnShare svg g{
+    stroke: var(--title);
+  }
+
+  /* docボタンも同じ外側に出したいなら（任意）
+     → 使うなら #btnDoc を display:block に戻して位置指定 */
+  #btnDoc{
+    position: absolute;
+    right: 70px;
+    top: -44px;
+    display: none; /* 既存挙動優先。資料ありのとき JS が表示するのでOK */
+    z-index: 80;
+  }
+  /* JSで資料あり時にinline-flexにされるので、外側でも整うように */
+  .doc-btn{
+    box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  }
+}
+
+/* 3) さらに小さい端末：上に出す量だけ調整 */
+@media (max-width: 380px){
+  #btnShare{ top: -44px; right: 6px; }
+  #btnDoc{ top: -42px; right: 66px; }
+}
     
   </style>
 </head>
@@ -1131,18 +1210,18 @@
       if(!res.ok) throw new Error("characters/index.json が読めない");
       const files = await res.json();
 
-      if(!Array.isArray(files)) throw new Error("index.json は配列にしてくれ（例: [\"a.json\",\"b.json\"]）");
+      if(!Array.isArray(files)) throw new Error("index.json は配列にしてね（例: [\"a.json\",\"b.json\"]）");
 
       // 2) それぞれのJSONを読む（並列）
       const results = await Promise.all(
         files.map(async (file)=>{
           const url = `./characters/${file}`;
           const r = await fetch(url, { cache:"no-store" });
-          if(!r.ok) throw new Error(`${url} が読めない`);
+          if(!r.ok) throw new Error(`${url} が読めないよ！`);
           const data = await r.json();
 
           // 各ファイルは「キャラ配列」で統一しろ
-          if(!Array.isArray(data)) throw new Error(`${url} の中身はキャラ配列にしてくれ`);
+          if(!Array.isArray(data)) throw new Error(`${url} の中身はキャラ配列にしてね`);
           return data;
         })
       );
@@ -1615,6 +1694,11 @@
         toast("画像保存が使えないかも…");
         return;
       }
+      
+      const actions = card.querySelector(".card-actions");
+      const prevDisplay = actions ? actions.style.display : "";
+      if(actions) actions.style.display = "none";
+      
       try{
         const canvas = await html2canvas(card, {backgroundColor:null, scale:2});
         const a = document.createElement("a");
@@ -1624,6 +1708,8 @@
         toast("画像を保存したよ！");
       }catch(e){
         toast("画像保存に失敗したよ！");
+      }finally{
+        if(actions) actions.style.display = prevDisplay;
       }
     }
 
