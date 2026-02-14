@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OC JSON Copy</title>
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#171a21; --line:#2a3040; --text:#e7e9ee; --muted:#a9b0bf;
+      --acc:#7aa2ff; --good:#34c38e; --warn:#f5b329; --bad:#ff5c7a;
+      --radius:14px;
+    }
+    html,body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;}
+    a{color:var(--acc); text-decoration:none}
+    header{position:sticky; top:0; z-index:10; background:rgba(15,17,21,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+    .wrap{max-width:1200px; margin:0 auto; padding:14px 14px 22px;}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid var(--line); border-radius:999px; color:var(--muted); background:rgba(255,255,255,.03)}
+    .panel{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:12px;}
+    .grid{display:grid; grid-template-columns: 420px 1fr; gap:12px;}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
+    input,select,textarea,button{
+      font:inherit; color:var(--text);
+      background:#0f1115; border:1px solid var(--line); border-radius:12px;
+      padding:10px 12px;
+    }
+    input[type="color"]{padding:4px; height:42px; width:64px}
+    textarea{min-height:120px; resize:vertical; line-height:1.35}
+    button{cursor:pointer}
+    button.primary{border-color:transparent; background:var(--acc); color:#0b0d10; font-weight:800}
+    button.good{border-color:transparent; background:var(--good); color:#08110d; font-weight:800}
+    button.warn{border-color:transparent; background:var(--warn); color:#140f03; font-weight:800}
+    button.bad{border-color:transparent; background:var(--bad); color:#1a050a; font-weight:800}
+    button.ghost{background:transparent}
+    .small{font-size:12px; color:var(--muted)}
+    .list{max-height:62vh; overflow:auto; padding:0; margin:0; list-style:none; border-radius:12px; border:1px solid var(--line)}
+    .list li{border-bottom:1px solid var(--line)}
+    .list li:last-child{border-bottom:none}
+    .itemBtn{
+      width:100%; text-align:left; padding:10px 12px; border:0; border-radius:0; background:transparent;
+      display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center;
+    }
+    .itemBtn:hover{background:rgba(255,255,255,.04)}
+    .itemBtn.active{background:rgba(122,162,255,.12)}
+    .tag{font-size:12px; color:var(--muted)}
+    .kvs{display:grid; grid-template-columns: 160px 1fr; gap:8px 10px;}
+    .kvs label{color:var(--muted); font-size:12px}
+    .hr{height:1px; background:var(--line); margin:10px 0}
+    .toast{
+      position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+      background:rgba(23,26,33,.95); border:1px solid var(--line); border-radius:999px;
+      padding:10px 14px; color:var(--text); z-index:50; display:none;
+    }
+    .preview{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .avatar{
+      width:64px; height:64px; border-radius:16px; border:1px solid var(--line); background:rgba(255,255,255,.03);
+      display:flex; align-items:center; justify-content:center; overflow:hidden;
+    }
+    .avatar img{width:100%; height:100%; object-fit:cover}
+    .colorSwatch{
+      width:26px; height:26px; border-radius:10px; border:1px solid var(--line); background:transparent;
+    }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .right{margin-left:auto}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="row">
+      <div class="pill"><b>OC JSON Copy</b><span class="small">GitHub Pages向け（上書き保存はしない、DL/コピーで運用）</span></div>
+      <div class="right row">
+        <button class="ghost" id="btnHelp">使い方</button>
+        <button class="ghost" id="btnReload">再読み込み</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <input id="basePath" style="flex:1; min-width:260px" class="mono" placeholder="../MAGOCgacha/characters" />
+      <button class="primary" id="btnLoad">一覧ロード</button>
+
+      <input id="q" style="flex:1; min-width:220px" placeholder="検索（name / yomi / id / series / genre）" />
+      <select id="filterSeries" style="min-width:160px">
+        <option value="">シリーズ全部</option>
+      </select>
+      <select id="filterGenre" style="min-width:140px">
+        <option value="">ジャンル全部</option>
+      </select>
+      <select id="filterGender" style="min-width:140px">
+        <option value="">性別全部</option>
+        <option value="male">male</option>
+        <option value="female">female</option>
+        <option value="other">other</option>
+      </select>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="ghost" id="btnNew">＋ 新規キャラ</button>
+      <button class="ghost" id="btnCopyOne">選択キャラJSONコピー</button>
+      <button class="ghost" id="btnCopyMin">選択キャラJSONコピー（空項目省く）</button>
+      <button class="ghost" id="btnDownloadOne">選択キャラJSONをDL</button>
+      <span class="small">｜</span>
+      <button class="ghost" id="btnDownloadIndex">index.json をDL（今の一覧から生成）</button>
+      <button class="ghost" id="btnCopyListArray">一覧を配列JSONでコピー（最小形式）</button>
+      <span class="small right" id="stat">未ロード</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- LEFT: list -->
+    <div class="panel">
+      <div class="row">
+        <b>キャラ一覧</b>
+        <span class="small" id="listHint">index.json を読み込むと出る</span>
+      </div>
+      <div class="hr"></div>
+      <ul class="list" id="list"></ul>
+    </div>
+
+    <!-- RIGHT: editor -->
+    <div class="panel">
+      <div class="row">
+        <b>編集</b>
+        <span class="small">空欄OK。コピー/書き出しの時に「空項目省く」も使える。</span>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="preview">
+        <div class="avatar" id="avatar"><span class="small">No Image</span></div>
+        <div>
+          <div class="row">
+            <span class="colorSwatch" id="sw"></span>
+            <span class="pill"><span class="small">ID:</span> <span class="mono" id="curId">-</span></span>
+            <span class="pill"><span class="small">file:</span> <span class="mono" id="curFile">-</span></span>
+          </div>
+          <div class="small" id="curNote">選択するとここに情報</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="kvs">
+        <label>id *</label> <input id="f_id" class="mono" placeholder="asano_sana" />
+        <label>name *</label> <input id="f_name" placeholder="浅野 醒那" />
+        <label>yomi</label> <input id="f_yomi" placeholder="アサノ サナ" />
+        <label>series *</label> <input id="f_series" placeholder="描楽幻想街" />
+        <label>genre *</label> <input id="f_genre" placeholder="人間" />
+
+        <label>gender *</label>
+        <select id="f_gender">
+          <option value="male">male</option>
+          <option value="female">female</option>
+          <option value="other" selected>other</option>
+        </select>
+
+        <label>genderlabel</label> <input id="f_genderlabel" placeholder="中性 / 無性 / 不明" />
+
+        <label>age</label> <input id="f_age" type="number" placeholder="21（未登録なら空）" />
+        <label>heightCm</label> <input id="f_heightCm" type="number" placeholder="158（未登録なら空）" />
+        <label>birthday</label> <input id="f_birthday" placeholder="11/11 / 不明 / 空" />
+
+        <label>personality</label> <textarea id="f_personality" placeholder="元気！&#10;超元気だよ！"></textarea>
+
+        <label>color</label>
+        <div class="row">
+          <input id="f_color" type="text" class="mono" placeholder="#34C38E / 空" style="flex:1; min-width:180px" />
+          <input id="f_color_picker" type="color" value="#34C38E" />
+        </div>
+
+        <label>colorTag</label> <input id="f_colorTag" placeholder="緑 / 青 / 赤..." />
+
+        <label>image</label> <input id="f_image" class="mono" placeholder="Charamedia/asano_sana.png" />
+        <label>docUrl</label> <input id="f_docUrl" class="mono" placeholder="https://example.com" />
+        <label>shareQuote</label> <input id="f_shareQuote" placeholder="飯が美味いぜ！" />
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <button class="good" id="btnApply">一覧に反映</button>
+        <button class="warn" id="btnRevert">選択キャラを再読込（破棄）</button>
+        <button class="bad" id="btnDelete">一覧から削除</button>
+        <span class="right small">※反映してもGitHub上のファイルは変わらない。DLして置き換え運用。</span>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <button class="ghost" id="btnPasteJson">JSON貼り付けで上書き</button>
+        <button class="ghost" id="btnViewJson">現在のJSONを見る</button>
+        <button class="ghost" id="btnOpenDoc">docUrl を開く</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  // ===== State =====
+  const state = {
+    basePath: "../MAGOCgacha/characters",
+    indexList: [],         // filenames from index.json
+    meta: [],              // {file, id, name, yomi, series, genre, gender, loaded?:obj}
+    selectedFile: null,
+    selectedObj: null,
+    dirty: false
+  };
+
+  // ===== DOM =====
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    basePath: $("basePath"),
+    btnLoad: $("btnLoad"),
+    btnReload: $("btnReload"),
+    q: $("q"),
+    filterSeries: $("filterSeries"),
+    filterGenre: $("filterGenre"),
+    filterGender: $("filterGender"),
+    list: $("list"),
+    stat: $("stat"),
+    listHint: $("listHint"),
+
+    avatar: $("avatar"),
+    sw: $("sw"),
+    curId: $("curId"),
+    curFile: $("curFile"),
+    curNote: $("curNote"),
+
+    f_id: $("f_id"),
+    f_name: $("f_name"),
+    f_yomi: $("f_yomi"),
+    f_series: $("f_series"),
+    f_genre: $("f_genre"),
+    f_gender: $("f_gender"),
+    f_genderlabel: $("f_genderlabel"),
+    f_age: $("f_age"),
+    f_heightCm: $("f_heightCm"),
+    f_birthday: $("f_birthday"),
+    f_personality: $("f_personality"),
+    f_color: $("f_color"),
+    f_color_picker: $("f_color_picker"),
+    f_colorTag: $("f_colorTag"),
+    f_image: $("f_image"),
+    f_docUrl: $("f_docUrl"),
+    f_shareQuote: $("f_shareQuote"),
+
+    btnNew: $("btnNew"),
+    btnCopyOne: $("btnCopyOne"),
+    btnCopyMin: $("btnCopyMin"),
+    btnDownloadOne: $("btnDownloadOne"),
+    btnDownloadIndex: $("btnDownloadIndex"),
+    btnCopyListArray: $("btnCopyListArray"),
+
+    btnApply: $("btnApply"),
+    btnRevert: $("btnRevert"),
+    btnDelete: $("btnDelete"),
+    btnPasteJson: $("btnPasteJson"),
+    btnViewJson: $("btnViewJson"),
+    btnOpenDoc: $("btnOpenDoc"),
+    btnHelp: $("btnHelp"),
+
+    toast: $("toast")
+  };
+
+  // ===== Utils =====
+  const toast = (msg) => {
+    els.toast.textContent = msg;
+    els.toast.style.display = "block";
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => els.toast.style.display = "none", 1800);
+  };
+
+  const safeJsonFetch = async (url) => {
+    const res = await fetch(url, { cache: "no-store" });
+    if(!res.ok) throw new Error(`${url} 読めない（${res.status}）`);
+    return await res.json();
+  };
+
+  const esc = (s) => String(s ?? "");
+
+  const isEmpty = (v) => v === "" || v === null || v === undefined;
+
+  // 空項目を削る（ただし必須は残す）
+  const prune = (obj) => {
+    const out = {};
+    for(const [k,v] of Object.entries(obj)){
+      if(Array.isArray(v)){
+        if(v.length>0) out[k]=v;
+        continue;
+      }
+      if(typeof v === "object" && v && !(v instanceof Date)){
+        const pv = prune(v);
+        if(Object.keys(pv).length>0) out[k]=pv;
+        continue;
+      }
+      if(isEmpty(v)) continue;
+      out[k]=v;
+    }
+    // required (最低限)
+    const required = ["id","name","series","genre","gender"];
+    for(const k of required){
+      if(!(k in out)) out[k] = obj[k] ?? "";
+    }
+    return out;
+  };
+
+  const downloadText = (filename, text, mime="application/json") => {
+    const blob = new Blob([text], {type: mime});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  };
+
+  const writeClipboard = async (text) => {
+    await navigator.clipboard.writeText(text);
+  };
+
+  const parseIndexToMeta = (files) => {
+    // index.json の中身が ["garaku_001.json", ...] 前提
+    return files.map(file => ({
+      file,
+      id: "",
+      name: "",
+      yomi: "",
+      series: "",
+      genre: "",
+      gender: "",
+      loaded: null
+    }));
+  };
+
+  const normalizeFromObj = (obj) => ({
+    id: esc(obj.id),
+    name: esc(obj.name),
+    yomi: esc(obj.yomi),
+    series: esc(obj.series),
+    genre: esc(obj.genre),
+    gender: esc(obj.gender || "other"),
+    genderlabel: esc(obj.genderlabel),
+    age: (obj.age === null || obj.age === undefined || obj.age === "") ? null : Number(obj.age),
+    heightCm: (obj.heightCm === null || obj.heightCm === undefined || obj.heightCm === "") ? null : Number(obj.heightCm),
+    birthday: esc(obj.birthday),
+    personality: esc(obj.personality),
+    color: esc(obj.color),
+    colorTag: esc(obj.colorTag),
+    image: esc(obj.image),
+    docUrl: esc(obj.docUrl),
+    shareQuote: esc(obj.shareQuote),
+  });
+
+  const buildObjFromForm = () => {
+    const toNumOrNull = (s) => (s === "" ? null : Number(s));
+    return normalizeFromObj({
+      id: els.f_id.value.trim(),
+      name: els.f_name.value.trim(),
+      yomi: els.f_yomi.value.trim(),
+      series: els.f_series.value.trim(),
+      genre: els.f_genre.value.trim(),
+      gender: els.f_gender.value,
+      genderlabel: els.f_genderlabel.value.trim(),
+      age: toNumOrNull(els.f_age.value),
+      heightCm: toNumOrNull(els.f_heightCm.value),
+      birthday: els.f_birthday.value.trim(),
+      personality: els.f_personality.value,
+      color: els.f_color.value.trim(),
+      colorTag: els.f_colorTag.value.trim(),
+      image: els.f_image.value.trim(),
+      docUrl: els.f_docUrl.value.trim(),
+      shareQuote: els.f_shareQuote.value.trim(),
+    });
+  };
+
+  const fillForm = (obj, file=null) => {
+    state.selectedObj = obj ? normalizeFromObj(obj) : null;
+
+    const o = state.selectedObj || normalizeFromObj({
+      id:"", name:"", yomi:"", series:"", genre:"", gender:"other"
+    });
+
+    els.f_id.value = o.id;
+    els.f_name.value = o.name;
+    els.f_yomi.value = o.yomi;
+    els.f_series.value = o.series;
+    els.f_genre.value = o.genre;
+    els.f_gender.value = o.gender || "other";
+    els.f_genderlabel.value = o.genderlabel || "";
+    els.f_age.value = (o.age ?? "") === null ? "" : (o.age ?? "");
+    els.f_heightCm.value = (o.heightCm ?? "") === null ? "" : (o.heightCm ?? "");
+    els.f_birthday.value = o.birthday || "";
+    els.f_personality.value = o.personality || "";
+    els.f_color.value = o.color || "";
+    // pickerは空だと扱いづらいので、値があれば反映
+    if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(o.color||"")){
+      els.f_color_picker.value = o.color;
+    }
+    els.f_colorTag.value = o.colorTag || "";
+    els.f_image.value = o.image || "";
+    els.f_docUrl.value = o.docUrl || "";
+    els.f_shareQuote.value = o.shareQuote || "";
+
+    state.selectedFile = file;
+    state.dirty = false;
+
+    refreshPreview();
+  };
+
+  const refreshPreview = () => {
+    const o = buildObjFromForm();
+
+    els.curId.textContent = o.id || "-";
+    els.curFile.textContent = state.selectedFile || "(new)";
+    els.curNote.textContent = state.dirty ? "未保存の変更あり（一覧に反映してない）" : "OK";
+    els.sw.style.background = (o.color && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(o.color)) ? o.color : "transparent";
+
+    // image preview（basePathの1階層上に画像があるかもしれないので、パスはそのまま扱う）
+    els.avatar.innerHTML = "";
+    if(o.image){
+      const img = document.createElement("img");
+      // 画像パスは「キャラJSONから見た相対」を想定してる場合もあるから2通り試す
+      const try1 = `${state.basePath.replace(/\/+$/,"")}/../${o.image}`.replace(/\/\.\.\//g,"/../");
+      const try2 = o.image;
+      img.src = try1;
+      img.onerror = () => { img.src = try2; };
+      els.avatar.appendChild(img);
+    }else{
+      els.avatar.innerHTML = '<span class="small">No Image</span>';
+    }
+  };
+
+  const markDirty = () => { state.dirty = true; refreshPreview(); };
+
+  const renderFilters = () => {
+    const seriesSet = new Set();
+    const genreSet = new Set();
+    for(const m of state.meta){
+      if(m.series) seriesSet.add(m.series);
+      if(m.genre) genreSet.add(m.genre);
+    }
+    const keep = (sel, values) => {
+      const cur = sel.value;
+      sel.innerHTML = sel.id === "filterSeries" ? '<option value="">シリーズ全部</option>' :
+                      sel.id === "filterGenre" ? '<option value="">ジャンル全部</option>' :
+                      sel.innerHTML;
+      for(const v of Array.from(values).sort()){
+        const opt = document.createElement("option");
+        opt.value = v; opt.textContent = v;
+        sel.appendChild(opt);
+      }
+      sel.value = cur;
+    };
+    keep(els.filterSeries, seriesSet);
+    keep(els.filterGenre, genreSet);
+  };
+
+  const filteredMeta = () => {
+    const q = els.q.value.trim().toLowerCase();
+    const fs = els.filterSeries.value;
+    const fg = els.filterGenre.value;
+    const fsex = els.filterGender.value;
+
+    return state.meta.filter(m => {
+      if(fs && m.series !== fs) return false;
+      if(fg && m.genre !== fg) return false;
+      if(fsex && m.gender !== fsex) return false;
+      if(!q) return true;
+      const hay = `${m.id} ${m.name} ${m.yomi} ${m.series} ${m.genre} ${m.gender}`.toLowerCase();
+      return hay.includes(q);
+    });
+  };
+
+  const renderList = () => {
+    const items = filteredMeta();
+
+    els.list.innerHTML = "";
+    for(const m of items){
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.className = "itemBtn" + (m.file === state.selectedFile ? " active" : "");
+      btn.innerHTML = `
+        <div>
+          <div><b>${esc(m.name || "(未読)")}</b> <span class="tag mono">${esc(m.id || m.file)}</span></div>
+          <div class="tag">${esc(m.series || "")} / ${esc(m.genre || "")} / ${esc(m.gender || "")}</div>
+        </div>
+        <div class="tag mono">${esc(m.file)}</div>
+      `;
+      btn.onclick = async () => {
+        if(state.dirty){
+          if(!confirm("未保存の変更がある。選択切り替えで破棄する？")) return;
+        }
+        await selectFile(m.file);
+      };
+      li.appendChild(btn);
+      els.list.appendChild(li);
+    }
+
+    els.stat.textContent = `${items.length}/${state.meta.length} 件`;
+  };
+
+  const readAndCacheMetaOne = async (file) => {
+    const url = `${state.basePath.replace(/\/+$/,"")}/${file}`;
+    const obj = await safeJsonFetch(url);
+    const m = state.meta.find(x => x.file === file);
+    if(m){
+      m.loaded = obj;
+      m.id = esc(obj.id);
+      m.name = esc(obj.name);
+      m.yomi = esc(obj.yomi);
+      m.series = esc(obj.series);
+      m.genre = esc(obj.genre);
+      m.gender = esc(obj.gender);
+    }
+    return obj;
+  };
+
+  const selectFile = async (file) => {
+    const m = state.meta.find(x => x.file === file);
+    if(!m) return;
+
+    // まだ読んでなければ読む
+    const obj = m.loaded ? m.loaded : await readAndCacheMetaOne(file);
+    fillForm(obj, file);
+    renderFilters();
+    renderList();
+    toast(`${file} を開いた`);
+  };
+
+  const validateRequired = (obj) => {
+    const req = ["id","name","series","genre","gender"];
+    const missing = req.filter(k => !String(obj[k] ?? "").trim());
+    if(missing.length){
+      alert(`必須が空：${missing.join(", ")}`);
+      return false;
+    }
+    return true;
+  };
+
+  // ===== Actions =====
+  els.btnLoad.onclick = async () => {
+    try{
+      state.basePath = els.basePath.value.trim() || state.basePath;
+      const indexUrl = `${state.basePath.replace(/\/+$/,"")}/index.json`;
+      const files = await safeJsonFetch(indexUrl);
+      if(!Array.isArray(files)) throw new Error("index.json は配列じゃない");
+
+      state.indexList = files.slice();
+      state.meta = parseIndexToMeta(files);
+
+      // まずは一覧の見た目を作るため、軽く先頭だけ読む（全部読むと多い時に重いから）
+      const preload = state.meta.slice(0, Math.min(12, state.meta.length));
+      await Promise.allSettled(preload.map(m => readAndCacheMetaOne(m.file)));
+
+      renderFilters();
+      renderList();
+      els.listHint.textContent = `読み込み先: ${indexUrl}`;
+      toast("一覧ロード完了");
+
+      // 何も選ばれてなければ先頭を開く
+      if(state.meta.length && !state.selectedFile){
+        await selectFile(state.meta[0].file);
+      }
+    }catch(e){
+      console.error(e);
+      alert(String(e.message || e));
+    }
+  };
+
+  els.btnReload.onclick = () => location.reload();
+
+  // 検索/フィルタ
+  for(const el of [els.q, els.filterSeries, els.filterGenre, els.filterGender]){
+    el.oninput = renderList;
+    el.onchange = renderList;
+  }
+
+  // フォーム変更検知
+  [
+    "f_id","f_name","f_yomi","f_series","f_genre","f_gender","f_genderlabel",
+    "f_age","f_heightCm","f_birthday","f_personality","f_color","f_colorTag","f_image","f_docUrl","f_shareQuote"
+  ].forEach(k => {
+    els[k].addEventListener("input", markDirty);
+    els[k].addEventListener("change", markDirty);
+  });
+
+  els.f_color_picker.addEventListener("input", () => {
+    els.f_color.value = els.f_color_picker.value;
+    markDirty();
+  });
+
+  els.btnNew.onclick = () => {
+    if(state.dirty && !confirm("未保存の変更がある。破棄して新規作成する？")) return;
+    fillForm({
+      id:"", name:"", yomi:"", series:"未分類", genre:"不明", gender:"other",
+      genderlabel:"", age:null, heightCm:null, birthday:"",
+      personality:"", color:"", colorTag:"", image:"", docUrl:"", shareQuote:""
+    }, null);
+    renderList();
+    toast("新規キャラ");
+  };
+
+  els.btnApply.onclick = async () => {
+    const obj = buildObjFromForm();
+    if(!validateRequired(obj)) return;
+
+    // file名が無い（新規）の場合は id.json を推奨
+    let file = state.selectedFile;
+    if(!file){
+      file = `${obj.id}.json`;
+      // index重複チェック
+      if(state.meta.some(m => m.file === file)){
+        alert(`同名ファイルが既にある：${file}\nID変えるか、既存を選んで編集して。`);
+        return;
+      }
+      state.meta.unshift({file, id:obj.id, name:obj.name, yomi:obj.yomi, series:obj.series, genre:obj.genre, gender:obj.gender, loaded:obj});
+      state.selectedFile = file;
+    }else{
+      const m = state.meta.find(x => x.file === file);
+      if(m){
+        m.loaded = obj;
+        m.id = obj.id; m.name = obj.name; m.yomi = obj.yomi; m.series = obj.series; m.genre = obj.genre; m.gender = obj.gender;
+      }
+    }
+
+    state.dirty = false;
+    renderFilters();
+    renderList();
+    refreshPreview();
+    toast("一覧に反映した（DLして置き換え運用）");
+  };
+
+  els.btnRevert.onclick = async () => {
+    if(!state.selectedFile){
+      toast("新規は戻せない");
+      return;
+    }
+    if(state.dirty && !confirm("変更を破棄して、ファイルを再読込する？")) return;
+    const obj = await readAndCacheMetaOne(state.selectedFile);
+    fillForm(obj, state.selectedFile);
+    renderList();
+    toast("再読込した");
+  };
+
+  els.btnDelete.onclick = () => {
+    if(!state.selectedFile){
+      toast("新規は削除不要");
+      return;
+    }
+    if(!confirm(`一覧から削除する？\n${state.selectedFile}\n（ファイル自体はGitHub上に残る。置き換えは手動）`)) return;
+    state.meta = state.meta.filter(m => m.file !== state.selectedFile);
+    state.selectedFile = null;
+    fillForm(null, null);
+    renderFilters();
+    renderList();
+    toast("一覧から削除した");
+  };
+
+  const getCurrentForExport = (min=false) => {
+    const obj = buildObjFromForm();
+    if(!validateRequired(obj)) return null;
+    return min ? prune(obj) : obj;
+  };
+
+  els.btnCopyOne.onclick = async () => {
+    const obj = getCurrentForExport(false);
+    if(!obj) return;
+    await writeClipboard(JSON.stringify(obj, null, 2));
+    toast("JSONコピーした（整形）");
+  };
+
+  els.btnCopyMin.onclick = async () => {
+    const obj = getCurrentForExport(true);
+    if(!obj) return;
+    await writeClipboard(JSON.stringify(obj, null, 2));
+    toast("JSONコピーした（空項目省いた）");
+  };
+
+  els.btnDownloadOne.onclick = () => {
+    const obj = getCurrentForExport(true);
+    if(!obj) return;
+    const filename = (state.selectedFile || `${obj.id}.json`);
+    downloadText(filename, JSON.stringify(obj, null, 2));
+    toast(`${filename} をDL`);
+  };
+
+  els.btnDownloadIndex.onclick = () => {
+    const files = state.meta.map(m => m.file);
+    downloadText("index.json", JSON.stringify(files, null, 2));
+    toast("index.json をDL");
+  };
+
+  // 「一覧を配列形式でコピー（最小）」：ユーザーが例で貼ったやつ
+  els.btnCopyListArray.onclick = async () => {
+    // まだロードしてないキャラは未読なので、必要なら全部読む
+    const need = state.meta.filter(m => !m.loaded);
+    if(need.length){
+      if(confirm(`未読が${need.length}件ある。全部読んでから配列JSONを作る？（多いと少し重い）`)){
+        for(const m of need){
+          try{ await readAndCacheMetaOne(m.file); }
+          catch(e){ console.warn("skip", m.file, e); }
+        }
+      }
+    }
+
+    const arr = state.meta.map(m => {
+      const o = m.loaded || {};
+      // 配列版は最小キーだけ固定（不足してたら空）
+      return {
+        id: esc(o.id || m.id),
+        name: esc(o.name || m.name),
+        yomi: esc(o.yomi || m.yomi || "未登録"),
+        series: esc(o.series || m.series),
+        genre: esc(o.genre || m.genre),
+        gender: esc(o.gender || m.gender || "other")
+      };
+    });
+
+    await writeClipboard(JSON.stringify(arr, null, 2));
+    toast("配列JSONコピーした");
+  };
+
+  els.btnPasteJson.onclick = async () => {
+    const txt = prompt("JSONを貼れ（1キャラ分のオブジェクト）");
+    if(!txt) return;
+    try{
+      const obj = JSON.parse(txt);
+      fillForm(obj, state.selectedFile);
+      state.dirty = true;
+      refreshPreview();
+      toast("貼り付け反映（未保存）");
+    }catch(e){
+      alert("JSONとして読めなかった");
+    }
+  };
+
+  els.btnViewJson.onclick = () => {
+    const obj = buildObjFromForm();
+    alert(JSON.stringify(prune(obj), null, 2));
+  };
+
+  els.btnOpenDoc.onclick = () => {
+    const url = els.f_docUrl.value.trim();
+    if(!url) { toast("docUrlが空"); return; }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  els.btnHelp.onclick = () => {
+    alert(
+`使い方（重要）
+1) basePath に characters フォルダを指定 → 一覧ロード
+   例: ../MAGOCgacha/characters
+
+2) キャラを選んで編集 → 「一覧に反映」
+   ※ GitHub上のファイルは変わらない（ブラウザは上書き不可）
+
+3) 反映後、「選択キャラJSONをDL」で .json を落とす
+   → Gitで characters/ に置き換える
+
+4) 追加/削除したら「index.json をDL」も忘れず置き換え
+
+便利:
+- 「JSONコピー」：1キャラ分をそのまま貼れる
+- 「空項目省く」：未登録フィールドを消して軽くする
+- 「一覧を配列JSON」：質問に貼ってた最小配列形式を作る`
+    );
+  };
+
+  // 初期値
+  els.basePath.value = state.basePath;
+  fillForm(null, null);
+})();
+</script>
+</body>
+</html>
