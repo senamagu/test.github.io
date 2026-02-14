@@ -1637,6 +1637,7 @@
       }else{
         btnDoc.style.display = "none";
       }
+      if(setupActionsBar._sync) setupActionsBar._sync();
     }
 
     /**********************
@@ -1680,9 +1681,14 @@
         return;
       }
       
-      const actions = card.querySelector(".card-actions");
-      const prevDisplay = actions ? actions.style.display : "";
-      if(actions) actions.style.display = "none";
+      const actionsIn = card.querySelector(".card-actions");
+      const actionsBar = document.getElementById("actionsBar");
+
+      const prevIn  = actionsIn ? actionsIn.style.display : "";
+      const prevBar = actionsBar ? actionsBar.style.display : "";
+
+      if(actionsIn) actionsIn.style.display = "none";
+      if(actionsBar) actionsBar.style.display = "none";
       
       try{
         const canvas = await html2canvas(card, {backgroundColor:null, scale:2});
@@ -1694,7 +1700,8 @@
       }catch(e){
         toast("画像保存に失敗したよ！");
       }finally{
-        if(actions) actions.style.display = prevDisplay;
+        if(actionsIn) actionsIn.style.display = prevIn;
+        if(actionsBar) actionsBar.style.display = prevBar;
       }
     }
 
