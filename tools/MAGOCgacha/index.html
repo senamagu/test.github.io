@@ -35,6 +35,8 @@
       --fieldBg:#DDEDF1;
       --fieldText:#89AFB9;
       --placeholder:#BBD1D6;
+
+      --card-fit-w: 920;
     }
 
     *{ box-sizing:border-box; }
@@ -406,8 +408,8 @@
 
     /* hitlist はこの塊の下に置く */
     .filter-side .hitlist{
-      min-height: 100px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
-      max-height: none;
+      min-height: 80px; /* ここで“赤線の下”の高さ調整。増やしたければ 280 とか */
+      max-height: 80px;
     }
 
     /* multi select */
@@ -418,8 +420,19 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      flex-wrap: nowrap;
     }
     .multi-btn .value.placeholder{ color:var(--placeholder); }
+
+    /* multi の表示文字を1行固定 + … */
+    .multi-btn .value{
+      flex: 1 1 auto;
+      min-width: 0;              /* ←これ超重要。flex内の省略を効かせる */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
 
     .caret{
       width:0; height:0;
@@ -581,8 +594,8 @@
       border-radius:14px;
       padding:10px;
 
-      max-height: 100px;     /* ←消す/上書き */
-      min-height: 100px;     /* ←色パネル下まで届く目安（必要なら 230 とかに） */
+      max-height: 80px;     /* ←消す/上書き */
+      min-height: 80px;     /* ←色パネル下まで届く目安（必要なら 230 とかに） */
       overflow:auto;
     }
     .hitgrid{
@@ -775,6 +788,122 @@
 
 
     /* スマホレイアウト */
+/* 1) スマホ向け全体の余白調整 */
+@media (max-width: 600px){
+  header{ font-size:14px; padding:10px 12px 6px; }
+  .wrap{ width: min(980px, 94vw); padding-bottom: 18px; }
+
+  .hero{ padding-top:6px; }
+  .hero h1{ margin:14px 0 6px; }
+  .cta{ margin:16px 0 16px; }
+  .btn-gacha{ padding:14px 18px; border-radius:12px; }
+
+  .filters-head .label{ font-size:28px; }
+  .btn-reset{ font-size:16px; padding:8px 12px; border-width:2px; }
+
+  /* 絞り込みはスマホで縦積み */
+  .filters{
+    grid-template-columns: 1fr;
+    gap:12px;
+  }
+  .filter-side{
+    grid-column: auto;
+  }
+  .side-top{
+    grid-template-columns: 1fr; /* 色+トグルも縦積み */
+    gap:12px;
+  }
+  .color-box{ width: 100%; height: 160px; }
+  .toggles-row{ flex-direction:column; }
+  .hits{ justify-content:space-between; font-size:24px; }
+  .hitgrid{ grid-template-columns: 1fr 1fr; }
+  .hitname{ font-size:16px; }
+}
+
+/* 2) 結果カード：横並び固定 & “全体が見える” を最優先 */
+@media (max-width: 600px){
+  .result-area{ overflow:hidden; }
+
+  /* カード自体は横並びのまま */
+  .card{
+    display:flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 12px;
+
+    /* 縮小用：基準幅で作って、画面に合わせて scale する */
+    width: calc(var(--card-fit-w) * 1px);
+    transform-origin: top left;
+    transform: scale(calc((100vw - 24px) / (var(--card-fit-w) * 1px)));
+
+    /* 見た目 */
+    border-radius: 18px;
+    padding: 12px;
+
+    /* 縮小した分だけ下が詰まるので余白で救う（好みで調整） */
+    margin-bottom: 10px;
+  }
+
+  /* 縮小時にボタンが押しづらくなるので、位置を少し詰める */
+  .card-actions{
+    right: 10px;
+    top: 10px;
+    gap: 8px;
+  }
+  .doc-btn{
+    font-size: 14px;
+    padding: 7px 10px;
+    border-radius: 10px;
+  }
+  .icon-btn{
+    width: 40px;
+    height: 34px;
+  }
+  .icon-btn svg{ width: 24px; height: 24px; }
+
+  /* 左右の比率固定（横幅を%で保持） */
+  .left{
+    width: 42%;
+    min-width: 0; /* ←スマホで横幅を固定したいので min-width を殺す */
+    gap: 8px;
+  }
+  .right{
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  /* 文字がはみ出ても崩れない */
+  .series{
+    padding-right: 105px; /* ボタン避けを維持 */
+    text-overflow: ellipsis;
+  }
+  .name-main, .series{
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 情報欄の見え方 */
+  .kv{ grid-template-columns: 130px 1fr; }
+  .kv .k, .kv .v,
+  .personality .k, .personality .v{
+    font-size: 18px;
+  }
+}
+
+/* 3) さらに小さい端末（iPhone SE級） */
+@media (max-width: 380px){
+  :root{ --card-fit-w: 980; } /* 少し広め想定にして、さらに縮める */
+
+  .kv{ grid-template-columns: 120px 1fr; }
+  .kv .k, .kv .v,
+  .personality .k, .personality .v{
+    font-size: 17px;
+  }
+}
+
+    
   </style>
 </head>
 
