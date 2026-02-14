@@ -267,7 +267,7 @@
 
     /* 9 情報ボックス */
     .info{
-      background: rgba(255,255,255,.22); /* 画像の薄い面 */
+      background: #89AFB9; /* 画像の薄い面 */
       border-radius:18px;
       padding:14px 14px 12px;
       overflow:hidden;
@@ -297,7 +297,7 @@
     }
 
     .personality{
-      display:grid;
+      display:block;
       grid-template-columns: 150px 1fr;
       gap:8px 12px;
       align-items:start;
@@ -305,15 +305,16 @@
     .personality .k{
       color:var(--title);
       font-size:20px;
+      margin-bottom:8px;
     }
     .personality .v{
       color:var(--name);
       font-size:20px;
       line-height:1.35;
       white-space:pre-wrap;
-      display:-webkit-box;
+      display:block;
       -webkit-line-clamp:3;
-      -webkit-box-orient:vertical;
+      /* -webkit-box-orient:vertical; */
       overflow:hidden;
     }
 
@@ -901,121 +902,67 @@
   }
 }
 
-/* 3) さらに小さい端末（iPhone SE級） */
-@media (max-width: 380px){
-  :root{ --card-fit-w: 980; } /* 少し広め想定にして、さらに縮める */
-
-  .kv{ grid-template-columns: 120px 1fr; }
-  .kv .k, .kv .v,
-  .personality .k, .personality .v{
-    font-size: 17px;
-  }
-}
 /* =========================
-   Mobile: gap fix + actions outside (usable size)
+   Mobile Actions Bar (PC無影響)
    ========================= */
-
-@media (max-width: 600px){
-
-  /* --- (A) カードと絞り込み間の“デカ余白”を詰める --- */
-  .section-line{
-    margin: 10px 0;     /* 元: 18px 0 */
-  }
-  .result-area{
-    margin-top: 8px;    /* 元: 18px */
-  }
-  /* resultCard の下も詰める（次の section-line まで近づける） */
-  #resultCard{
-    margin-bottom: 6px;
-  }
-
-  /* --- (B) result card 構造：中身だけ縮小、ボタンは等倍 --- */
-  .card{
-    /* もう card 自体を scale しない */
-    width: auto;
-    transform: none;
-    padding: 0;
-    background: transparent; /* 外枠は透明にして“中身”に任せる */
-  }
-
-  /* カード中身（横並び固定・比率維持・全体表示） */
-  .card-inner{
-    background: var(--card);
-    border-radius: 18px;
-    padding: 12px;
-
-    display: flex;
-    gap: 12px;
-    align-items: stretch;
-    flex-wrap: nowrap;
-
-    /* ここだけ縮小する */
-    width: calc(var(--card-fit-w) * 1px);
-    transform-origin: top left;
-    transform: scale(calc((100vw - 24px) / (var(--card-fit-w) * 1px)));
-  }
-
-  /* 左右比率はそのまま */
-  .left{
-    width: 42%;
-    min-width: 0;
-    gap: 8px;
-  }
-  .right{
-    flex: 1 1 auto;
-    min-width: 0;
-    gap: 8px;
-    padding-top: 4px;
-  }
-
-  /* --- (C) ボタンをカード外（下）へ：等倍で押しやすく --- */
-  .card-actions{
-    position: static;               /* absolute解除 */
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 10px;               /* “カード外の下” */
-    padding: 0 2px;
-  }
-
-  /* --- (D) “反転”＆視認性：資料・共有を同じ見た目に --- */
-  .doc-btn,
-  .icon-btn{
-    background: var(--btn);         /* 緑 */
-    color: var(--bg);               /* 白系 */
-    border: none;
-    border-radius: 12px;
-    min-height: 44px;
-    padding: 10px 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  /* 共有アイコンも白で見えるように */
-  .icon-btn{
-    width: auto;                    /* 元の固定幅解除 */
-    height: auto;
-    padding: 10px 14px;
-  }
-  .icon-btn svg{ width: 22px; height: 22px; }
-  .icon-btn svg g{ stroke: var(--bg) !important; }
-
-  /* タップ感 */
-  .doc-btn:active,
-  .icon-btn:active{ transform: translateY(1px); }
-
-  /* 右上ボタン避けの padding は不要になる（中身側の series を戻す） */
-  .series{
-    padding-right: 0;
-  }
+.actions-bar{
+  display:none;           /* PCは出さない */
+  gap:10px;
+  justify-content:flex-end;
+  margin-top:10px;
 }
 
-/* さらに小さい端末の微調整（任意） */
-@media (max-width: 380px){
-  .card-actions{ gap: 8px; }
-  .doc-btn,.icon-btn{ padding: 10px 12px; }
+/* スマホ：カードと絞り込みの間隔を詰める */
+@media (max-width: 600px){
+  .section-line{ margin:10px 0; }
+  .result-area{ margin-top:8px; }
+  #resultCard{ margin-bottom:6px; }
+
+  /* スマホ時はカード内の右上ボタンを隠す（JSで外に出す） */
+  .card-actions{ display:none !important; }
+
+  /* 外側のボタンバーを出す */
+  .actions-bar{
+    display:flex;
+    padding:0 2px;
+  }
+
+  /* 資料ボタン：反転（緑背景＋白文字） */
+  .actions-bar .doc-btn{
+    background: var(--btn);
+    color: var(--bg);
+    border:none;
+    border-radius:12px;
+    min-height:44px;
+    padding:10px 14px;
+    font-size:16px;
+    line-height:1;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* 共有ボタンも資料と同じ見た目に（＝“ボタン化”） */
+  .actions-bar .icon-btn{
+    width:auto;
+    height:auto;
+    background: var(--btn);
+    border:none;
+    border-radius:12px;
+    min-height:44px;
+    padding:10px 14px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .actions-bar .icon-btn svg{ width:22px; height:22px; }
+
+  /* アイコン線も白にする */
+  .actions-bar .icon-btn svg g{ stroke: var(--bg) !important; }
+
+  /* 押し心地 */
+  .actions-bar .doc-btn:active,
+  .actions-bar .icon-btn:active{ transform: translateY(1px); }
 }
     
   </style>
@@ -1055,7 +1002,8 @@
           </button>
         </div>
 
-      <div class="card-inner">
+        <div class="actions-bar" id="actionsBar"></div>
+
         <!-- left -->
         <div class="left">
           <div class="imgbox" id="imgBox">
@@ -1075,6 +1023,7 @@
 
           <div class="info">
             <div class="kv" id="kvArea"></div>
+            <div class="info-divider"></div>
 
             <div class="personality">
               <div class="k">性格</div>
@@ -1084,7 +1033,6 @@
         </div>
       </div>
     </div>
-  </div>
   
 
     <div class="section-line"></div>
@@ -1852,6 +1800,43 @@
       $("#btnSaveShareImg").addEventListener("click", saveCardImage);
     }
 
+    function setupActionsBar(){
+  const bar = document.getElementById("actionsBar");
+  const card = document.getElementById("resultCard");
+  const inside = card ? card.querySelector(".card-actions") : null;
+  if(!bar || !inside) return;
+
+  const mq = window.matchMedia("(max-width: 600px)");
+
+  const sync = ()=>{
+    // resultCardが非表示の時はバーも隠す
+    const cardVisible = card.style.display !== "none";
+    bar.style.display = (mq.matches && cardVisible) ? "flex" : "none";
+
+    // スマホ：外へ移動
+    if(mq.matches){
+      // btnDoc と btnShare を bar に移す（同じDOMを移動する）
+      const btnDoc = document.getElementById("btnDoc");
+      const btnShare = document.getElementById("btnShare");
+      if(btnDoc && btnDoc.parentElement !== bar) bar.appendChild(btnDoc);
+      if(btnShare && btnShare.parentElement !== bar) bar.appendChild(btnShare);
+    }else{
+      // PC：元へ戻す
+      const btnDoc = document.getElementById("btnDoc");
+      const btnShare = document.getElementById("btnShare");
+      if(btnDoc && btnDoc.parentElement !== inside) inside.appendChild(btnDoc);
+      if(btnShare && btnShare.parentElement !== inside) inside.appendChild(btnShare);
+    }
+  };
+
+  mq.addEventListener?.("change", sync);
+  window.addEventListener("resize", sync);
+  sync();
+
+  // ガチャで表示切り替わるので、renderResult後にも追随させたい
+  setupActionsBar._sync = sync;
+}
+    
     function init(){
       updateCounts();
       setupMulti();
@@ -1859,6 +1844,7 @@
       setToggle($("#dotHasDoc"), state.hasDocOnly);
       applyFilters();
       wireInputs();
+      setupActionsBar();
     }
     
     (async ()=>{  
