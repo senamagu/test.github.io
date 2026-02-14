@@ -12,10 +12,8 @@
       --radius: 14px;
     }
     *{ box-sizing:border-box; }
-    body{
-      margin:0; background:linear-gradient(180deg,#0f1115,#0b0e13);
-      color:var(--text); font-family:system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;
-    }
+    body{ margin:0; background:linear-gradient(180deg,#0f1115,#0b0e13); color:var(--text);
+      font-family:system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif; }
     header{
       position:sticky; top:0; z-index:50;
       background:rgba(15,17,21,.92); backdrop-filter: blur(10px);
@@ -26,19 +24,11 @@
     .leftHeader{ display:flex; gap:10px; align-items:center; flex:1; min-width:0; }
     .rightHeader{ display:flex; gap:10px; align-items:center; }
     .brand{ font-weight:800; letter-spacing:.3px; opacity:.9; white-space:nowrap; }
-    .pill{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px; border:1px solid var(--line); border-radius:999px;
-      background:rgba(255,255,255,.03); color:var(--muted); font-size:12px;
-    }
+    .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid var(--line);
+      border-radius:999px; background:rgba(255,255,255,.03); color:var(--muted); font-size:12px; }
     input[type="text"], input[type="url"], input[type="number"], select, textarea{
-      width:100%;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px 12px;
-      color:var(--text);
-      outline:none;
+      width:100%; background:rgba(255,255,255,.04); border:1px solid var(--line);
+      border-radius:12px; padding:10px 12px; color:var(--text); outline:none;
     }
     textarea{ min-height:120px; resize:vertical; }
     input:focus, select:focus, textarea:focus{ border-color:rgba(122,162,255,.7); box-shadow:0 0 0 3px rgba(122,162,255,.15); }
@@ -56,155 +46,56 @@
     .ok:hover{ background:rgba(71,209,140,.14); }
     .warn{ border-color:rgba(245,179,41,.55); background:rgba(245,179,41,.10); }
     .warn:hover{ background:rgba(245,179,41,.14); }
-    .iconBtn{
-      display:inline-flex; align-items:center; justify-content:center;
-      width:38px; height:38px; padding:0; border-radius:12px;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 440px minmax(320px, 1fr);
-      gap:12px;
-      padding:12px;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-    .panel{
-      background:rgba(23,26,33,.70);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .panelHead{
-      padding:12px;
-      border-bottom:1px solid var(--line);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      background:rgba(19,26,36,.55);
-    }
+    .iconBtn{ display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; padding:0; border-radius:12px; }
+    .grid{ display:grid; grid-template-columns: 440px minmax(320px, 1fr); gap:12px; padding:12px; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+    .panel{ background:rgba(23,26,33,.70); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+    .panelHead{ padding:12px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:10px; background:rgba(19,26,36,.55); }
     .panelHead .title{ font-weight:900; letter-spacing:.2px; }
     .panelBody{ padding:12px; }
-    .split{
-      display:grid; grid-template-rows: auto 1fr;
-      min-height: calc(100vh - 74px);
-    }
-
-    /* left side */
+    .split{ display:grid; grid-template-rows: auto 1fr; min-height: calc(100vh - 74px); }
     .leftCols{ display:grid; grid-template-columns: 1fr; gap:12px; }
-    .list{
-      display:flex; flex-direction:column; gap:10px;
-      max-height: 240px; overflow:auto;
-      padding-right:6px;
-    }
+    .list{ display:flex; flex-direction:column; gap:10px; max-height: 240px; overflow:auto; padding-right:6px; }
     .list.big{ max-height: calc(100vh - 470px); min-height: 220px; }
-    .itemBtn{
-      text-align:left;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      padding:10px 12px;
-      border-radius:14px;
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-    }
+    .itemBtn{ text-align:left; border:1px solid var(--line); background:rgba(255,255,255,.03);
+      padding:10px 12px; border-radius:14px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
     .itemBtn.active{ border-color:rgba(122,162,255,.7); background:rgba(122,162,255,.10); }
     .itemMeta{ color:var(--muted); font-size:12px; margin-top:3px; }
     .row{ display:flex; gap:10px; align-items:center; }
     .row > *{ flex:1; }
     .mini{ font-size:12px; color:var(--muted); }
     .hr{ height:1px; background:var(--line); margin:12px 0; opacity:.8; }
-    .sortbar{
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
-    }
+    .sortbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
     .sortbar select{ width:auto; min-width:180px; }
-    .charCard{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      border-radius:16px;
-      padding:10px 12px;
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap:10px;
-      align-items:start;
-    }
+    .charCard{ border:1px solid var(--line); background:rgba(255,255,255,.03); border-radius:16px; padding:10px 12px;
+      display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:start; }
     .charCard.active{ border-color:rgba(122,162,255,.7); background:rgba(122,162,255,.10); }
-    .charName{
-      font-size:18px; font-weight:1000; letter-spacing:.2px;
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-    }
-    .idTag{
-      font-size:12px; font-weight:800; color:var(--muted);
-      border:1px solid var(--line); padding:4px 8px; border-radius:999px;
-      background:rgba(0,0,0,.18);
-    }
-    .metaGrid{
-      display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;
-    }
-    .chip{
-      font-size:12px; color:var(--muted);
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:4px 8px;
-      background:rgba(0,0,0,.14);
-    }
+    .charName{ font-size:18px; font-weight:1000; letter-spacing:.2px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .idTag{ font-size:12px; font-weight:800; color:var(--muted); border:1px solid var(--line); padding:4px 8px; border-radius:999px; background:rgba(0,0,0,.18); }
+    .metaGrid{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .chip{ font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:4px 8px; background:rgba(0,0,0,.14); }
     .cardActions{ display:flex; gap:8px; }
-    .toast{
-      position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
-      background:rgba(23,26,33,.92); border:1px solid var(--line);
-      border-radius:999px; padding:10px 14px; font-weight:800;
-      box-shadow:var(--shadow); display:none; z-index:200;
-    }
-
-    /* editor */
-    .formGrid{
-      display:grid; grid-template-columns: 1fr 1fr; gap:10px;
-    }
-    @media (max-width: 980px){
-      .formGrid{ grid-template-columns: 1fr; }
-    }
+    .toast{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+      background:rgba(23,26,33,.92); border:1px solid var(--line); border-radius:999px; padding:10px 14px; font-weight:800;
+      box-shadow:var(--shadow); display:none; z-index:200; }
+    .formGrid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    @media (max-width: 980px){ .formGrid{ grid-template-columns: 1fr; } }
     label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
     .field{ display:flex; flex-direction:column; gap:6px; }
     .imgRow{ display:grid; grid-template-columns: 1fr 120px; gap:10px; align-items:start; }
-    .imgPreview{
-      width:120px; height:120px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.25);
-      display:flex; align-items:center; justify-content:center;
-      overflow:hidden;
-    }
+    .imgPreview{ width:120px; height:120px; border-radius:14px; border:1px solid var(--line);
+      background:rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; overflow:hidden; }
     .imgPreview img{ max-width:100%; max-height:100%; display:block; }
     .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:12px; }
-    .bottomCopy{
-      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
-    }
-    @media (max-width: 980px){
-      .bottomCopy{ grid-template-columns: 1fr; }
-    }
-    .hint{
-      border-left:3px solid rgba(245,179,41,.75);
-      padding:10px 12px;
-      background:rgba(245,179,41,.08);
-      border-radius:12px;
-      color:var(--text);
-      font-size:13px;
-    }
+    .bottomCopy{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    @media (max-width: 980px){ .bottomCopy{ grid-template-columns: 1fr; } }
+    .hint{ border-left:3px solid rgba(245,179,41,.75); padding:10px 12px; background:rgba(245,179,41,.08); border-radius:12px; color:var(--text); font-size:13px; }
     .smallBtns{ display:flex; gap:8px; flex-wrap:wrap; }
-    .badge{
-      display:inline-flex; align-items:center; gap:6px;
-      font-size:12px; font-weight:800; color:var(--muted);
-    }
+    .badge{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color:var(--muted); }
     .dot{ width:8px; height:8px; border-radius:999px; background:var(--muted); display:inline-block; }
-    .dot.ok{ background:var(--ok); }
     .dot.warn{ background:var(--warn); }
-    dialog{
-      width:min(860px, 96vw);
-      border:none;
-      border-radius:16px;
-      padding:0;
-      background:rgba(23,26,33,.96);
-      color:var(--text);
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-    }
+    dialog{ width:min(860px, 96vw); border:none; border-radius:16px; padding:0; background:rgba(23,26,33,.96);
+      color:var(--text); border:1px solid var(--line); box-shadow:var(--shadow); }
     dialog::backdrop{ background:rgba(0,0,0,.55); backdrop-filter: blur(2px); }
     .dlgHead{ padding:12px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
     .dlgBody{ padding:12px; }
@@ -213,6 +104,7 @@
     .tab.active{ border-color:rgba(122,162,255,.7); background:rgba(122,162,255,.12); }
     .twoCols{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
     @media (max-width: 980px){ .twoCols{ grid-template-columns: 1fr; } }
+    .errBox{ border-left:3px solid rgba(255,91,91,.85); background:rgba(255,91,91,.08); padding:10px 12px; border-radius:12px; display:none; }
   </style>
 </head>
 <body>
@@ -223,13 +115,12 @@
     <div class="pill" id="statusPill">未読込</div>
   </div>
   <div class="rightHeader">
-    <button class="warn" id="btnReloadRemote" title="MAGOCgacha側の最新を読み直してローカル差分を上書き">公式データ再読込</button>
+    <button class="warn" id="btnReloadRemote">公式データ再読込</button>
     <button class="primary" id="btnAdd">新規キャラ追加</button>
   </div>
 </header>
 
 <div class="grid">
-  <!-- LEFT -->
   <section class="panel split">
     <div class="panelHead">
       <div>
@@ -243,22 +134,21 @@
       <div class="panel" style="background:rgba(0,0,0,.0); border:0; box-shadow:none;">
         <div class="row">
           <button id="btnLoad" class="ok">index.json 読込</button>
-          <button id="btnClearDraft" class="danger" title="ローカル保存（途中復帰）を全消し">ローカル消去</button>
+          <button id="btnClearDraft" class="danger">ローカル消去</button>
         </div>
         <div class="hint" style="margin-top:10px;">
-          ※ Web上のJSだけではリポジトリのJSONを直接更新できない。<br>
-          ここで編集 → <b>カテゴリJSONを書き出し / コピー</b> → 手動で差し替え、が確実ルートだ。
+          ※ GitHub Pages上のJSだけじゃリポジトリのJSONは直接更新できない。<br>
+          編集 → <b>カテゴリJSONを書き出し / コピー</b> → 手動で差し替え、が確実ルート。
         </div>
+        <div class="errBox" id="errBox"><b>エラー：</b><span id="errText"></span></div>
       </div>
 
       <div class="panel">
         <div class="panelHead">
           <div class="title">子json一覧</div>
-          <div class="mini kbd" id="childPathHint">../MAGOCgacha/characters/</div>
+          <div class="mini kbd" id="childPathHint"></div>
         </div>
-        <div class="panelBody">
-          <div class="list" id="childList"></div>
-        </div>
+        <div class="panelBody"><div class="list" id="childList"></div></div>
       </div>
 
       <div class="panel">
@@ -281,14 +171,11 @@
             </select>
           </div>
         </div>
-        <div class="panelBody">
-          <div class="list big" id="charList"></div>
-        </div>
+        <div class="panelBody"><div class="list big" id="charList"></div></div>
       </div>
     </div>
   </section>
 
-  <!-- RIGHT -->
   <section class="panel split">
     <div class="panelHead">
       <div>
@@ -296,9 +183,9 @@
         <div class="mini" id="editTitle">キャラ未選択</div>
       </div>
       <div class="smallBtns">
-        <button id="btnApply" class="ok" title="ツール内の一覧へ反映＋ローカル保存（途中復帰）">反映</button>
-        <button id="btnReloadChar" class="warn" title="選択キャラを最後の反映状態に戻す">選択キャラを再読込</button>
-        <button id="btnDeleteChar" class="danger" title="選択キャラを削除（ツール内＋ローカル）">削除</button>
+        <button id="btnApply" class="ok">反映</button>
+        <button id="btnReloadChar" class="warn">選択キャラを再読込</button>
+        <button id="btnDeleteChar" class="danger">削除</button>
       </div>
     </div>
 
@@ -310,17 +197,10 @@
           <div class="field">
             <label>id（自動採番：{子}_{001}）</label>
             <input id="f_id" type="text" disabled />
-            <div class="mini">※ 反映/書き出し時にカテゴリ内を上から連番に揃える。</div>
+            <div class="mini">※ 書き出し時にカテゴリ内を上から連番に揃える。</div>
           </div>
-          <div class="field">
-            <label>name</label>
-            <input id="f_name" type="text" />
-          </div>
-
-          <div class="field">
-            <label>yomi</label>
-            <input id="f_yomi" type="text" />
-          </div>
+          <div class="field"><label>name</label><input id="f_name" type="text" /></div>
+          <div class="field"><label>yomi</label><input id="f_yomi" type="text" /></div>
 
           <div class="field">
             <label>series（既存から選択 / 手入力）</label>
@@ -355,20 +235,9 @@
             <div class="mini">genderがotherの時だけ使う。female/maleなら空推奨。</div>
           </div>
 
-          <div class="field">
-            <label>age</label>
-            <input id="f_age" type="number" step="1" placeholder="未登録なら空" />
-          </div>
-
-          <div class="field">
-            <label>heightCm</label>
-            <input id="f_height" type="number" step="1" placeholder="未登録なら空" />
-          </div>
-
-          <div class="field">
-            <label>birthday</label>
-            <input id="f_birthday" type="text" placeholder="11/11 / 不明 / 空など" />
-          </div>
+          <div class="field"><label>age</label><input id="f_age" type="number" step="1" placeholder="未登録なら空" /></div>
+          <div class="field"><label>heightCm</label><input id="f_height" type="number" step="1" placeholder="未登録なら空" /></div>
+          <div class="field"><label>birthday</label><input id="f_birthday" type="text" placeholder="11/11 / 不明 / 空など" /></div>
 
           <div class="field">
             <label>color（#RRGGBB）</label>
@@ -380,7 +249,7 @@
 
           <div class="field" style="grid-column:1/-1;">
             <label>personality（改行OK → JSONでは \\n）</label>
-            <textarea id="f_personality" placeholder="改行して書け。反映/書き出しでちゃんと \\n にして保存する。"></textarea>
+            <textarea id="f_personality" placeholder="改行して書け。反映/書き出しでちゃんと \\n になる。"></textarea>
           </div>
 
           <div class="field" style="grid-column:1/-1;">
@@ -388,21 +257,14 @@
             <div class="imgRow">
               <div>
                 <select id="f_imageSel"></select>
-                <div class="mini">保存される値：<span class="kbd" id="imgSavedVal">images/xxx.png</span></div>
+                <div class="mini">保存される値：<span class="kbd" id="imgSavedVal"></span></div>
               </div>
               <div class="imgPreview" id="imgPreview"><span class="mini">no image</span></div>
             </div>
           </div>
 
-          <div class="field">
-            <label>docUrl</label>
-            <input id="f_docUrl" type="url" placeholder="https://..." />
-          </div>
-
-          <div class="field">
-            <label>shareQuote</label>
-            <input id="f_shareQuote" type="text" placeholder="一言" />
-          </div>
+          <div class="field"><label>docUrl</label><input id="f_docUrl" type="url" placeholder="https://..." /></div>
+          <div class="field"><label>shareQuote</label><input id="f_shareQuote" type="text" placeholder="一言" /></div>
         </div>
 
         <div class="hr"></div>
@@ -425,9 +287,7 @@
           <div class="panel" style="background:rgba(0,0,0,0); box-shadow:none;">
             <div class="panelHead">
               <div class="title">キャラのJSONコピー</div>
-              <div class="smallBtns">
-                <button class="primary" id="btnCopyChar">コピー</button>
-              </div>
+              <div class="smallBtns"><button class="primary" id="btnCopyChar">コピー</button></div>
             </div>
             <div class="panelBody">
               <textarea id="taChar" class="kbd" readonly></textarea>
@@ -442,20 +302,17 @@
           <button class="warn" id="btnDownloadIndex">index.json 書き出し（子一覧）</button>
           <button class="primary" id="btnCopyIndex">index.json コピー（子一覧）</button>
         </div>
-        <div class="mini" style="margin-top:8px;">
-          ※ 子jsonの増減は index.json を書き換え。ツールはそこだけ参照する。
-        </div>
       </div>
     </div>
   </section>
 </div>
 
-<div class="toast" id="toast">コピーした</div>
+<div class="toast" id="toast">OK</div>
 
 <dialog id="dlgAdd">
   <div class="dlgHead">
     <div style="font-weight:1000;">新規キャラ追加</div>
-    <button class="iconBtn" id="btnCloseAdd" title="閉じる">✕</button>
+    <button class="iconBtn" id="btnCloseAdd">✕</button>
   </div>
   <div class="dlgBody">
     <div class="tabs">
@@ -468,16 +325,12 @@
         <div>
           <div class="mini" style="margin-bottom:8px;">キャラ1人分のJSONを貼れ（オブジェクト）。配列でも先頭1件だけ拾う。</div>
           <textarea id="taPaste" class="kbd" placeholder='{"name":"名無し","series":"未分類","genre":"不明","gender":"other"}'></textarea>
-          <div class="smallBtns" style="margin-top:10px;">
-            <button class="ok" id="btnAddFromPaste">追加</button>
-          </div>
+          <div class="smallBtns" style="margin-top:10px;"><button class="ok" id="btnAddFromPaste">追加</button></div>
         </div>
         <div>
           <div class="hint">
-            貼り付け追加のルール：<br>
-            ・series / genre / colorTag は空でもOK<br>
             ・genderがfemale/male以外なら other 扱い<br>
-            ・idはカテゴリ反映時に自動採番になる（上書き）<br>
+            ・idは書き出し時に自動採番（貼ったidは無視）<br>
             ・imageは "images/xxx.png" 推奨
           </div>
         </div>
@@ -487,17 +340,13 @@
     <div id="tab_fromChild" style="display:none;">
       <div class="twoCols">
         <div>
-          <div class="mini" style="margin-bottom:8px;">追加先の子jsonを選べ。seriesはその子json先頭キャラのseriesを自動で入れる（無ければ子名）。</div>
+          <div class="mini" style="margin-bottom:8px;">追加先の子jsonを選べ。seriesは先頭キャラのseries（無ければ子名）。</div>
           <select id="selAddChild"></select>
-          <div class="smallBtns" style="margin-top:10px;">
-            <button class="ok" id="btnAddBlank">空キャラを追加</button>
-          </div>
+          <div class="smallBtns" style="margin-top:10px;"><button class="ok" id="btnAddBlank">空キャラを追加</button></div>
         </div>
         <div>
           <div class="hint">
-            「空キャラ」は最低限の形で追加する：<br>
-            name: "新規キャラ" / gender: other / series: 自動 / genre: "不明"<br>
-            あとは右側で編集して反映。
+            空キャラ：name「新規キャラ」/ gender other / genre 不明 / series 自動
           </div>
         </div>
       </div>
@@ -507,272 +356,194 @@
 
 <script>
 (() => {
-  // ========= Paths =========
+  // ===== Paths（OCJSONCopy と MAGOCgacha は tools 配下で兄弟フォルダ想定）=====
   const BASE = "../MAGOCgacha/";
   const CHAR_DIR = BASE + "characters/";
   const IMG_DIR  = BASE + "images/";
   const INDEX_PATH = CHAR_DIR + "index.json";
   const IMG_INDEX_PATH = IMG_DIR + "index.json";
 
-  // ========= State =========
-  let childFiles = [];         // ["garaku.json", ...]
-  let childData = new Map();   // file -> { remote:[], draft:[], loadedAt:number }
-  let images = [];             // ["a.png", ...]
+  // ===== State =====
+  let childFiles = [];
+  let childData = new Map(); // file -> { remote:[], draft:[], loadedAt }
+  let images = [];
   let selectedChild = "";
   let selectedCharIdx = -1;
-  let selectedCharSnapshot = null; // for reload single char
+  let selectedCharSnapshot = null;
   let sortMode = "order";
   let sortDir = "asc";
   let searchText = "";
 
-  // ========= DOM =========
-  const $ = (id) => document.getElementById(id);
-
+  // ===== DOM =====
+  const $ = (id)=>document.getElementById(id);
   const statusPill = $("statusPill");
   const draftBadge = $("draftBadge");
   const childList = $("childList");
-  const charList  = $("charList");
+  const charList = $("charList");
   const search = $("search");
   const sortModeSel = $("sortMode");
   const sortDirSel = $("sortDir");
-
   const noSel = $("noSel");
   const editor = $("editor");
   const editTitle = $("editTitle");
-
   const taCategory = $("taCategory");
   const taChar = $("taChar");
-
   const toast = $("toast");
+  const errBox = $("errBox");
+  const errText = $("errText");
+  $("childPathHint").textContent = CHAR_DIR;
 
-  // fields
-  const f_id = $("f_id");
-  const f_name = $("f_name");
-  const f_yomi = $("f_yomi");
-  const f_series = $("f_series");
-  const f_genre = $("f_genre");
-  const f_colorTag = $("f_colorTag");
-  const f_gender = $("f_gender");
-  const f_genderlabel = $("f_genderlabel");
-  const f_age = $("f_age");
-  const f_height = $("f_height");
-  const f_birthday = $("f_birthday");
-  const f_personality = $("f_personality");
-  const f_color = $("f_color");
-  const f_colorPick = $("f_colorPick");
-  const f_imageSel = $("f_imageSel");
-  const imgPreview = $("imgPreview");
-  const imgSavedVal = $("imgSavedVal");
-  const f_docUrl = $("f_docUrl");
-  const f_shareQuote = $("f_shareQuote");
+  // Fields
+  const f_id=$("f_id"), f_name=$("f_name"), f_yomi=$("f_yomi"), f_series=$("f_series"),
+        f_genre=$("f_genre"), f_colorTag=$("f_colorTag"), f_gender=$("f_gender"),
+        f_genderlabel=$("f_genderlabel"), f_age=$("f_age"), f_height=$("f_height"),
+        f_birthday=$("f_birthday"), f_personality=$("f_personality"),
+        f_color=$("f_color"), f_colorPick=$("f_colorPick"),
+        f_imageSel=$("f_imageSel"), imgPreview=$("imgPreview"),
+        imgSavedVal=$("imgSavedVal"), f_docUrl=$("f_docUrl"), f_shareQuote=$("f_shareQuote");
 
-  // add dialog
-  const dlgAdd = $("dlgAdd");
-  const btnAdd = $("btnAdd");
-  const btnCloseAdd = $("btnCloseAdd");
-  const tabs = dlgAdd.querySelectorAll(".tab");
-  const tabPaste = $("tab_paste");
-  const tabFromChild = $("tab_fromChild");
-  const taPaste = $("taPaste");
-  const btnAddFromPaste = $("btnAddFromPaste");
-  const selAddChild = $("selAddChild");
-  const btnAddBlank = $("btnAddBlank");
+  // Dialog add
+  const dlgAdd=$("dlgAdd"), btnAdd=$("btnAdd"), btnCloseAdd=$("btnCloseAdd"),
+        tabs=dlgAdd.querySelectorAll(".tab"), tabPaste=$("tab_paste"), tabFromChild=$("tab_fromChild"),
+        taPaste=$("taPaste"), btnAddFromPaste=$("btnAddFromPaste"),
+        selAddChild=$("selAddChild"), btnAddBlank=$("btnAddBlank");
 
-  // buttons
-  const btnLoad = $("btnLoad");
-  const btnReloadRemote = $("btnReloadRemote");
-  const btnClearDraft = $("btnClearDraft");
-  const btnApply = $("btnApply");
-  const btnReloadChar = $("btnReloadChar");
-  const btnDeleteChar = $("btnDeleteChar");
+  // Buttons
+  const btnLoad=$("btnLoad"), btnReloadRemote=$("btnReloadRemote"), btnClearDraft=$("btnClearDraft");
+  const btnApply=$("btnApply"), btnReloadChar=$("btnReloadChar"), btnDeleteChar=$("btnDeleteChar");
+  const btnCopyCategory=$("btnCopyCategory"), btnDownloadCategory=$("btnDownloadCategory");
+  const btnCopyChar=$("btnCopyChar"), btnDownloadIndex=$("btnDownloadIndex"), btnCopyIndex=$("btnCopyIndex");
 
-  const btnCopyCategory = $("btnCopyCategory");
-  const btnDownloadCategory = $("btnDownloadCategory");
-  const btnCopyChar = $("btnCopyChar");
-  const btnDownloadIndex = $("btnDownloadIndex");
-  const btnCopyIndex = $("btnCopyIndex");
-
-  // ========= Utils =========
-  const sleep = (ms)=> new Promise(r=>setTimeout(r,ms));
-
+  // ===== Utils =====
   function showToast(msg="OK"){
     toast.textContent = msg;
     toast.style.display = "block";
     clearTimeout(showToast._t);
     showToast._t = setTimeout(()=> toast.style.display="none", 1100);
   }
-
   async function copyText(text){
-    try{
-      await navigator.clipboard.writeText(text);
-      showToast("コピーした");
-    }catch(e){
-      // fallback
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      ta.remove();
-      showToast("コピーした");
+    try{ await navigator.clipboard.writeText(text); showToast("コピーした"); }
+    catch{
+      const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy"); ta.remove(); showToast("コピーした");
     }
   }
-
-  function baseName(file){
-    return file.replace(/\.json$/i,"");
+  function setStatus(t){ statusPill.textContent=t; }
+  function setErr(msg){
+    if(!msg){ errBox.style.display="none"; errText.textContent=""; return; }
+    errBox.style.display="block"; errText.textContent=msg;
   }
-
-  function pad3(n){
-    const s = String(n);
-    return s.length>=3? s : ("000"+s).slice(-3);
-  }
-
-  function normalizeGender(g){
-    if(g==="male"||g==="female"||g==="other") return g;
-    return "other";
-  }
-
-  function safeNum(v){
-    if(v===null || v===undefined || v==="") return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
-
+  function baseName(file){ return file.replace(/\.json$/i,""); }
+  function pad3(n){ const s=String(n); return s.length>=3?s:("000"+s).slice(-3); }
+  function computeId(childFile, idx1){ return `${baseName(childFile)}_${pad3(idx1)}`; }
   function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-
-  function prettyJson(obj){
-    return JSON.stringify(obj, null, 2);
+  function prettyJson(o){ return JSON.stringify(o,null,2); }
+  function toLF(s){ return (s??"").replace(/\r\n/g,"\n").replace(/\r/g,"\n"); }
+  function normalizeGender(g){ return (g==="male"||g==="female"||g==="other")?g:"other"; }
+  function safeNum(v){
+    if(v===null||v===undefined||v==="") return null;
+    const n=Number(v); return Number.isFinite(n)?n:null;
   }
-
-  function toLF(s){
-    return (s ?? "").replace(/\r\n/g,"\n").replace(/\r/g,"\n");
-  }
-
-  function escapeHtml(s){
-    return (s??"").replace(/[&<>"']/g, (c)=>({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-
-  function draftKey(){
-    return "OCJSONCopy__draft__v1";
-  }
-
-  function saveDraftAll(){
-    const payload = {
-      ts: Date.now(),
-      childFiles,
-      selectedChild,
-      childData: {}
+  function normalizeChar(c){
+    const out={
+      id:c?.id??"",
+      name:c?.name??"",
+      yomi:c?.yomi??"",
+      series:c?.series??"",
+      genre:c?.genre??"",
+      gender:normalizeGender(c?.gender),
+      genderlabel:c?.genderlabel??"",
+      age:(c?.age===undefined?null:c.age),
+      heightCm:(c?.heightCm===undefined?null:c.heightCm),
+      birthday:c?.birthday??"",
+      personality:toLF(c?.personality??""),
+      color:c?.color??"",
+      colorTag:c?.colorTag??"",
+      image:c?.image??"",
+      docUrl:c?.docUrl??"",
+      shareQuote:c?.shareQuote??""
     };
-    for(const [file, info] of childData.entries()){
-      payload.childData[file] = {
-        draft: info.draft ?? null
-      };
+    out.age=safeNum(out.age);
+    out.heightCm=safeNum(out.heightCm);
+    if(out.gender!=="other") out.genderlabel="";
+    // image "xxx.png"だけなら images/xxx.png に寄せる
+    if(out.image && !out.image.includes("/") && !out.image.includes("\\")) out.image="images/"+out.image;
+    return out;
+  }
+  async function fetchJson(path){
+    const res=await fetch(path,{cache:"no-store"});
+    if(!res.ok) throw new Error(`${res.status} ${res.statusText} : ${path}`);
+    return await res.json();
+  }
+
+  function draftKey(){ return "OCJSONCopy__draft__v1"; }
+  function saveDraftAll(){
+    const payload={ ts:Date.now(), childFiles, selectedChild, childData:{} };
+    for(const [file,info] of childData.entries()){
+      payload.childData[file]={ draft: info.draft ?? null };
     }
     localStorage.setItem(draftKey(), JSON.stringify(payload));
     updateDraftBadge();
   }
-
   function loadDraftAll(){
-    const raw = localStorage.getItem(draftKey());
+    const raw=localStorage.getItem(draftKey());
     if(!raw) return null;
-    try{ return JSON.parse(raw); }catch(e){ return null; }
+    try{ return JSON.parse(raw); }catch{ return null; }
   }
-
-  function clearDraftAll(){
-    localStorage.removeItem(draftKey());
-    updateDraftBadge();
-  }
+  function clearDraftAll(){ localStorage.removeItem(draftKey()); updateDraftBadge(); }
 
   function hasAnyDraft(){
-    for(const [file, info] of childData.entries()){
-      if(info.draft && info.remote && JSON.stringify(info.draft) !== JSON.stringify(info.remote)) return true;
-      if(info.draft && !info.remote) return true;
+    for(const [file,info] of childData.entries()){
+      if(info.draft && info.remote && JSON.stringify(info.draft)!==JSON.stringify(info.remote)) return true;
     }
     return false;
   }
-
   function updateDraftBadge(){
     const on = hasAnyDraft() || !!localStorage.getItem(draftKey());
     const dot = draftBadge.querySelector(".dot");
     const text = draftBadge.querySelector("span:last-child");
-    if(on){
-      dot.classList.add("warn");
-      text.textContent = "ローカル保存あり（途中復帰）";
-    }else{
-      dot.classList.remove("warn");
-      dot.classList.remove("ok");
-      text.textContent = "ローカル未保存";
-    }
-  }
-
-  function setStatus(text){
-    statusPill.textContent = text;
-  }
-
-  async function fetchJson(path){
-    const res = await fetch(path, { cache:"no-store" });
-    if(!res.ok) throw new Error("読めない: " + path);
-    return await res.json();
-  }
-
-  function ensureArrays(){
-    // datalist options from all loaded drafts
-    const seriesSet = new Set();
-    const genreSet = new Set();
-    const colorTagSet = new Set();
-
-    for(const [file, info] of childData.entries()){
-      const arr = info.draft || info.remote || [];
-      for(const c of arr){
-        if(c?.series) seriesSet.add(String(c.series));
-        if(c?.genre) genreSet.add(String(c.genre));
-        if(c?.colorTag) colorTagSet.add(String(c.colorTag));
-      }
-    }
-
-    fillDatalist("dl_series", [...seriesSet].sort());
-    fillDatalist("dl_genre", [...genreSet].sort());
-    fillDatalist("dl_colorTag", [...colorTagSet].sort());
+    if(on){ dot.classList.add("warn"); text.textContent="ローカル保存あり（途中復帰）"; }
+    else{ dot.classList.remove("warn"); text.textContent="ローカル未保存"; }
   }
 
   function fillDatalist(id, values){
-    const dl = $(id);
-    dl.innerHTML = values.map(v=> `<option value="${escapeHtml(v)}"></option>`).join("");
+    const dl=$(id);
+    dl.innerHTML = values.map(v=>`<option value="${String(v).replace(/"/g,"&quot;")}"></option>`).join("");
   }
-
-  function currentArr(){
-    if(!selectedChild) return [];
-    const info = childData.get(selectedChild);
-    if(!info) return [];
-    return info.draft || info.remote || [];
+  function ensureArrays(){
+    const series=new Set(), genre=new Set(), colorTag=new Set();
+    for(const [,info] of childData.entries()){
+      const arr=(info.draft||info.remote||[]);
+      for(const c of arr){
+        if(c?.series) series.add(String(c.series));
+        if(c?.genre) genre.add(String(c.genre));
+        if(c?.colorTag) colorTag.add(String(c.colorTag));
+      }
+    }
+    fillDatalist("dl_series",[...series].sort());
+    fillDatalist("dl_genre",[...genre].sort());
+    fillDatalist("dl_colorTag",[...colorTag].sort());
   }
 
   function ensureDraftForSelected(){
     if(!selectedChild) return;
-    const info = childData.get(selectedChild);
+    const info=childData.get(selectedChild);
     if(!info) return;
-    if(!info.draft){
-      info.draft = deepClone(info.remote || []);
-    }
+    if(!info.draft) info.draft = deepClone(info.remote||[]);
   }
 
   function applySearchFilter(list){
-    const q = searchText.trim().toLowerCase();
+    const q=searchText.trim().toLowerCase();
     if(!q) return list;
     return list.filter(c=>{
-      const blob = [
-        c.id, c.name, c.yomi, c.series, c.genre, c.gender, c.genderlabel,
-        c.birthday, c.personality, c.color, c.colorTag, c.image, c.docUrl, c.shareQuote
-      ].map(x=> (x??"")).join(" ").toLowerCase();
+      const blob=[c.id,c.name,c.yomi,c.series,c.genre,c.gender,c.genderlabel,c.birthday,c.personality,c.color,c.colorTag,c.image,c.docUrl,c.shareQuote]
+        .map(x=>x??"").join(" ").toLowerCase();
       return blob.includes(q);
     });
   }
-
   function sortList(list){
-    const dir = (sortDir==="asc") ? 1 : -1;
-    const get = (c)=>{
+    const dir=(sortDir==="asc")?1:-1;
+    const get=(c)=>{
       switch(sortMode){
         case "name": return (c.name??"");
         case "yomi": return (c.yomi??"");
@@ -781,163 +552,104 @@
         case "colorTag": return (c.colorTag??"");
         case "series": return (c.series??"");
         case "genre": return (c.genre??"");
-        case "order":
         default: return 0;
       }
     };
     if(sortMode==="order") return list;
     return [...list].sort((a,b)=>{
-      const A = get(a), B = get(b);
-      if(typeof A==="number" || typeof B==="number"){
-        return (Number(A)-Number(B))*dir;
-      }
+      const A=get(a), B=get(b);
+      if(typeof A==="number"||typeof B==="number") return (Number(A)-Number(B))*dir;
       return String(A).localeCompare(String(B),"ja")*dir;
     });
   }
 
-  function computeId(childFile, index1based){
-    return `${baseName(childFile)}_${pad3(index1based)}`;
-  }
-
-  function normalizeChar(c){
-    const out = {
-      id: c.id ?? "",
-      name: c.name ?? "",
-      yomi: c.yomi ?? "",
-      series: c.series ?? "",
-      genre: c.genre ?? "",
-      gender: normalizeGender(c.gender),
-      genderlabel: c.genderlabel ?? "",
-      age: (c.age===undefined ? null : c.age),
-      heightCm: (c.heightCm===undefined ? null : c.heightCm),
-      birthday: c.birthday ?? "",
-      personality: c.personality ?? "",
-      color: c.color ?? "",
-      colorTag: c.colorTag ?? "",
-      image: c.image ?? "",
-      docUrl: c.docUrl ?? "",
-      shareQuote: c.shareQuote ?? ""
-    };
-    // sanitize numbers
-    out.age = safeNum(out.age);
-    out.heightCm = safeNum(out.heightCm);
-
-    // genderlabel rule
-    if(out.gender !== "other") out.genderlabel = "";
-
-    // personality normalize line breaks (keep \n in string)
-    out.personality = toLF(out.personality);
-
-    // image rule: if user selected filename, make it images/<file>
-    if(out.image && !out.image.includes("/") && !out.image.includes("\\")){
-      out.image = "images/" + out.image;
-    }
-    return out;
+  function currentArr(){
+    if(!selectedChild) return [];
+    const info=childData.get(selectedChild);
+    return (info?.draft||info?.remote||[]);
   }
 
   function renderChildList(){
-    childList.innerHTML = "";
+    childList.innerHTML="";
     for(const file of childFiles){
-      const info = childData.get(file);
-      const arr = (info?.draft || info?.remote || []);
-      const isActive = (file===selectedChild);
-      const btn = document.createElement("button");
-      btn.className = "itemBtn" + (isActive ? " active" : "");
+      const info=childData.get(file);
+      const arr=(info?.draft||info?.remote||[]);
+      const btn=document.createElement("button");
+      btn.className="itemBtn"+(file===selectedChild?" active":"");
       btn.innerHTML = `
         <div style="min-width:0;">
-          <div style="font-weight:1000;">${escapeHtml(file)}</div>
+          <div style="font-weight:1000;">${file}</div>
           <div class="itemMeta">キャラ数: ${arr.length}</div>
         </div>
-        <div class="smallBtns">
-          <button class="iconBtn" title="カテゴリをコピー" data-copy-cat="${escapeHtml(file)}">⧉</button>
-        </div>
+        <div class="smallBtns"><button class="iconBtn" data-copy="${file}" title="カテゴリをコピー">⧉</button></div>
       `;
-      btn.addEventListener("click", (e)=>{
-        const t = e.target;
-        if(t?.dataset?.copyCat){
+      btn.addEventListener("click",(e)=>{
+        const t=e.target;
+        if(t?.dataset?.copy){
           e.stopPropagation();
-          const file2 = t.dataset.copyCat;
-          selectChild(file2);
+          selectChild(file);
           updateCopyAreas();
-          copyText(taCategory.value || "");
+          copyText(taCategory.value||"");
           return;
         }
         selectChild(file);
       });
       childList.appendChild(btn);
     }
-
-    // also update add-dialog child selector
-    selAddChild.innerHTML = childFiles.map(f=>`<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join("");
+    selAddChild.innerHTML = childFiles.map(f=>`<option value="${f}">${f}</option>`).join("");
   }
 
   function renderCharList(){
-    const info = childData.get(selectedChild);
-    const arr = (info?.draft || info?.remote || []);
-    const filtered = applySearchFilter(arr);
-    const view = sortList(filtered);
+    const arr=currentArr();
+    const filtered=applySearchFilter(arr);
+    const view=sortList(filtered);
 
-    charList.innerHTML = "";
-    view.forEach((c, viewIdx)=>{
-      // need actual index in underlying arr to select correctly
-      const realIdx = arr.indexOf(c);
-      const computed = computeId(selectedChild, realIdx+1);
-      const active = (realIdx===selectedCharIdx);
-
-      const card = document.createElement("div");
-      card.className = "charCard" + (active ? " active" : "");
-      card.innerHTML = `
+    charList.innerHTML="";
+    view.forEach(c=>{
+      const realIdx=arr.indexOf(c);
+      const id=computeId(selectedChild, realIdx+1);
+      const card=document.createElement("div");
+      card.className="charCard"+(realIdx===selectedCharIdx?" active":"");
+      card.innerHTML=`
         <div style="min-width:0;">
-          <div class="charName">
-            <span>${escapeHtml(c.name || "(no name)")}</span>
-            <span class="idTag">${escapeHtml(computed)}</span>
-          </div>
+          <div class="charName"><span>${c.name||"(no name)"}</span><span class="idTag">${id}</span></div>
           <div class="metaGrid">
-            ${c.series ? `<span class="chip">series: ${escapeHtml(c.series)}</span>` : ""}
-            ${c.genre ? `<span class="chip">genre: ${escapeHtml(c.genre)}</span>` : ""}
-            ${c.colorTag ? `<span class="chip">colorTag: ${escapeHtml(c.colorTag)}</span>` : ""}
-            ${c.gender ? `<span class="chip">gender: ${escapeHtml(c.gender)}</span>` : ""}
-            ${c.age!=null ? `<span class="chip">age: ${escapeHtml(String(c.age))}</span>` : ""}
-            ${c.heightCm!=null ? `<span class="chip">height: ${escapeHtml(String(c.heightCm))}cm</span>` : ""}
+            ${c.series?`<span class="chip">series: ${c.series}</span>`:""}
+            ${c.genre?`<span class="chip">genre: ${c.genre}</span>`:""}
+            ${c.colorTag?`<span class="chip">colorTag: ${c.colorTag}</span>`:""}
+            ${c.gender?`<span class="chip">gender: ${c.gender}</span>`:""}
           </div>
         </div>
         <div class="cardActions">
-          <button class="iconBtn" title="このキャラをコピー" data-copy-one="${realIdx}">⧉</button>
-          <button class="iconBtn" title="編集へ" data-edit="${realIdx}">✎</button>
+          <button class="iconBtn" data-copy-one="${realIdx}" title="このキャラをコピー">⧉</button>
+          <button class="iconBtn" data-edit="${realIdx}" title="編集へ">✎</button>
         </div>
       `;
-
-      card.querySelector('[data-edit]')?.addEventListener("click",(e)=>{
-        e.stopPropagation();
-        selectChar(realIdx);
-      });
+      card.querySelector('[data-edit]')?.addEventListener("click",(e)=>{ e.stopPropagation(); selectChar(realIdx); });
       card.querySelector('[data-copy-one]')?.addEventListener("click",(e)=>{
         e.stopPropagation();
-        // update temp selection for copy without changing editor
-        const one = normalizeChar(arr[realIdx] || {});
-        one.id = computeId(selectedChild, realIdx+1);
-        const text = prettyJson(one);
-        copyText(text);
+        const one=normalizeChar(arr[realIdx]||{});
+        one.id=id;
+        copyText(prettyJson(one));
       });
-      card.addEventListener("click", ()=> selectChar(realIdx));
+      card.addEventListener("click",()=>selectChar(realIdx));
       charList.appendChild(card);
     });
-
     if(view.length===0){
-      const empty = document.createElement("div");
-      empty.className = "hint";
-      empty.textContent = "該当なし。検索条件を変えろ。";
+      const empty=document.createElement("div");
+      empty.className="hint";
+      empty.textContent="該当なし。検索条件を変えろ。";
       charList.appendChild(empty);
     }
   }
 
   function selectChild(file){
-    selectedChild = file;
-    selectedCharIdx = -1;
-    selectedCharSnapshot = null;
-    noSel.style.display = "block";
-    editor.style.display = "none";
-    editTitle.textContent = "キャラ未選択";
+    selectedChild=file;
+    selectedCharIdx=-1;
+    selectedCharSnapshot=null;
+    noSel.style.display="block";
+    editor.style.display="none";
+    editTitle.textContent="キャラ未選択";
 
     renderChildList();
     renderCharList();
@@ -947,87 +659,74 @@
     setStatus(`子json: ${file}`);
   }
 
-  function selectChar(idx){
-    ensureDraftForSelected();
-    const info = childData.get(selectedChild);
-    const arr = (info?.draft || info?.remote || []);
-    if(idx<0 || idx>=arr.length) return;
-
-    selectedCharIdx = idx;
-    const raw = normalizeChar(arr[idx]);
-    raw.id = computeId(selectedChild, idx+1);
-    selectedCharSnapshot = deepClone(raw);
-
-    noSel.style.display = "none";
-    editor.style.display = "block";
-    editTitle.textContent = `${selectedChild} / #${pad3(idx+1)} を編集中`;
-
-    // fill fields
-    f_id.value = raw.id;
-    f_name.value = raw.name;
-    f_yomi.value = raw.yomi;
-    f_series.value = raw.series;
-    f_genre.value = raw.genre;
-    f_colorTag.value = raw.colorTag;
-    f_gender.value = raw.gender;
-    f_genderlabel.value = raw.genderlabel;
-    f_age.value = (raw.age==null ? "" : raw.age);
-    f_height.value = (raw.heightCm==null ? "" : raw.heightCm);
-    f_birthday.value = raw.birthday;
-    f_personality.value = raw.personality;
-    f_color.value = raw.color;
-    // color picker sync
-    const cp = (raw.color && /^#([0-9a-f]{6})$/i.test(raw.color)) ? raw.color : "#34c38e";
-    f_colorPick.value = cp;
-
-    f_docUrl.value = raw.docUrl;
-    f_shareQuote.value = raw.shareQuote;
-
-    // image select
-    buildImageSelect(raw.image);
-    updateImagePreview();
-    updateCopyAreas();
-    renderCharList(); // update highlight
-  }
-
   function buildImageSelect(current){
-    // images list => options
-    // stored value should be "images/xxx.png" (or empty)
-    const cur = current || "";
-    let curFile = "";
-    if(cur.startsWith("images/")) curFile = cur.slice("images/".length);
-    else if(cur.includes("/")) curFile = cur.split("/").pop();
-    else curFile = cur;
+    let curFile="";
+    if(current?.startsWith("images/")) curFile=current.slice("images/".length);
+    else if(current?.includes("/")) curFile=current.split("/").pop();
+    else curFile=current||"";
 
-    const opts = [
-      `<option value="">（画像なし）</option>`,
-      ...images.map(fn=>`<option value="${escapeHtml(fn)}">${escapeHtml(fn)}</option>`)
-    ].join("");
-    f_imageSel.innerHTML = opts;
+    f_imageSel.innerHTML = `<option value="">（画像なし）</option>` +
+      images.map(fn=>`<option value="${fn}">${fn}</option>`).join("");
     f_imageSel.value = images.includes(curFile) ? curFile : "";
     imgSavedVal.textContent = f_imageSel.value ? `images/${f_imageSel.value}` : "";
+    updateImagePreview();
   }
 
   function updateImagePreview(){
-    const fn = f_imageSel.value;
-    imgPreview.innerHTML = "";
+    const fn=f_imageSel.value;
+    imgPreview.innerHTML="";
     if(!fn){
-      imgPreview.innerHTML = `<span class="mini">no image</span>`;
-      imgSavedVal.textContent = "";
+      imgPreview.innerHTML=`<span class="mini">no image</span>`;
+      imgSavedVal.textContent="";
       return;
     }
-    const url = IMG_DIR + fn;
-    const img = document.createElement("img");
-    img.src = url;
-    img.alt = fn;
-    img.onerror = ()=>{ imgPreview.innerHTML = `<span class="mini">読み込み失敗</span>`; };
+    const url=IMG_DIR+fn;
+    const img=document.createElement("img");
+    img.src=url;
+    img.onerror=()=>{ imgPreview.innerHTML=`<span class="mini">読み込み失敗</span>`; };
     imgPreview.appendChild(img);
-    imgSavedVal.textContent = `images/${fn}`;
+    imgSavedVal.textContent=`images/${fn}`;
+  }
+
+  function selectChar(idx){
+    ensureDraftForSelected();
+    const info=childData.get(selectedChild);
+    const arr=(info?.draft||info?.remote||[]);
+    if(idx<0||idx>=arr.length) return;
+
+    selectedCharIdx=idx;
+    const raw=normalizeChar(arr[idx]);
+    raw.id=computeId(selectedChild, idx+1);
+    selectedCharSnapshot=deepClone(raw);
+
+    noSel.style.display="none";
+    editor.style.display="block";
+    editTitle.textContent=`${selectedChild} / #${pad3(idx+1)} を編集中`;
+
+    f_id.value=raw.id;
+    f_name.value=raw.name;
+    f_yomi.value=raw.yomi;
+    f_series.value=raw.series;
+    f_genre.value=raw.genre;
+    f_colorTag.value=raw.colorTag;
+    f_gender.value=raw.gender;
+    f_genderlabel.value=raw.genderlabel;
+    f_age.value=(raw.age==null?"":raw.age);
+    f_height.value=(raw.heightCm==null?"":raw.heightCm);
+    f_birthday.value=raw.birthday;
+    f_personality.value=raw.personality;
+    f_color.value=raw.color;
+    if(raw.color && /^#([0-9a-f]{6})$/i.test(raw.color)) f_colorPick.value=raw.color;
+    f_docUrl.value=raw.docUrl;
+    f_shareQuote.value=raw.shareQuote;
+
+    buildImageSelect(raw.image);
+    updateCopyAreas();
+    renderCharList();
   }
 
   function collectFromFields(){
-    const obj = {
-      id: f_id.value,
+    const obj=normalizeChar({
       name: f_name.value.trim(),
       yomi: f_yomi.value.trim(),
       series: f_series.value.trim(),
@@ -1040,126 +739,79 @@
       personality: toLF(f_personality.value),
       color: f_color.value.trim(),
       colorTag: f_colorTag.value.trim(),
-      image: f_imageSel.value ? ("images/" + f_imageSel.value) : "",
+      image: f_imageSel.value ? ("images/"+f_imageSel.value) : "",
       docUrl: f_docUrl.value.trim(),
       shareQuote: f_shareQuote.value.trim()
-    };
-    if(obj.gender !== "other") obj.genderlabel = "";
-    return normalizeChar(obj);
+    });
+    if(obj.gender!=="other") obj.genderlabel="";
+    return obj;
   }
 
   function updateCopyAreas(){
-    // category
     if(selectedChild){
-      const info = childData.get(selectedChild);
-      const arr = (info?.draft || info?.remote || []);
-      const out = arr.map((c,i)=>{
-        const cc = normalizeChar(c);
-        cc.id = computeId(selectedChild, i+1);
+      const arr=currentArr();
+      const out=arr.map((c,i)=>{
+        const cc=normalizeChar(c);
+        cc.id=computeId(selectedChild, i+1);
         return cc;
       });
-      taCategory.value = prettyJson(out);
-    }else{
-      taCategory.value = "";
-    }
+      taCategory.value=prettyJson(out);
+    }else taCategory.value="";
 
-    // char
     if(selectedChild && selectedCharIdx>=0){
-      const info = childData.get(selectedChild);
-      const arr = (info?.draft || info?.remote || []);
-      const c = arr[selectedCharIdx];
+      const arr=currentArr();
+      const c=arr[selectedCharIdx];
       if(c){
-        const out = normalizeChar(c);
-        out.id = computeId(selectedChild, selectedCharIdx+1);
-        taChar.value = prettyJson(out);
-      }else{
-        taChar.value = "";
-      }
-    }else{
-      taChar.value = "";
-    }
+        const out=normalizeChar(c);
+        out.id=computeId(selectedChild, selectedCharIdx+1);
+        taChar.value=prettyJson(out);
+      }else taChar.value="";
+    }else taChar.value="";
   }
 
   function downloadText(filename, text){
-    const blob = new Blob([text], {type:"application/json;charset=utf-8"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
+    const blob=new Blob([text],{type:"application/json;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=filename;
     document.body.appendChild(a);
     a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
   }
 
-  // ========= Main loading =========
   async function loadAll(remoteOverwrite=false){
+    setErr("");
     setStatus("読込中...");
     try{
-      // index.json
       const idx = await fetchJson(INDEX_PATH);
       if(!Array.isArray(idx)) throw new Error("characters/index.json は配列じゃないとダメ");
       childFiles = idx;
 
-      // images index (optional)
       try{
         const im = await fetchJson(IMG_INDEX_PATH);
         images = Array.isArray(im) ? im : [];
-      }catch(e){
+      }catch{
         images = [];
       }
 
-      // load each child json
+      const newMap=new Map();
       for(const file of childFiles){
-        const path = CHAR_DIR + file;
-        let arr = await fetchJson(path);
-        if(!Array.isArray(arr)) arr = [];
-        // normalize raw
-        arr = arr.map収 => normalizeChar(収); // (typo protector?) 
+        const arrRaw = await fetchJson(CHAR_DIR+file);
+        const arr = (Array.isArray(arrRaw)?arrRaw:[]).map(c=>normalizeChar(c));
+        const prev=childData.get(file);
+        const keepDraft=prev?.draft && !remoteOverwrite;
+        newMap.set(file,{ remote: arr, draft: keepDraft ? prev.draft : null, loadedAt: Date.now() });
       }
+      childData=newMap;
 
-    }catch(e){
-      // fallback for typo above (Safari strict) => do normal loop
-    }
-
-    // Actually do proper load (again, without arrow typo)
-    try{
-      // index.json
-      const idx = await fetchJson(INDEX_PATH);
-      if(!Array.isArray(idx)) throw new Error("characters/index.json は配列じゃないとダメ");
-      childFiles = idx;
-
-      // images index
-      try{
-        const im = await fetchJson(IMG_INDEX_PATH);
-        images = Array.isArray(im) ? im : [];
-      }catch(e){
-        images = [];
-      }
-
-      const newMap = new Map();
-      for(const file of childFiles){
-        const path = CHAR_DIR + file;
-        let arr = await fetchJson(path);
-        if(!Array.isArray(arr)) arr = [];
-        arr = arr.map(c=> normalizeChar(c));
-
-        const prev = childData.get(file);
-        const keepDraft = prev?.draft && !remoteOverwrite;
-        newMap.set(file, {
-          remote: arr,
-          draft: keepDraft ? prev.draft : null,
-          loadedAt: Date.now()
-        });
-      }
-      childData = newMap;
-
-      // restore draft from localStorage if exists
-      const saved = loadDraftAll();
-      if(saved && saved.childData && !remoteOverwrite){
+      // local restore
+      const saved=loadDraftAll();
+      if(saved?.childData && !remoteOverwrite){
         for(const file of childFiles){
-          const entry = saved.childData[file];
+          const entry=saved.childData[file];
           if(entry?.draft && Array.isArray(entry.draft)){
-            const info = childData.get(file);
-            if(info) info.draft = entry.draft.map(c=> normalizeChar(c));
+            const info=childData.get(file);
+            if(info) info.draft=entry.draft.map(c=>normalizeChar(c));
           }
         }
       }
@@ -1167,254 +819,138 @@
       ensureArrays();
       renderChildList();
 
-      if(!selectedChild && childFiles.length){
-        selectedChild = childFiles[0];
-      }else if(selectedChild && !childFiles.includes(selectedChild)){
-        selectedChild = childFiles[0] || "";
-      }
-
+      if(!selectedChild && childFiles.length) selectedChild=childFiles[0];
+      if(selectedChild && !childFiles.includes(selectedChild)) selectedChild=childFiles[0]||"";
       if(selectedChild) selectChild(selectedChild);
-      else{
-        setStatus("子jsonなし");
-        renderCharList();
-        updateCopyAreas();
-      }
 
       saveDraftAll();
-      setStatus("読込完了");
       updateDraftBadge();
-      if(loadDraftAll()) showToast("ローカル復元");
-    }catch(err){
-      console.error(err);
+      setStatus("読込完了");
+      showToast(saved ? "ローカル復元" : "読込OK");
+    }catch(e){
+      console.error(e);
       setStatus("読込失敗");
-      alert(String(err?.message || err));
+      setErr(String(e?.message||e));
     }
   }
 
-  // ========= Actions =========
-  btnLoad.addEventListener("click", ()=> loadAll(false));
-  btnReloadRemote.addEventListener("click", ()=> loadAll(true));
-  btnClearDraft.addEventListener("click", ()=>{
+  // ===== Events =====
+  btnLoad.addEventListener("click",()=>loadAll(false));
+  btnReloadRemote.addEventListener("click",()=>loadAll(true));
+  btnClearDraft.addEventListener("click",()=>{
     if(confirm("ローカル保存（途中復帰）を全消しする。いいか？")){
       clearDraftAll();
-      // also drop drafts in memory
-      for(const [file, info] of childData.entries()){
-        info.draft = null;
-      }
+      for(const [,info] of childData.entries()) info.draft=null;
       if(selectedChild) selectChild(selectedChild);
       showToast("消した");
     }
   });
 
-  search.addEventListener("input", ()=>{
-    searchText = search.value;
-    renderCharList();
-  });
+  search.addEventListener("input",()=>{ searchText=search.value; renderCharList(); });
+  sortModeSel.addEventListener("change",()=>{ sortMode=sortModeSel.value; renderCharList(); });
+  sortDirSel.addEventListener("change",()=>{ sortDir=sortDirSel.value; renderCharList(); });
 
-  sortModeSel.addEventListener("change", ()=>{
-    sortMode = sortModeSel.value;
-    renderCharList();
+  f_colorPick.addEventListener("input",()=>{ f_color.value=f_colorPick.value; });
+  f_color.addEventListener("input",()=>{
+    const v=f_color.value.trim();
+    if(/^#([0-9a-f]{6})$/i.test(v)) f_colorPick.value=v;
   });
-  sortDirSel.addEventListener("change", ()=>{
-    sortDir = sortDirSel.value;
-    renderCharList();
-  });
+  f_imageSel.addEventListener("change",()=>updateImagePreview());
 
-  // Sync color picker <-> text
-  f_colorPick.addEventListener("input", ()=>{
-    f_color.value = f_colorPick.value;
-  });
-  f_color.addEventListener("input", ()=>{
-    const v = f_color.value.trim();
-    if(/^#([0-9a-f]{6})$/i.test(v)) f_colorPick.value = v;
-  });
-
-  f_imageSel.addEventListener("change", ()=>{
-    updateImagePreview();
-  });
-
-  btnApply.addEventListener("click", ()=>{
+  btnApply.addEventListener("click",()=>{
     if(!selectedChild || selectedCharIdx<0) return;
     ensureDraftForSelected();
-    const info = childData.get(selectedChild);
-    const arr = info.draft;
-    const obj = collectFromFields();
-
-    // write back (except id is computed)
-    obj.id = ""; // stored id ignored; we compute at export
-    arr[selectedCharIdx] = obj;
-
+    const info=childData.get(selectedChild);
+    const arr=info.draft;
+    arr[selectedCharIdx]=collectFromFields();
     ensureArrays();
     saveDraftAll();
     updateCopyAreas();
+    renderChildList();
     renderCharList();
     showToast("反映した");
   });
 
-  btnReloadChar.addEventListener("click", ()=>{
+  btnReloadChar.addEventListener("click",()=>{
     if(!selectedCharSnapshot) return;
-    // restore from snapshot into fields (doesn't touch stored draft)
-    const s = deepClone(selectedCharSnapshot);
-    f_id.value = s.id;
-    f_name.value = s.name;
-    f_yomi.value = s.yomi;
-    f_series.value = s.series;
-    f_genre.value = s.genre;
-    f_colorTag.value = s.colorTag;
-    f_gender.value = s.gender;
-    f_genderlabel.value = s.genderlabel;
-    f_age.value = (s.age==null ? "" : s.age);
-    f_height.value = (s.heightCm==null ? "" : s.heightCm);
-    f_birthday.value = s.birthday;
-    f_personality.value = s.personality;
-    f_color.value = s.color;
-    if(s.color && /^#([0-9a-f]{6})$/i.test(s.color)) f_colorPick.value = s.color;
-    f_docUrl.value = s.docUrl;
-    f_shareQuote.value = s.shareQuote;
+    const s=deepClone(selectedCharSnapshot);
+    f_id.value=s.id; f_name.value=s.name; f_yomi.value=s.yomi; f_series.value=s.series;
+    f_genre.value=s.genre; f_colorTag.value=s.colorTag; f_gender.value=s.gender; f_genderlabel.value=s.genderlabel;
+    f_age.value=(s.age==null?"":s.age); f_height.value=(s.heightCm==null?"":s.heightCm);
+    f_birthday.value=s.birthday; f_personality.value=s.personality; f_color.value=s.color;
+    if(s.color && /^#([0-9a-f]{6})$/i.test(s.color)) f_colorPick.value=s.color;
+    f_docUrl.value=s.docUrl; f_shareQuote.value=s.shareQuote;
     buildImageSelect(s.image);
-    updateImagePreview();
     showToast("戻した");
   });
 
-  btnDeleteChar.addEventListener("click", ()=>{
+  btnDeleteChar.addEventListener("click",()=>{
     if(!selectedChild || selectedCharIdx<0) return;
     if(!confirm("このキャラを削除する。いいか？")) return;
     ensureDraftForSelected();
-    const info = childData.get(selectedChild);
-    info.draft.splice(selectedCharIdx, 1);
-    selectedCharIdx = -1;
-    selectedCharSnapshot = null;
-    noSel.style.display = "block";
-    editor.style.display = "none";
-    editTitle.textContent = "キャラ未選択";
-    ensureArrays();
-    saveDraftAll();
-    renderCharList();
-    updateCopyAreas();
+    const info=childData.get(selectedChild);
+    info.draft.splice(selectedCharIdx,1);
+    selectedCharIdx=-1; selectedCharSnapshot=null;
+    noSel.style.display="block"; editor.style.display="none"; editTitle.textContent="キャラ未選択";
+    ensureArrays(); saveDraftAll(); renderChildList(); renderCharList(); updateCopyAreas();
     showToast("削除した");
   });
 
-  btnCopyCategory.addEventListener("click", ()=> copyText(taCategory.value || ""));
-  btnDownloadCategory.addEventListener("click", ()=>{
+  btnCopyCategory.addEventListener("click",()=>copyText(taCategory.value||""));
+  btnDownloadCategory.addEventListener("click",()=>{
     if(!selectedChild) return;
-    downloadText(selectedChild, taCategory.value || "[]");
+    downloadText(selectedChild, taCategory.value||"[]");
     showToast("書き出した");
   });
+  btnCopyChar.addEventListener("click",()=>copyText(taChar.value||""));
+  btnCopyIndex.addEventListener("click",()=>copyText(prettyJson(childFiles)));
+  btnDownloadIndex.addEventListener("click",()=>{ downloadText("index.json", prettyJson(childFiles)); showToast("書き出した"); });
 
-  btnCopyChar.addEventListener("click", ()=> copyText(taChar.value || ""));
-  btnCopyIndex.addEventListener("click", ()=>{
-    copyText(prettyJson(childFiles));
-  });
-  btnDownloadIndex.addEventListener("click", ()=>{
-    downloadText("index.json", prettyJson(childFiles));
-    showToast("書き出した");
-  });
-
-  // ========= Add dialog =========
-  btnAdd.addEventListener("click", ()=>{
-    if(!childFiles.length){
-      alert("先に index.json 読み込め。");
-      return;
-    }
-    // default selection
+  // add dialog
+  btnAdd.addEventListener("click",()=>{
+    if(!childFiles.length){ alert("先に index.json 読み込め。"); return; }
     selAddChild.value = selectedChild || childFiles[0];
     dlgAdd.showModal();
   });
-
-  btnCloseAdd.addEventListener("click", ()=> dlgAdd.close());
-
+  btnCloseAdd.addEventListener("click",()=>dlgAdd.close());
   tabs.forEach(t=>{
-    t.addEventListener("click", ()=>{
+    t.addEventListener("click",()=>{
       tabs.forEach(x=>x.classList.remove("active"));
       t.classList.add("active");
-      const tab = t.dataset.tab;
-      if(tab==="paste"){
-        tabPaste.style.display = "";
-        tabFromChild.style.display = "none";
-      }else{
-        tabPaste.style.display = "none";
-        tabFromChild.style.display = "";
-      }
+      const tab=t.dataset.tab;
+      tabPaste.style.display = (tab==="paste") ? "" : "none";
+      tabFromChild.style.display = (tab==="fromChild") ? "" : "none";
     });
   });
 
-  btnAddFromPaste.addEventListener("click", ()=>{
-    if(!selectedChild){
-      alert("追加先の子jsonを先に選べ。");
-      return;
-    }
+  btnAddFromPaste.addEventListener("click",()=>{
+    if(!selectedChild){ alert("追加先の子jsonを先に選べ。"); return; }
     let data;
-    try{
-      data = JSON.parse(taPaste.value || "");
-    }catch(e){
-      alert("JSONが壊れてる。");
-      return;
-    }
-    let obj = null;
-    if(Array.isArray(data)) obj = data[0] ?? {};
-    else obj = data;
-
-    obj = normalizeChar(obj);
-
+    try{ data=JSON.parse(taPaste.value||""); }catch{ alert("JSONが壊れてる。"); return; }
+    const obj = Array.isArray(data) ? (data[0]||{}) : (data||{});
     ensureDraftForSelected();
-    const info = childData.get(selectedChild);
-    info.draft.push(obj);
-
-    saveDraftAll();
-    ensureArrays();
-    renderChildList();
-    renderCharList();
-    updateCopyAreas();
-    dlgAdd.close();
-    showToast("追加した");
+    childData.get(selectedChild).draft.push(normalizeChar(obj));
+    ensureArrays(); saveDraftAll(); renderChildList(); renderCharList(); updateCopyAreas();
+    dlgAdd.close(); showToast("追加した");
   });
 
-  btnAddBlank.addEventListener("click", ()=>{
-    const dest = selAddChild.value;
+  btnAddBlank.addEventListener("click",()=>{
+    const dest=selAddChild.value;
     if(!dest) return;
-
-    // make sure dest draft exists
-    selectedChild = dest;
+    selectedChild=dest;
     ensureDraftForSelected();
-    const info = childData.get(dest);
-
-    // series prefill rule: first char's series else child basename
-    const head = (info.draft[0] || info.remote?.[0] || null);
+    const info=childData.get(dest);
+    const head = info.draft[0] || info.remote?.[0] || null;
     const s = head?.series ? String(head.series) : baseName(dest);
-
-    const obj = normalizeChar({
-      name: "新規キャラ",
-      yomi: "",
-      series: s,
-      genre: "不明",
-      gender: "other",
-      genderlabel: "",
-      age: null,
-      heightCm: null,
-      birthday: "",
-      personality: "",
-      color: "",
-      colorTag: "",
-      image: "",
-      docUrl: "",
-      shareQuote: ""
-    });
-
-    info.draft.push(obj);
-    saveDraftAll();
-    ensureArrays();
-    renderChildList();
+    info.draft.push(normalizeChar({ name:"新規キャラ", series:s, genre:"不明", gender:"other" }));
+    ensureArrays(); saveDraftAll(); renderChildList();
     selectChild(dest);
-    // select newly added
-    selectChar((info.draft.length-1));
-    dlgAdd.close();
-    showToast("追加した");
+    selectChar(info.draft.length-1);
+    dlgAdd.close(); showToast("追加した");
   });
 
-  // ========= Init =========
-  // Try auto-load when opened (nice UX)
+  // ===== boot =====
   loadAll(false);
-
 })();
 </script>
 </body>
