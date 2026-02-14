@@ -1698,17 +1698,21 @@ document.fonts?.ready?.then(()=>requestAnimationFrame(fitResultTexts));
                  * SHARE MODAL
                  **********************/
                 function buildShareText(c, opt = { includeUrl: true }){
-                  const spacer = "\n\u2800\n";
-                  let text = `あなたはフィップスガチャで\n${c.name}を出しました！`;
-          
-                  if(hasValue(c.shareQuote)){
-                    text += `${spacer}${c.name}「${c.shareQuote}」`;
-                }
-                  if(opt.includeUrl){
-                    text += `${spacer}${SHARE_URL}`;
-                  }
-                  return text;
-                }
+  const spacer = "\n\u2800\n";
+
+  const lines = [];
+  lines.push(`あなたはフィップスガチャで\n${c.name}を出しました！`);
+
+  if(hasValue(c.shareQuote)){
+    lines.push(`${c.name}「${c.shareQuote}」`);
+  }
+
+  if(opt.includeUrl){
+    lines.push(SHARE_URL);
+  }
+
+  return lines.join(spacer);
+}
           
                 function postToX(){
                   if(!state.lastResult){
@@ -1861,7 +1865,7 @@ document.fonts?.ready?.then(()=>requestAnimationFrame(fitResultTexts));
                     state.selectedGenders.clear();
                     state.ageMin = state.ageMax = state.hMin = state.hMax = null;
                     state.selectedColors.clear();
-                    state.hasImageOnly = true;
+                    state.hasImageOnly = false;
                     state.hasDocOnly = false;
             
                     $("#ageMin").value = "";
