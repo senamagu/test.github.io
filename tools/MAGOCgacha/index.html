@@ -900,21 +900,19 @@
               padding-top: 4px;
             }
           
-  /* ▼▼ ここに置き換え：名前は省略しない ▼▼ */
-  .name-main{
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;      /* 1行固定やめる */
-    overflow-wrap: anywhere;  /* 英数字長い保険 */
-    word-break: keep-all;
-  }
-  
-  /* 創作名は今まで通り1行省略でもOK（好み） */
-  .series{
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+/* ▼▼ スマホ：名前は1行固定・省略なし ▼▼ */
+.name-main{
+  white-space: nowrap;
+  overflow: visible;      /* 切らない */
+  text-overflow: clip;    /* …にしない */
+}
+
+/* 創作名は今まで通り省略でOK（好みで） */
+.series{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
           
             /* 情報欄の見え方 */
             .kv{ grid-template-columns: 130px 1fr; }
@@ -1675,15 +1673,15 @@
                   const p = hasValue(c.personality) ? c.personality : "未登録";
                   $("#personalityText").textContent = p;
             
-  // fit（スマホでも確実に効かせる）
-  const fitResultTexts = ()=>{
-    fitTextToWidth($("#nameText"), 52, 16);        // minを16まで許可（長名救済）
-    fitTextToWidth($("#seriesText"), 46, 18, 120);
-  };
-  
-  // 描画が安定してから2段階で当てる
-  requestAnimationFrame(()=>requestAnimationFrame(fitResultTexts));
-  document.fonts?.ready?.then(()=>requestAnimationFrame(fitResultTexts));
+// fit（名前は1行固定で絶対全部表示：極小まで落とす）
+const fitResultTexts = ()=>{
+  fitTextToWidth($("#nameText"), 52, 10, 0);     // min=10まで許可 / padding=0
+  fitTextToWidth($("#seriesText"), 46, 18, 120); // ここは通常でOK
+};
+
+// 描画とフォント読み込み後にも当てる（スマホのズレ対策）
+requestAnimationFrame(()=>requestAnimationFrame(fitResultTexts));
+document.fonts?.ready?.then(()=>requestAnimationFrame(fitResultTexts));
             
                   // 18 doc button
                   const btnDoc = $("#btnDoc");
