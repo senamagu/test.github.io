@@ -1,0 +1,9 @@
+[
+  {"id":"tokan_001","name":"白銀 晄兎","yomi":"シロガネ アキト","series":"兎還","genre":"棒人間","gender":"other"},
+  {"id":"tokan_002","name":"黄水 狐","yomi":"オウスイ コン","series":"兎還","genre":"棒人間","gender":"other"},
+  {"id":"tokan_003","name":"ヒトダマ","yomi":"未登録","series":"兎還","genre":"棒人間","gender":"other"},
+  {"id":"tokan_004","name":"赤兎 柔李","yomi":"アカウサ トオリ","series":"兎還","genre":"人間","gender":"other"},
+  {"id":"tokan_005","name":"青兎 カタリ","yomi":"アオウサ","series":"兎還","genre":"人間","gender":"other"},
+  {"id":"tokan_006","name":"大蜘蛛 マニ","yomi":"オオグモ","series":"兎還","genre":"人間","gender":"other"},
+  {"id":"tokan_007","name":"化鮫 スパ","yomi":"バケサメ","series":"兎還","genre":"人間","gender":"other"},
+]
