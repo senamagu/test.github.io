@@ -1,0 +1,10 @@
+[
+  {"id":"other_001","name":"戸羽ワンダイ","yomi":"トバ","series":"その他","genre":"人外","gender":"other"},
+  {"id":"other_002","name":"秋元健太","yomi":"アキモト ケンタ","series":"その他","genre":"人間","gender":"other"},
+  {"id":"other_003","name":"愛鷹 広","yomi":"アシタカ ヒロ","series":"その他","genre":"棒人間","gender":"other"},
+  {"id":"other_004","name":"アデリーヌ・カミュ","yomi":"未登録","series":"その他","genre":"棒人間","gender":"other"},
+  {"id":"other_005","name":"丒路","yomi":"ウシジ","series":"その他","genre":"人外","gender":"other"},
+  {"id":"other_006","name":"立石","yomi":"タテイシ","series":"その他","genre":"人間","gender":"other"},
+  {"id":"other_007","name":"白川 恒一","yomi":"シラカワ コウイチ","series":"その他","genre":"人間","gender":"other"},
+  {"id":"other_008","name":"朝霧 まどか","yomi":"アサギリ","series":"その他","genre":"人間","gender":"other"},
+]
