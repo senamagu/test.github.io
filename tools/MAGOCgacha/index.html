@@ -4,7 +4,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>フィップス キャラガチャ</title>
+  <meta property="og:title" content="フィップス ガチャ">
+  <meta property="og:description" content="結果をシェアできるよ！">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://senamagu.github.io/test.github.io/tools/MAGOCgacha/">
+  <meta property="og:image" content="https://raw.githubusercontent.com/senamagu/test.github.io/main/tools/MAGOCgacha/images/tmb.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="フィップス ガチャ">
+  <meta name="twitter:description" content="結果をシェアできるよ！">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/senamagu/test.github.io/main/tools/MAGOCgacha/images/tmb.png">
+
+  <title>フィップス ガチャ</title>
+  
   <style>
   @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@900&display=swap');
   </style>
@@ -969,7 +983,7 @@
   <div class="wrap">
     <div class="hero">
       <h1>フィップス
-        <br>キャラガチャ</h1>
+        <br>ガチャ</h1>
       <div class="total">総数
         <span id="totalCount">0</span>名</div>
     </div>
@@ -1172,8 +1186,9 @@
         </div>
         <div class="preview" id="sharePreview">—</div>
         <div class="share-actions">
+          <button class="smallbtn clear" id="btnSaveShareImg">画像として保存</button>
           <button class="smallbtn clear" id="btnCopyShare">共有文をコピー</button>
-          <button class="smallbtn ok" id="btnSaveShareImg">画像として保存</button>
+          <button class="smallbtn ok" id="btnPostX">Xで投稿</button>
         </div>
       </div>
     </div>
@@ -1187,7 +1202,7 @@
       // 画像はローカル相対パス: "Charamedia/xxx.png"
       // docUrl があれば資料ボタン表示
       // shareQuote があれば共有文に入れる
-  
+
       let characters = [];
   
       async function loadCharacters(){
@@ -1246,6 +1261,8 @@
         hasDocOnly: false,
         lastResult: null
       };
+
+      const SHARE_URL = "https://senamagu.github.io/test.github.io/tools/MAGOCgacha/";
   
       /**********************
        * HELPERS
@@ -1665,10 +1682,27 @@
       /**********************
        * SHARE MODAL
        **********************/
-      function buildShareText(c){
-        const base = `あなたはフィップスキャラガチャで${c.name}を出しました！`;
-        if(hasValue(c.shareQuote)) return `${base} ${c.name}「${c.shareQuote}」`;
-        return base;
+      function buildShareText(c, opt = { includeUrl: true }){
+        const base = `あなたはフィップスガチャで${c.name}を出しました！`;
+
+        let text = base;
+        if(hasValue(c.shareQuote)){
+          text += `\n\n${c.name}「${c.shareQuote}」`;
+        }
+        if(opt.includeUrl){
+          text += `\n\n${SHARE_URL}`;
+        }
+        return text;
+      }
+
+      function postToX(){
+        if(!state.lastResult){
+          toast("先にガチャしてね！");
+          return;
+        }
+        const text = buildShareText(state.lastResult, { includeUrl:false });
+        const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(SHARE_URL)}`;
+        window.open(intent, "_blank", "noopener,noreferrer");
       }
   
       function openShareModal(){
@@ -1827,6 +1861,7 @@
         $("#shareModal").addEventListener("click", (e)=>{ if(e.target.id==="shareModal") closeShareModal(); });
         $("#btnCopyShare").addEventListener("click", copyShare);
         $("#btnSaveShareImg").addEventListener("click", saveCardImage);
+        $("#btnPostX").addEventListener("click", postToX);
       }
   
       function setupActionsBar(){
