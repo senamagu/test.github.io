@@ -1,19 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>フィップス キャラガチャ</title>
-
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@900&display=swap');
   </style>
-
   <!-- 結果カード画像保存に使う（ネット必要）。不要ならこのscriptと save 関連を消してOK -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
   <style>
-    :root{
+  :root{
       --bg:#F6FCFA;
       --line:#DDEDF1;
 
@@ -964,67 +962,71 @@
   .actions-bar .doc-btn:active,
   .actions-bar .icon-btn:active{ transform: translateY(1px); }
 }
-    
   </style>
 </head>
 
 <body>
-
   <div class="wrap">
     <div class="hero">
-      <h1>フィップス<br>キャラガチャ</h1>
-      <div class="total">総数 <span id="totalCount">0</span>名</div>
+      <h1>フィップス
+        <br>キャラガチャ</h1>
+      <div class="total">総数
+        <span id="totalCount">0</span>名</div>
     </div>
-
     <div class="cta">
       <button class="btn-gacha" id="btnGacha">ガチャる</button>
     </div>
-
-    <div class="section-line"></div>
-
+    <div class="section-line">
+    </div>
     <!-- Result -->
     <div class="result-area">
       <div class="card" id="resultCard" style="display:none;">
         <div class="card-actions">
           <button class="doc-btn" id="btnDoc" style="display:none;">資料</button>
-
           <!-- 19 share -->
           <button class="icon-btn" id="btnShare" title="共有">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg viewbox="0 0 24 24" aria-hidden="true">
               <g fill="none" stroke="#DDEDF1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="18" cy="5.5" r="2.5"/>
-                <circle cx="6" cy="12" r="2.5"/>
-                <circle cx="18" cy="18.5" r="2.5"/>
-                <path d="M8.2 11l7.2-4.2"/>
-                <path d="M8.2 13l7.2 4.2"/>
+                <circle cx="18" cy="5.5" r="2.5">
+                </circle>
+                <circle cx="6" cy="12" r="2.5">
+                </circle>
+                <circle cx="18" cy="18.5" r="2.5">
+                </circle>
+                <path d="M8.2 11l7.2-4.2">
+                </path>
+                <path d="M8.2 13l7.2 4.2">
+                </path>
               </g>
             </svg>
           </button>
         </div>
-
-        <div class="actions-bar" id="actionsBar"></div>
-
+        <div class="actions-bar" id="actionsBar">
+        </div>
         <!-- left -->
         <div class="left">
           <div class="imgbox" id="imgBox">
-            <div class="img-inner" id="imgInner"></div>
+            <div class="img-inner" id="imgInner">
+            </div>
           </div>
-
           <div class="nameblock">
             <div class="name-yomi" id="yomiText">—</div>
-            <div class="name-divider"></div>
+            <div class="name-divider">
+            </div>
             <h2 class="name-main" id="nameText">—</h2>
           </div>
         </div>
-
         <!-- right -->
         <div class="right">
-          <div class="series" id="seriesText"><small>創作</small><span id="seriesName">—</span></div>
-
+          <div class="series" id="seriesText">
+            <small>創作</small>
+            <span id="seriesName">—</span>
+          </div>
           <div class="info">
-            <div class="kv" id="kvArea"></div>
-            <div class="info-divider"></div>
-
+            <div class="kv" id="kvArea">
+            </div>
+            <div class="info-divider">
+            </div>
             <div class="personality">
               <div class="k">性格</div>
               <div class="v" id="personalityText">未登録</div>
@@ -1033,75 +1035,77 @@
         </div>
       </div>
     </div>
-  
-
-    <div class="section-line"></div>
-
+    <div class="section-line">
+    </div>
     <!-- Filters header -->
     <div class="filters-head">
       <div class="label">絞り込む</div>
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
-
     <div class="filters">
       <!-- left -->
       <div class="filter-left">
-      <!-- 創作 -->
+        <!-- 創作 -->
         <div class="field">
-          <div class="k">創作名</div> 
+          <div class="k">創作名</div>
           <div class="multi" data-multi="series">
-          <div class="control multi-btn" role="button" tabindex="0"> 
-            <span class="value placeholder">未選択</span><span class="caret"></span>
-          </div>      
-            <div class="multi-panel"></div>  
+            <div class="control multi-btn" role="button" tabindex="0">
+              <span class="value placeholder">未選択</span>
+              <span class="caret">
+              </span>
+            </div>
+            <div class="multi-panel">
+            </div>
           </div>
         </div>
-        
         <!-- ジャンル -->
-        <div class="field"> 
+        <div class="field">
           <div class="k">見た目ジャンル</div>
           <div class="multi" data-multi="genre">
             <div class="control multi-btn" role="button" tabindex="0">
-              <span class="value placeholder">未選択</span><span class="caret"></span> 
-            </div>  
-            <div class="multi-panel"></div>
+              <span class="value placeholder">未選択</span>
+              <span class="caret">
+              </span>
+            </div>
+            <div class="multi-panel">
+            </div>
           </div>
         </div>
-
         <!-- 性別 -->
         <div class="field">
-          <div class="k">性別</div> 
-          <div class="multi" data-multi="gender"> 
-            <div class="control multi-btn" role="button" tabindex="0"> 
-              <span class="value placeholder">未選択</span><span class="caret"></span> 
-            </div>  
-            <div class="multi-panel"></div> 
-          </div> 
+          <div class="k">性別</div>
+          <div class="multi" data-multi="gender">
+            <div class="control multi-btn" role="button" tabindex="0">
+              <span class="value placeholder">未選択</span>
+              <span class="caret">
+              </span>
+            </div>
+            <div class="multi-panel">
+            </div>
+          </div>
         </div>
-
         <!-- 年齢 -->
         <div class="field">
           <div class="k">年齢</div>
           <div class="range-row suffix-right">
-            <input class="control" id="ageMin" inputmode="numeric" placeholder="最小" />
+            <input class="control" id="ageMin" inputmode="numeric" placeholder="最小">
             <div class="sep">〜</div>
-            <input class="control" id="ageMax" inputmode="numeric" placeholder="最大" />
+            <input class="control" id="ageMax" inputmode="numeric" placeholder="最大">
             <div class="suffix-out">歳</div>
           </div>
         </div>
-
         <!-- 身長 -->
         <div class="field">
           <div class="k">身長</div>
           <div class="range-row suffix-right">
-            <input class="control" id="hMin" inputmode="numeric" placeholder="最小" />
+            <input class="control" id="hMin" inputmode="numeric" placeholder="最小">
             <div class="sep">〜</div>
-            <input class="control" id="hMax" inputmode="numeric" placeholder="最大" />
+            <input class="control" id="hMax" inputmode="numeric" placeholder="最大">
             <div class="suffix-out">cm</div>
           </div>
         </div>
-      </div><!-- /filter-left -->
-
+      </div>
+      <!-- /filter-left -->
       <!-- mid + right をまとめる -->
       <div class="filter-side">
         <div class="side-top">
@@ -1114,757 +1118,776 @@
               </div>
             </div>
           </div>
-
           <!-- light -->
           <div class="filter-right">
             <div class="toggle" id="tglHasImage">
-              <span class="radio" id="dotHasImage"></span>
+              <span class="radio" id="dotHasImage">
+              </span>
               <span>画像ありのみ</span>
-          </div>
-
-          <div class="toggle" id="tglHasDoc">
-            <span class="radio" id="dotHasDoc"></span>
-            <span>資料ありのみ</span>
-          </div>
-
-          <div class="hits">
-            <span>ヒット件数</span>
-            <span id="hitCount">0</span><span>名</span>
+            </div>
+            <div class="toggle" id="tglHasDoc">
+              <span class="radio" id="dotHasDoc">
+              </span>
+              <span>資料ありのみ</span>
+            </div>
+            <div class="hits">
+              <span>ヒット件数</span>
+              <span id="hitCount">0</span>
+              <span>名</span>
+            </div>
           </div>
         </div>
-      </div><!-- /side-top -->
-
-      <!-- bottom list -->
-      <div class="hitlist">
-        <div class="hitgrid" id="hitGrid"></div>
-      </div>
-   </div>
-</div>
-
-<div class="bottom">
-  <button class="btn-list" id="btnList">キャラ一覧へ</button>
-</div>
-
-  <!-- Color modal -->
-  <div class="modal" id="colorModal" aria-hidden="true">
-    <div class="modal-panel">
-      <div class="modal-title">
-        <span>カラーを選択</span>
-        <button class="xbtn" id="btnCloseColor" aria-label="close">×</button>
-      </div>
-      <div class="color-grid" id="colorGrid"></div>
-      <div class="modal-actions">
-        <button class="smallbtn clear" id="btnClearColor">クリア</button>
-        <button class="smallbtn ok" id="btnOkColor">OK</button>
+        <!-- /side-top -->
+        <!-- bottom list -->
+        <div class="hitlist">
+          <div class="hitgrid" id="hitGrid">
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Share modal -->
-  <div class="modal" id="shareModal" aria-hidden="true">
-    <div class="modal-panel">
-      <div class="modal-title">
-        <span>共有</span>
-        <button class="xbtn" id="btnCloseShare" aria-label="close">×</button>
-      </div>
-      <div class="preview" id="sharePreview">—</div>
-      <div class="share-actions">
-        <button class="smallbtn clear" id="btnCopyShare">共有文をコピー</button>
-        <button class="smallbtn ok" id="btnSaveShareImg">画像として保存</button>
+    <div class="bottom">
+      <button class="btn-list" id="btnList">キャラ一覧へ</button>
+    </div>
+    <!-- Color modal -->
+    <div class="modal" id="colorModal" aria-hidden="true">
+      <div class="modal-panel">
+        <div class="modal-title">
+          <span>カラーを選択</span>
+          <button class="xbtn" id="btnCloseColor" aria-label="close">×</button>
+        </div>
+        <div class="color-grid" id="colorGrid">
+        </div>
+        <div class="modal-actions">
+          <button class="smallbtn clear" id="btnClearColor">クリア</button>
+          <button class="smallbtn ok" id="btnOkColor">OK</button>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <footer class="credit">© senamagu</footer>
-
-  <script>
-    /**********************
-     * DATA
-     **********************/
-    // 画像はローカル相対パス: "Charamedia/xxx.png"
-    // docUrl があれば資料ボタン表示
-    // shareQuote があれば共有文に入れる
-
-    let characters = [];
-
-    async function loadCharacters(){
-      // 1) 一覧を読む
-      const res = await fetch("./characters/index.json", { cache:"no-store" });
-      if(!res.ok) throw new Error("characters/index.json が読めない");
-      const files = await res.json();
-
-      if(!Array.isArray(files)) throw new Error("index.json は配列にしてね（例: [\"a.json\",\"b.json\"]）");
-
-      // 2) それぞれのJSONを読む（並列）
-      const results = await Promise.all(
-        files.map(async (file)=>{
-          const url = `./characters/${file}`;
-          const r = await fetch(url, { cache:"no-store" });
-          if(!r.ok) throw new Error(`${url} が読めないよ！`);
-          const data = await r.json();
-
-          // 各ファイルは「キャラ配列」で統一しろ
-          if(!Array.isArray(data)) throw new Error(`${url} の中身はキャラ配列にしてね`);
-          return data;
-        })
-      );
-
-      // 3) 配列を平坦化して characters に
-      characters = results.flat();
-    }
-
-    const COLOR_ITEMS = [
-      {key:"赤",   hex:"#F37679"},
-      {key:"青",   hex:"#58A8DD"},
-      {key:"緑",   hex:"#34C38E"},
-      {key:"黄色", hex:"#DADD4F"},
-      {key:"オレンジ", hex:"#F08D58"},
-      {key:"ピンク", hex:"#F777B0"},
-      {key:"紫",   hex:"#8C6BFF"},
-      {key:"茶色", hex:"#AD7B74"},
-      {key:"黒",   hex:"#464B51"},
-      {key:"白",   hex:"#F6FCFA"},
-      {key:"灰色", hex:"#7F8389"}
-    ];
-
-    /**********************
-     * STATE
-     **********************/
-    const state = {
-      selectedSeries: new Set(),
-      selectedGenres: new Set(),
-      selectedGenders: new Set(),
-      ageMin: null,
-      ageMax: null,
-      hMin: null,
-      hMax: null,
-      selectedColors: new Set(), // "赤" など
-      hasImageOnly: false,  // 初期：画像ありのみON
-      hasDocOnly: false,
-      lastResult: null
-    };
-
-    /**********************
-     * HELPERS
-     **********************/
-    const $ = (sel)=>document.querySelector(sel);
-
-    const toast = (msg)=>{
-      const el = $("#toast");
-      el.textContent = msg;
-      el.classList.add("show");
-      clearTimeout(toast._t);
-      toast._t = setTimeout(()=>el.classList.remove("show"), 1700);
-    };
-
-    const normNum = (v)=>{
-      const s = String(v ?? "").trim();
-      if(!s) return null;
-      const n = Number(s);
-      return Number.isFinite(n) ? n : null;
-    };
-
-    function hasValue(v){
-      return v!==null && v!==undefined && String(v).trim()!=="";
-    }
-
-  function genderLabel(c){
-    if(c.genderLabel) return c.genderLabel;
-    if(c.gender==="male") return "男性";
-    if(c.gender==="female") return "女性";
-    return "その他";
-  }
-
-    // テキスト横幅フィット
-    function fitTextToWidth(el, maxPx, minPx, padding=8){
-      if(!el) return;
-      el.style.fontSize = maxPx + "px";
-      const parent = el.parentElement;
-      const limitW = Math.max(0, (parent ? parent.clientWidth : el.clientWidth) - padding);
-      let size = maxPx;
-      while(size > minPx && el.scrollWidth > limitW){
-        size -= 1;
-        el.style.fontSize = size + "px";
+    <!-- Share modal -->
+    <div class="modal" id="shareModal" aria-hidden="true">
+      <div class="modal-panel">
+        <div class="modal-title">
+          <span>共有</span>
+          <button class="xbtn" id="btnCloseShare" aria-label="close">×</button>
+        </div>
+        <div class="preview" id="sharePreview">—</div>
+        <div class="share-actions">
+          <button class="smallbtn clear" id="btnCopyShare">共有文をコピー</button>
+          <button class="smallbtn ok" id="btnSaveShareImg">画像として保存</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" id="toast">
+    </div>
+    <footer class="credit">© senamagu</footer>
+    <script>
+  /**********************
+       * DATA
+       **********************/
+      // 画像はローカル相対パス: "Charamedia/xxx.png"
+      // docUrl があれば資料ボタン表示
+      // shareQuote があれば共有文に入れる
+  
+      let characters = [];
+  
+      async function loadCharacters(){
+        // 1) 一覧を読む
+        const res = await fetch("./characters/index.json", { cache:"no-store" });
+        if(!res.ok) throw new Error("characters/index.json が読めない");
+        const files = await res.json();
+  
+        if(!Array.isArray(files)) throw new Error("index.json は配列にしてね（例: [\"a.json\",\"b.json\"]）");
+  
+        // 2) それぞれのJSONを読む（並列）
+        const results = await Promise.all(
+          files.map(async (file)=>{
+            const url = `./characters/${file}`;
+            const r = await fetch(url, { cache:"no-store" });
+            if(!r.ok) throw new Error(`${url} が読めないよ！`);
+            const data = await r.json();
+  
+            // 各ファイルは「キャラ配列」で統一しろ
+            if(!Array.isArray(data)) throw new Error(`${url} の中身はキャラ配列にしてね`);
+            return data;
+          })
+        );
+  
+        // 3) 配列を平坦化して characters に
+        characters = results.flat();
       }
-    }
-
-    /**********************
-     * COLOR: hex -> tag (範囲で分類)
-     **********************/
-    function hexToRgb(hex){
-      const h = String(hex||"").trim();
-      const m = h.match(/^#?([0-9a-f]{6})$/i);
-      if(!m) return null;
-      const n = parseInt(m[1], 16);
-      return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
-    }
-
-    function rgbToHsl(r,g,b){
-      r/=255; g/=255; b/=255;
-      const max=Math.max(r,g,b), min=Math.min(r,g,b);
-      let h=0, s=0;
-      const l=(max+min)/2;
-      const d=max-min;
-      if(d!==0){
-        s = d / (1 - Math.abs(2*l - 1));
-        switch(max){
-          case r: h = ((g-b)/d) % 6; break;
-          case g: h = (b-r)/d + 2; break;
-          case b: h = (r-g)/d + 4; break;
-        }
-        h *= 60;
-        if(h<0) h+=360;
-      }
-      return {h,s,l};
-    }
-
-    function colorToTagByHex(hex){
-      const rgb = hexToRgb(hex);
-      if(!rgb) return "";
-      const {h,s,l} = rgbToHsl(rgb.r,rgb.g,rgb.b);
-
-      // 白/黒/灰（彩度と明度で判定）
-      if(l >= 0.92) return "白";
-      if(l <= 0.12) return "黒";
-      if(s <= 0.12) return "灰色";
-
-      // 色相で分類（ざっくり範囲）
-      // 赤: 345-360 / 0-15
-      if(h >= 345 || h < 15) return "赤";
-      if(h < 45) return "オレンジ";
-      if(h < 75) return "黄色";
-      if(h < 165) return "緑";
-      if(h < 255) return "青";
-      if(h < 300) return "紫";
-      if(h < 345) return "ピンク";
-      return "赤";
-    }
-
-    function getCharColorTag(c){
-      // 明示タグ優先、なければカラーコードから推定
-      if(hasValue(c.colorTag)) return c.colorTag.trim();
-      if(hasValue(c.color)) return colorToTagByHex(c.color.trim());
-      return "";
-    }
-
-    /**********************
-     * FILTERING
-     **********************/
-    function applyFilters(){
-      const aMin = state.ageMin, aMax = state.ageMax;
-      const hMin = state.hMin, hMax = state.hMax;
-
-      const res = characters.filter(c=>{
-        if(state.selectedSeries.size && !state.selectedSeries.has(c.series)) return false;
-        if(state.selectedGenres.size && !state.selectedGenres.has(c.genre)) return false;
-        if(state.selectedGenders.size && !state.selectedGenders.has(c.gender)) return false;
-
-        if(aMin!==null || aMax!==null){
-          if(!Number.isFinite(c.age)) return false;
-          if(aMin!==null && c.age < aMin) return false;
-          if(aMax!==null && c.age > aMax) return false;
-        }
-        if(hMin!==null || hMax!==null){
-          if(!Number.isFinite(c.heightCm)) return false;
-          if(hMin!==null && c.heightCm < hMin) return false;
-          if(hMax!==null && c.heightCm > hMax) return false;
-        }
-
-        if(state.selectedColors.size){
-          const tag = getCharColorTag(c);
-          if(!tag) return false;
-          if(!state.selectedColors.has(tag)) return false;
-        }
-
-        if(state.hasImageOnly && !hasValue(c.image)) return false;
-        if(state.hasDocOnly && !hasValue(c.docUrl)) return false;
-
-        return true;
-      });
-
-      renderHit(res);
-      return res;
-    }
-
-    /**********************
-     * HIT LIST
-     **********************/
-    function renderHit(list){
-      $("#hitCount").textContent = list.length;
-      const grid = $("#hitGrid");
-      grid.innerHTML = "";
-      for(const c of list){
-        const div = document.createElement("div");
-        div.className = "hitname";
-        div.textContent = c.name;
-        grid.appendChild(div);
-      }
-    }
-
-    /**********************
-     * MULTI SELECT
-     **********************/
-    function uniqueValues(key){
-      const set = new Set();
-      for(const c of characters){
-        if(key==="series") set.add(c.series);
-        if(key==="genre") set.add(c.genre);
-        if(key==="gender") set.add(c.gender);
-      }
-      return [...set].filter(Boolean);
-    }
-
-    function updateMultiValueText(multiEl){
-      const kind = multiEl.dataset.multi;
-      const valEl = multiEl.querySelector(".value");
-
-      const set =
-        kind==="series" ? state.selectedSeries :
-        kind==="genre"  ? state.selectedGenres :
-        kind==="gender" ? state.selectedGenders :
-        new Set();
-
-      if(!set.size){
-        valEl.textContent = "選択";
-        valEl.classList.add("placeholder");
-        return;
-      }
-     const arr = [...set].map(v=>{
-      if(kind!=="gender") return v;
-      return v==="male" ? "男性" :
-             v==="female" ? "女性" : "その他";
-    });
-      valEl.textContent = arr.join("、");
-      valEl.classList.remove("placeholder");
-    }
-
-    function renderMulti(multiEl){
-      const kind = multiEl.dataset.multi;
-      const panel = multiEl.querySelector(".multi-panel");
-      panel.innerHTML = "";
-
-      const values = uniqueValues(kind).sort((a,b)=>String(a).localeCompare(String(b),"ja"));
-      const currentSet =
-        kind==="series" ? state.selectedSeries :
-        kind==="genre"  ? state.selectedGenres :
-        kind==="gender" ? state.selectedGenders :
-        new Set();
-
-      for(const v of values){
-        const row = document.createElement("div");
-        row.className = "opt";
-
-        const tick = document.createElement("span");
-        tick.className = "tick" + (currentSet.has(v) ? " on":"");
-
-        const label = document.createElement("span");
-        label.textContent = (kind==="gender") ? genderLabel(v) : v;
-
-        row.appendChild(tick);
-        row.appendChild(label);
-
-        row.addEventListener("click", (e)=>{
-          e.stopPropagation();
-          if(currentSet.has(v)) currentSet.delete(v);
-          else currentSet.add(v);
-
-          renderMulti(multiEl);
-          updateMultiValueText(multiEl);
-          applyFilters();
-        });
-
-        panel.appendChild(row);
-      }
-
-      updateMultiValueText(multiEl);
-    }
-
-    function setupMulti(){
-      document.querySelectorAll(".multi").forEach(m=>{
-        renderMulti(m);
-        const btn = m.querySelector(".multi-btn");
-        btn.addEventListener("click", ()=>{
-          // 他は閉じる
-          document.querySelectorAll(".multi").forEach(x=>{ if(x!==m) x.classList.remove("open"); });
-          m.classList.toggle("open");
-        });
-        btn.addEventListener("keydown", (e)=>{
-          if(e.key==="Enter" || e.key===" "){
-            e.preventDefault();
-            btn.click();
-          }
-        });
-      });
-
-      document.addEventListener("click", (e)=>{
-        const inside = e.target.closest(".multi");
-        if(!inside){
-          document.querySelectorAll(".multi").forEach(x=>x.classList.remove("open"));
-        }
-      });
-    }
-
-    /**********************
-     * COLOR MODAL
-     **********************/
-    let tempColors = new Set();
-
-    function renderColorGrid(){
-      const grid = $("#colorGrid");
-      grid.innerHTML = "";
-      for(const item of COLOR_ITEMS){
-        const row = document.createElement("div");
-        row.className = "color-item";
-        const sw = document.createElement("span");
-        sw.className = "swatch";
-        sw.style.background = item.hex;
-
-        const name = document.createElement("div");
-        name.className = "name";
-        name.textContent = item.key;
-
-        const mark = document.createElement("span");
-        mark.className = "mark" + (tempColors.has(item.key) ? " on":"");
-
-        row.appendChild(sw);
-        row.appendChild(name);
-        row.appendChild(mark);
-
-        row.addEventListener("click", ()=>{
-          if(tempColors.has(item.key)) tempColors.delete(item.key);
-          else tempColors.add(item.key);
-          renderColorGrid();
-        });
-
-        grid.appendChild(row);
-      }
-    }
-
-    function openColorModal(){
-      tempColors = new Set(state.selectedColors);
-      renderColorGrid();
-      $("#colorModal").classList.add("open");
-    }
-    function closeColorModal(){
-      $("#colorModal").classList.remove("open");
-    }
-
-    /**********************
-     * TOGGLES
-     **********************/
-    function setToggle(elDot, on){
-      elDot.classList.toggle("on", !!on);
-    }
-
-    /**********************
-     * RESULT RENDER
-     **********************/
-    function renderResult(c){
-      state.lastResult = c;
-
-      $("#resultCard").style.display = "flex";
-
-      // 6 画像枠背景はカラーコード依存
-      const bg = hasValue(c.color) ? c.color : "#89AFB9";
-      $("#imgBox").style.background = bg;
-
-      // 画像 or 画像なし
-      const inner = $("#imgInner");
-      inner.innerHTML = "";
-      inner.style.background = "transparent";
-      if(hasValue(c.image)){
-        const img = document.createElement("img");
-        img.src = c.image;
-        img.alt = c.name;
-        inner.appendChild(img);
-      }else{
-        inner.style.background = "#89AFB9";
-        const div = document.createElement("div");
-        div.className = "no-image";
-        div.textContent = "画像なし";
-        inner.appendChild(div);
-      }
-
-      // 7 名前
-      $("#nameText").textContent = c.name || "—";
-      $("#yomiText").textContent = hasValue(c.yomi) ? c.yomi : "—";
-
-      // 8 創作
-      $("#seriesName").textContent = c.series || "—";
-
-      // 9 rows
-      const kv = $("#kvArea");
-      kv.innerHTML = "";
-
-      const rows = [
-        ["性別", hasValue(c.gender) ? genderLabel(c) : "未登録"],
-        ["年齢", Number.isFinite(c.age) ? (c.age + "歳") : "未登録"],
-        ["身長", Number.isFinite(c.heightCm) ? (c.heightCm + "cm") : "未登録"],
-        ["誕生日", hasValue(c.birthday) ? c.birthday : "未登録"],
-        ["カラーコード", hasValue(c.color) ? c.color : "未登録"]
+  
+      const COLOR_ITEMS = [
+        {key:"赤",   hex:"#F37679"},
+        {key:"青",   hex:"#58A8DD"},
+        {key:"緑",   hex:"#34C38E"},
+        {key:"黄色", hex:"#DADD4F"},
+        {key:"オレンジ", hex:"#F08D58"},
+        {key:"ピンク", hex:"#F777B0"},
+        {key:"紫",   hex:"#8C6BFF"},
+        {key:"茶色", hex:"#AD7B74"},
+        {key:"黒",   hex:"#464B51"},
+        {key:"白",   hex:"#F6FCFA"},
+        {key:"灰色", hex:"#7F8389"}
       ];
-
-      rows.forEach(([k,v], i)=>{
-        const kEl = document.createElement("div");
-        kEl.className = "k";
-        kEl.textContent = k;
-        const vEl = document.createElement("div");
-        vEl.className = "v";
-        vEl.textContent = v;
-        kv.appendChild(kEl);
-        kv.appendChild(vEl);
-        if(i !== rows.length-1){
-          const line = document.createElement("div");
-          line.className = "kv-line";
-          kv.appendChild(line);
-        }
-      });
-
-      const p = hasValue(c.personality) ? c.personality : "未登録";
-      $("#personalityText").textContent = p;
-
-      // fit
-      fitTextToWidth($("#nameText"), 52, 22);
-      fitTextToWidth($("#seriesText"), 46, 22, 120);
-
-      // 18 doc button
-      const btnDoc = $("#btnDoc");
-      if(hasValue(c.docUrl)){
-        btnDoc.style.display = "inline-flex";
-        btnDoc.onclick = ()=> window.open(c.docUrl, "_blank", "noopener");
-      }else{
-        btnDoc.style.display = "none";
-      }
-      if(setupActionsBar._sync) setupActionsBar._sync();
-    }
-
-    /**********************
-     * SHARE MODAL
-     **********************/
-    function buildShareText(c){
-      const base = `あなたはフィップスキャラガチャで${c.name}を出しました！`;
-      if(hasValue(c.shareQuote)) return `${base} ${c.name}「${c.shareQuote}」`;
-      return base;
-    }
-
-    function openShareModal(){
-      if(!state.lastResult){
-        toast("先にガチャしてね！");
-        return;
-      }
-      $("#sharePreview").textContent = buildShareText(state.lastResult);
-      $("#shareModal").classList.add("open");
-    }
-    function closeShareModal(){
-      $("#shareModal").classList.remove("open");
-    }
-
-    async function copyShare(){
-      try{
-        await navigator.clipboard.writeText($("#sharePreview").textContent);
-        toast("共有文をコピーしたよ！");
-      }catch(e){
-        toast("コピーに失敗したよ！");
-      }
-    }
-
-    async function saveCardImage(){
-      const card = $("#resultCard");
-      if(card.style.display==="none"){
-        toast("先にガチャしてね！");
-        return;
-      }
-      if(typeof html2canvas !== "function"){
-        toast("画像保存が使えないかも…");
-        return;
-      }
-      
-      const actionsIn = card.querySelector(".card-actions");
-      const actionsBar = document.getElementById("actionsBar");
-
-      const prevIn  = actionsIn ? actionsIn.style.display : "";
-      const prevBar = actionsBar ? actionsBar.style.display : "";
-
-      if(actionsIn) actionsIn.style.display = "none";
-      if(actionsBar) actionsBar.style.display = "none";
-      
-      try{
-        const canvas = await html2canvas(card, {backgroundColor:null, scale:2});
-        const a = document.createElement("a");
-        a.download = "gacha_result.png";
-        a.href = canvas.toDataURL("image/png");
-        a.click();
-        toast("画像を保存したよ！");
-      }catch(e){
-        toast("画像保存に失敗したよ！");
-      }finally{
-        if(actionsIn) actionsIn.style.display = prevIn;
-        if(actionsBar) actionsBar.style.display = prevBar;
-      }
-    }
-
-    /**********************
-     * INIT + EVENTS
-     **********************/
-    function updateCounts(){
-      $("#totalCount").textContent = characters.length;
-    }
-
-    function wireInputs(){
-      // range
-      const onRangeChange = ()=>{
-        state.ageMin = normNum($("#ageMin").value);
-        state.ageMax = normNum($("#ageMax").value);
-        state.hMin   = normNum($("#hMin").value);
-        state.hMax   = normNum($("#hMax").value);
-        applyFilters();
+  
+      /**********************
+       * STATE
+       **********************/
+      const state = {
+        selectedSeries: new Set(),
+        selectedGenres: new Set(),
+        selectedGenders: new Set(),
+        ageMin: null,
+        ageMax: null,
+        hMin: null,
+        hMax: null,
+        selectedColors: new Set(), // "赤" など
+        hasImageOnly: false,  // 初期：画像ありのみON
+        hasDocOnly: false,
+        lastResult: null
       };
-      ["#ageMin","#ageMax","#hMin","#hMax"].forEach(sel=>{
-        $(sel).addEventListener("input", onRangeChange);
-        $(sel).addEventListener("change", onRangeChange);
-      });
-
-      // color
-      $("#colorBox").addEventListener("click", openColorModal);
-      $("#btnCloseColor").addEventListener("click", closeColorModal);
-      $("#colorModal").addEventListener("click", (e)=>{ if(e.target.id==="colorModal") closeColorModal(); });
-      $("#btnClearColor").addEventListener("click", ()=>{ tempColors.clear(); renderColorGrid(); });
-      $("#btnOkColor").addEventListener("click", ()=>{
-        state.selectedColors = new Set(tempColors);
-        closeColorModal();
-        applyFilters();
-      });
-
-      // toggles
-      $("#tglHasImage").addEventListener("click", ()=>{
-        state.hasImageOnly = !state.hasImageOnly;
-        setToggle($("#dotHasImage"), state.hasImageOnly);
-        applyFilters();
-      });
-      $("#tglHasDoc").addEventListener("click", ()=>{
-        state.hasDocOnly = !state.hasDocOnly;
-        setToggle($("#dotHasDoc"), state.hasDocOnly);
-        applyFilters();
-      });
-
-      // gacha
-      $("#btnGacha").addEventListener("click", ()=>{
-        let pool = applyFilters();
-
-        // 画像URL消して全員画像無しになった時でも、ガチャ押したら自動で画像ありのみOFFして動かす
-        if(!pool.length && state.hasImageOnly){
-          state.hasImageOnly = false;
-          setToggle($("#dotHasImage"), state.hasImageOnly);
-          toast("ヒット0件だよ！");
-          pool = applyFilters();
+  
+      /**********************
+       * HELPERS
+       **********************/
+  
+      function isOtherLabel(kind, v){
+    const s = String(v ?? "").trim().toLowerCase();
+  
+    // 性別：valueは male/female/other のはず
+    if(kind === "gender"){
+      return s === "other";
+    }
+  
+    // 創作名/ジャンル：文字列で "その他" を想定（必要なら追加）
+    return s === "その他" || s === "other" || s === "others";
+  }
+      
+      const $ = (sel)=>document.querySelector(sel);
+  
+      const toast = (msg)=>{
+        const el = $("#toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(()=>el.classList.remove("show"), 1700);
+      };
+  
+      const normNum = (v)=>{
+        const s = String(v ?? "").trim();
+        if(!s) return null;
+        const n = Number(s);
+        return Number.isFinite(n) ? n : null;
+      };
+  
+      function hasValue(v){
+        return v!==null && v!==undefined && String(v).trim()!=="";
+      }
+  
+    function genderLabel(c){
+      if(c.genderLabel) return c.genderLabel;
+      if(c.gender==="male") return "男性";
+      if(c.gender==="female") return "女性";
+      return "その他";
+    }
+  
+      // テキスト横幅フィット
+      function fitTextToWidth(el, maxPx, minPx, padding=8){
+        if(!el) return;
+        el.style.fontSize = maxPx + "px";
+        const parent = el.parentElement;
+        const limitW = Math.max(0, (parent ? parent.clientWidth : el.clientWidth) - padding);
+        let size = maxPx;
+        while(size > minPx && el.scrollWidth > limitW){
+          size -= 1;
+          el.style.fontSize = size + "px";
         }
-
-        if(!pool.length){
-          toast("ヒット0件！絞り込みを変えてね！");
+      }
+  
+      /**********************
+       * COLOR: hex -> tag (範囲で分類)
+       **********************/
+      function hexToRgb(hex){
+        const h = String(hex||"").trim();
+        const m = h.match(/^#?([0-9a-f]{6})$/i);
+        if(!m) return null;
+        const n = parseInt(m[1], 16);
+        return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+      }
+  
+      function rgbToHsl(r,g,b){
+        r/=255; g/=255; b/=255;
+        const max=Math.max(r,g,b), min=Math.min(r,g,b);
+        let h=0, s=0;
+        const l=(max+min)/2;
+        const d=max-min;
+        if(d!==0){
+          s = d / (1 - Math.abs(2*l - 1));
+          switch(max){
+            case r: h = ((g-b)/d) % 6; break;
+            case g: h = (b-r)/d + 2; break;
+            case b: h = (r-g)/d + 4; break;
+          }
+          h *= 60;
+          if(h<0) h+=360;
+        }
+        return {h,s,l};
+      }
+  
+      function colorToTagByHex(hex){
+        const rgb = hexToRgb(hex);
+        if(!rgb) return "";
+        const {h,s,l} = rgbToHsl(rgb.r,rgb.g,rgb.b);
+  
+        // 白/黒/灰（彩度と明度で判定）
+        if(l >= 0.92) return "白";
+        if(l <= 0.12) return "黒";
+        if(s <= 0.12) return "灰色";
+  
+        // 色相で分類（ざっくり範囲）
+        // 赤: 345-360 / 0-15
+        if(h >= 345 || h < 15) return "赤";
+        if(h < 45) return "オレンジ";
+        if(h < 75) return "黄色";
+        if(h < 165) return "緑";
+        if(h < 255) return "青";
+        if(h < 300) return "紫";
+        if(h < 345) return "ピンク";
+        return "赤";
+      }
+  
+      function getCharColorTag(c){
+        // 明示タグ優先、なければカラーコードから推定
+        if(hasValue(c.colorTag)) return c.colorTag.trim();
+        if(hasValue(c.color)) return colorToTagByHex(c.color.trim());
+        return "";
+      }
+  
+      /**********************
+       * FILTERING
+       **********************/
+      function applyFilters(){
+        const aMin = state.ageMin, aMax = state.ageMax;
+        const hMin = state.hMin, hMax = state.hMax;
+  
+        const res = characters.filter(c=>{
+          if(state.selectedSeries.size && !state.selectedSeries.has(c.series)) return false;
+          if(state.selectedGenres.size && !state.selectedGenres.has(c.genre)) return false;
+          if(state.selectedGenders.size && !state.selectedGenders.has(c.gender)) return false;
+  
+          if(aMin!==null || aMax!==null){
+            if(!Number.isFinite(c.age)) return false;
+            if(aMin!==null && c.age < aMin) return false;
+            if(aMax!==null && c.age > aMax) return false;
+          }
+          if(hMin!==null || hMax!==null){
+            if(!Number.isFinite(c.heightCm)) return false;
+            if(hMin!==null && c.heightCm < hMin) return false;
+            if(hMax!==null && c.heightCm > hMax) return false;
+          }
+  
+          if(state.selectedColors.size){
+            const tag = getCharColorTag(c);
+            if(!tag) return false;
+            if(!state.selectedColors.has(tag)) return false;
+          }
+  
+          if(state.hasImageOnly && !hasValue(c.image)) return false;
+          if(state.hasDocOnly && !hasValue(c.docUrl)) return false;
+  
+          return true;
+        });
+  
+        renderHit(res);
+        return res;
+      }
+  
+      /**********************
+       * HIT LIST
+       **********************/
+      function renderHit(list){
+        $("#hitCount").textContent = list.length;
+        const grid = $("#hitGrid");
+        grid.innerHTML = "";
+        for(const c of list){
+          const div = document.createElement("div");
+          div.className = "hitname";
+          div.textContent = c.name;
+          grid.appendChild(div);
+        }
+      }
+  
+      /**********************
+       * MULTI SELECT
+       **********************/
+      function uniqueValues(key){
+        const set = new Set();
+        for(const c of characters){
+          if(key==="series") set.add(c.series);
+          if(key==="genre") set.add(c.genre);
+          if(key==="gender") set.add(c.gender);
+        }
+        return [...set].filter(Boolean);
+      }
+  
+      function updateMultiValueText(multiEl){
+        const kind = multiEl.dataset.multi;
+        const valEl = multiEl.querySelector(".value");
+  
+        const set =
+          kind==="series" ? state.selectedSeries :
+          kind==="genre"  ? state.selectedGenres :
+          kind==="gender" ? state.selectedGenders :
+          new Set();
+  
+        if(!set.size){
+          valEl.textContent = "選択";
+          valEl.classList.add("placeholder");
           return;
         }
-        const pick = pool[Math.floor(Math.random()*pool.length)];
-        renderResult(pick);
+       const arr = [...set].map(v=>{
+        if(kind!=="gender") return v;
+        return v==="male" ? "男性" :
+               v==="female" ? "女性" : "その他";
       });
-
-      // reset
-      $("#btnReset").addEventListener("click", ()=>{
-        state.selectedSeries.clear();
-        state.selectedGenres.clear();
-        state.selectedGenders.clear();
-        state.ageMin = state.ageMax = state.hMin = state.hMax = null;
-        state.selectedColors.clear();
-        state.hasImageOnly = true;
-        state.hasDocOnly = false;
-
-        $("#ageMin").value = "";
-        $("#ageMax").value = "";
-        $("#hMin").value = "";
-        $("#hMax").value = "";
-
-        setToggle($("#dotHasImage"), state.hasImageOnly);
-        setToggle($("#dotHasDoc"), state.hasDocOnly);
-
+        valEl.textContent = arr.join("、");
+        valEl.classList.remove("placeholder");
+      }
+  
+      function renderMulti(multiEl){
+        const kind = multiEl.dataset.multi;
+        const panel = multiEl.querySelector(".multi-panel");
+        panel.innerHTML = "";
+  
+        const values = uniqueValues(kind).sort((a,b)=>{
+    const ao = isOtherLabel(kind, a);
+    const bo = isOtherLabel(kind, b);
+    if(ao !== bo) return ao ? 1 : -1; // その他だけ最後へ
+    return String(a).localeCompare(String(b), "ja");
+  });
+        const currentSet =
+          kind==="series" ? state.selectedSeries :
+          kind==="genre"  ? state.selectedGenres :
+          kind==="gender" ? state.selectedGenders :
+          new Set();
+  
+        for(const v of values){
+          const row = document.createElement("div");
+          row.className = "opt";
+  
+          const tick = document.createElement("span");
+          tick.className = "tick" + (currentSet.has(v) ? " on":"");
+  
+          const label = document.createElement("span");
+          label.textContent =
+    (kind==="gender")
+      ? (v==="male" ? "男性" : v==="female" ? "女性" : "その他")
+      : v;
+  
+          row.appendChild(tick);
+          row.appendChild(label);
+  
+          row.addEventListener("click", (e)=>{
+            e.stopPropagation();
+            if(currentSet.has(v)) currentSet.delete(v);
+            else currentSet.add(v);
+  
+            renderMulti(multiEl);
+            updateMultiValueText(multiEl);
+            applyFilters();
+          });
+  
+          panel.appendChild(row);
+        }
+  
+        updateMultiValueText(multiEl);
+      }
+  
+      function setupMulti(){
         document.querySelectorAll(".multi").forEach(m=>{
           renderMulti(m);
-          m.classList.remove("open");
+          const btn = m.querySelector(".multi-btn");
+          btn.addEventListener("click", ()=>{
+            // 他は閉じる
+            document.querySelectorAll(".multi").forEach(x=>{ if(x!==m) x.classList.remove("open"); });
+            m.classList.toggle("open");
+          });
+          btn.addEventListener("keydown", (e)=>{
+            if(e.key==="Enter" || e.key===" "){
+              e.preventDefault();
+              btn.click();
+            }
+          });
         });
-
+  
+        document.addEventListener("click", (e)=>{
+          const inside = e.target.closest(".multi");
+          if(!inside){
+            document.querySelectorAll(".multi").forEach(x=>x.classList.remove("open"));
+          }
+        });
+      }
+  
+      /**********************
+       * COLOR MODAL
+       **********************/
+      let tempColors = new Set();
+  
+      function renderColorGrid(){
+        const grid = $("#colorGrid");
+        grid.innerHTML = "";
+        for(const item of COLOR_ITEMS){
+          const row = document.createElement("div");
+          row.className = "color-item";
+          const sw = document.createElement("span");
+          sw.className = "swatch";
+          sw.style.background = item.hex;
+  
+          const name = document.createElement("div");
+          name.className = "name";
+          name.textContent = item.key;
+  
+          const mark = document.createElement("span");
+          mark.className = "mark" + (tempColors.has(item.key) ? " on":"");
+  
+          row.appendChild(sw);
+          row.appendChild(name);
+          row.appendChild(mark);
+  
+          row.addEventListener("click", ()=>{
+            if(tempColors.has(item.key)) tempColors.delete(item.key);
+            else tempColors.add(item.key);
+            renderColorGrid();
+          });
+  
+          grid.appendChild(row);
+        }
+      }
+  
+      function openColorModal(){
+        tempColors = new Set(state.selectedColors);
+        renderColorGrid();
+        $("#colorModal").classList.add("open");
+      }
+      function closeColorModal(){
+        $("#colorModal").classList.remove("open");
+      }
+  
+      /**********************
+       * TOGGLES
+       **********************/
+      function setToggle(elDot, on){
+        elDot.classList.toggle("on", !!on);
+      }
+  
+      /**********************
+       * RESULT RENDER
+       **********************/
+      function renderResult(c){
+        state.lastResult = c;
+  
+        $("#resultCard").style.display = "flex";
+  
+        // 6 画像枠背景はカラーコード依存
+        const bg = hasValue(c.color) ? c.color : "#89AFB9";
+        $("#imgBox").style.background = bg;
+  
+        // 画像 or 画像なし
+        const inner = $("#imgInner");
+        inner.innerHTML = "";
+        inner.style.background = "transparent";
+        if(hasValue(c.image)){
+          const img = document.createElement("img");
+          img.src = c.image;
+          img.alt = c.name;
+          inner.appendChild(img);
+        }else{
+          inner.style.background = "#89AFB9";
+          const div = document.createElement("div");
+          div.className = "no-image";
+          div.textContent = "画像なし";
+          inner.appendChild(div);
+        }
+  
+        // 7 名前
+        $("#nameText").textContent = c.name || "—";
+        $("#yomiText").textContent = hasValue(c.yomi) ? c.yomi : "—";
+  
+        // 8 創作
+        $("#seriesName").textContent = c.series || "—";
+  
+        // 9 rows
+        const kv = $("#kvArea");
+        kv.innerHTML = "";
+  
+        const rows = [
+          ["性別", hasValue(c.gender) ? genderLabel(c) : "未登録"],
+          ["年齢", Number.isFinite(c.age) ? (c.age + "歳") : "未登録"],
+          ["身長", Number.isFinite(c.heightCm) ? (c.heightCm + "cm") : "未登録"],
+          ["誕生日", hasValue(c.birthday) ? c.birthday : "未登録"],
+          ["カラーコード", hasValue(c.color) ? c.color : "未登録"]
+        ];
+  
+        rows.forEach(([k,v], i)=>{
+          const kEl = document.createElement("div");
+          kEl.className = "k";
+          kEl.textContent = k;
+          const vEl = document.createElement("div");
+          vEl.className = "v";
+          vEl.textContent = v;
+          kv.appendChild(kEl);
+          kv.appendChild(vEl);
+          if(i !== rows.length-1){
+            const line = document.createElement("div");
+            line.className = "kv-line";
+            kv.appendChild(line);
+          }
+        });
+  
+        const p = hasValue(c.personality) ? c.personality : "未登録";
+        $("#personalityText").textContent = p;
+  
+        // fit
+        fitTextToWidth($("#nameText"), 52, 22);
+        fitTextToWidth($("#seriesText"), 46, 22, 120);
+  
+        // 18 doc button
+        const btnDoc = $("#btnDoc");
+        if(hasValue(c.docUrl)){
+          btnDoc.style.display = "inline-flex";
+          btnDoc.onclick = ()=> window.open(c.docUrl, "_blank", "noopener");
+        }else{
+          btnDoc.style.display = "none";
+        }
+        if(setupActionsBar._sync) setupActionsBar._sync();
+      }
+  
+      /**********************
+       * SHARE MODAL
+       **********************/
+      function buildShareText(c){
+        const base = `あなたはフィップスキャラガチャで${c.name}を出しました！`;
+        if(hasValue(c.shareQuote)) return `${base} ${c.name}「${c.shareQuote}」`;
+        return base;
+      }
+  
+      function openShareModal(){
+        if(!state.lastResult){
+          toast("先にガチャしてね！");
+          return;
+        }
+        $("#sharePreview").textContent = buildShareText(state.lastResult);
+        $("#shareModal").classList.add("open");
+      }
+      function closeShareModal(){
+        $("#shareModal").classList.remove("open");
+      }
+  
+      async function copyShare(){
+        try{
+          await navigator.clipboard.writeText($("#sharePreview").textContent);
+          toast("共有文をコピーしたよ！");
+        }catch(e){
+          toast("コピーに失敗したよ！");
+        }
+      }
+  
+      async function saveCardImage(){
+        const card = $("#resultCard");
+        if(card.style.display==="none"){
+          toast("先にガチャしてね！");
+          return;
+        }
+        if(typeof html2canvas !== "function"){
+          toast("画像保存が使えないかも…");
+          return;
+        }
+        
+        const actionsIn = card.querySelector(".card-actions");
+        const actionsBar = document.getElementById("actionsBar");
+  
+        const prevIn  = actionsIn ? actionsIn.style.display : "";
+        const prevBar = actionsBar ? actionsBar.style.display : "";
+  
+        if(actionsIn) actionsIn.style.display = "none";
+        if(actionsBar) actionsBar.style.display = "none";
+        
+        try{
+          const canvas = await html2canvas(card, {backgroundColor:null, scale:2});
+          const a = document.createElement("a");
+          a.download = "gacha_result.png";
+          a.href = canvas.toDataURL("image/png");
+          a.click();
+          toast("画像を保存したよ！");
+        }catch(e){
+          toast("画像保存に失敗したよ！");
+        }finally{
+          if(actionsIn) actionsIn.style.display = prevIn;
+          if(actionsBar) actionsBar.style.display = prevBar;
+        }
+      }
+  
+      /**********************
+       * INIT + EVENTS
+       **********************/
+      function updateCounts(){
+        $("#totalCount").textContent = characters.length;
+      }
+  
+      function wireInputs(){
+        // range
+        const onRangeChange = ()=>{
+          state.ageMin = normNum($("#ageMin").value);
+          state.ageMax = normNum($("#ageMax").value);
+          state.hMin   = normNum($("#hMin").value);
+          state.hMax   = normNum($("#hMax").value);
+          applyFilters();
+        };
+        ["#ageMin","#ageMax","#hMin","#hMax"].forEach(sel=>{
+          $(sel).addEventListener("input", onRangeChange);
+          $(sel).addEventListener("change", onRangeChange);
+        });
+  
+        // color
+        $("#colorBox").addEventListener("click", openColorModal);
+        $("#btnCloseColor").addEventListener("click", closeColorModal);
+        $("#colorModal").addEventListener("click", (e)=>{ if(e.target.id==="colorModal") closeColorModal(); });
+        $("#btnClearColor").addEventListener("click", ()=>{ tempColors.clear(); renderColorGrid(); });
+        $("#btnOkColor").addEventListener("click", ()=>{
+          state.selectedColors = new Set(tempColors);
+          closeColorModal();
+          applyFilters();
+        });
+  
+        // toggles
+        $("#tglHasImage").addEventListener("click", ()=>{
+          state.hasImageOnly = !state.hasImageOnly;
+          setToggle($("#dotHasImage"), state.hasImageOnly);
+          applyFilters();
+        });
+        $("#tglHasDoc").addEventListener("click", ()=>{
+          state.hasDocOnly = !state.hasDocOnly;
+          setToggle($("#dotHasDoc"), state.hasDocOnly);
+          applyFilters();
+        });
+  
+        // gacha
+        $("#btnGacha").addEventListener("click", ()=>{
+          let pool = applyFilters();
+  
+          // 画像URL消して全員画像無しになった時でも、ガチャ押したら自動で画像ありのみOFFして動かす
+          if(!pool.length && state.hasImageOnly){
+            state.hasImageOnly = false;
+            setToggle($("#dotHasImage"), state.hasImageOnly);
+            toast("ヒット0件だよ！");
+            pool = applyFilters();
+          }
+  
+          if(!pool.length){
+            toast("ヒット0件！絞り込みを変えてね！");
+            return;
+          }
+          const pick = pool[Math.floor(Math.random()*pool.length)];
+          renderResult(pick);
+        });
+  
+        // reset
+        $("#btnReset").addEventListener("click", ()=>{
+          state.selectedSeries.clear();
+          state.selectedGenres.clear();
+          state.selectedGenders.clear();
+          state.ageMin = state.ageMax = state.hMin = state.hMax = null;
+          state.selectedColors.clear();
+          state.hasImageOnly = true;
+          state.hasDocOnly = false;
+  
+          $("#ageMin").value = "";
+          $("#ageMax").value = "";
+          $("#hMin").value = "";
+          $("#hMax").value = "";
+  
+          setToggle($("#dotHasImage"), state.hasImageOnly);
+          setToggle($("#dotHasDoc"), state.hasDocOnly);
+  
+          document.querySelectorAll(".multi").forEach(m=>{
+            renderMulti(m);
+            m.classList.remove("open");
+          });
+  
+          applyFilters();
+          toast("リセットしたよ！");
+        });
+  
+        // 17
+        $("#btnList").addEventListener("click", ()=> toast("準備中"));
+  
+        // 19 share modal
+        $("#btnShare").addEventListener("click", openShareModal);
+        $("#btnCloseShare").addEventListener("click", closeShareModal);
+        $("#shareModal").addEventListener("click", (e)=>{ if(e.target.id==="shareModal") closeShareModal(); });
+        $("#btnCopyShare").addEventListener("click", copyShare);
+        $("#btnSaveShareImg").addEventListener("click", saveCardImage);
+      }
+  
+      function setupActionsBar(){
+    const bar = document.getElementById("actionsBar");
+    const card = document.getElementById("resultCard");
+    const inside = card ? card.querySelector(".card-actions") : null;
+    if(!bar || !inside) return;
+  
+    const mq = window.matchMedia("(max-width: 600px)");
+  
+    const sync = ()=>{
+      // resultCardが非表示の時はバーも隠す
+      const cardVisible = card.style.display !== "none";
+      bar.style.display = (mq.matches && cardVisible) ? "flex" : "none";
+  
+      // スマホ：外へ移動
+      if(mq.matches){
+        // btnDoc と btnShare を bar に移す（同じDOMを移動する）
+        const btnDoc = document.getElementById("btnDoc");
+        const btnShare = document.getElementById("btnShare");
+        if(btnDoc && btnDoc.parentElement !== bar) bar.appendChild(btnDoc);
+        if(btnShare && btnShare.parentElement !== bar) bar.appendChild(btnShare);
+      }else{
+        // PC：元へ戻す
+        const btnDoc = document.getElementById("btnDoc");
+        const btnShare = document.getElementById("btnShare");
+        if(btnDoc && btnDoc.parentElement !== inside) inside.appendChild(btnDoc);
+        if(btnShare && btnShare.parentElement !== inside) inside.appendChild(btnShare);
+      }
+    };
+  
+    mq.addEventListener?.("change", sync);
+    window.addEventListener("resize", sync);
+    sync();
+  
+    // ガチャで表示切り替わるので、renderResult後にも追随させたい
+    setupActionsBar._sync = sync;
+  }
+      
+      function init(){
+        updateCounts();
+        setupMulti();
+        setToggle($("#dotHasImage"), state.hasImageOnly);
+        setToggle($("#dotHasDoc"), state.hasDocOnly);
         applyFilters();
-        toast("リセットしたよ！");
-      });
-
-      // 17
-      $("#btnList").addEventListener("click", ()=> toast("準備中"));
-
-      // 19 share modal
-      $("#btnShare").addEventListener("click", openShareModal);
-      $("#btnCloseShare").addEventListener("click", closeShareModal);
-      $("#shareModal").addEventListener("click", (e)=>{ if(e.target.id==="shareModal") closeShareModal(); });
-      $("#btnCopyShare").addEventListener("click", copyShare);
-      $("#btnSaveShareImg").addEventListener("click", saveCardImage);
-    }
-
-    function setupActionsBar(){
-  const bar = document.getElementById("actionsBar");
-  const card = document.getElementById("resultCard");
-  const inside = card ? card.querySelector(".card-actions") : null;
-  if(!bar || !inside) return;
-
-  const mq = window.matchMedia("(max-width: 600px)");
-
-  const sync = ()=>{
-    // resultCardが非表示の時はバーも隠す
-    const cardVisible = card.style.display !== "none";
-    bar.style.display = (mq.matches && cardVisible) ? "flex" : "none";
-
-    // スマホ：外へ移動
-    if(mq.matches){
-      // btnDoc と btnShare を bar に移す（同じDOMを移動する）
-      const btnDoc = document.getElementById("btnDoc");
-      const btnShare = document.getElementById("btnShare");
-      if(btnDoc && btnDoc.parentElement !== bar) bar.appendChild(btnDoc);
-      if(btnShare && btnShare.parentElement !== bar) bar.appendChild(btnShare);
-    }else{
-      // PC：元へ戻す
-      const btnDoc = document.getElementById("btnDoc");
-      const btnShare = document.getElementById("btnShare");
-      if(btnDoc && btnDoc.parentElement !== inside) inside.appendChild(btnDoc);
-      if(btnShare && btnShare.parentElement !== inside) inside.appendChild(btnShare);
-    }
-  };
-
-  mq.addEventListener?.("change", sync);
-  window.addEventListener("resize", sync);
-  sync();
-
-  // ガチャで表示切り替わるので、renderResult後にも追随させたい
-  setupActionsBar._sync = sync;
-}
-    
-    function init(){
-      updateCounts();
-      setupMulti();
-      setToggle($("#dotHasImage"), state.hasImageOnly);
-      setToggle($("#dotHasDoc"), state.hasDocOnly);
-      applyFilters();
-      wireInputs();
-      setupActionsBar();
-    }
-    
-    (async ()=>{  
-      try{ 
-        await loadCharacters();  
-      }catch(e){    
-        console.error(e);   
-        toast("characters/ 読み込み失敗");    
-        characters = [];  
-      }  
-      init(); // ←ここで起動
-    })();
-
-  </script>
+        wireInputs();
+        setupActionsBar();
+      }
+      
+      (async ()=>{  
+        try{ 
+          await loadCharacters();  
+        }catch(e){    
+          console.error(e);   
+          toast("characters/ 読み込み失敗");    
+          characters = [];  
+        }  
+        init(); // ←ここで起動
+      })();
+    </script>
+  </div>
 </body>
+
 </html>
