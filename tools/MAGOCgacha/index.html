@@ -775,69 +775,6 @@
 
 
     /* スマホレイアウト */
-/* ===== Mobile (no horizontal scroll) ===== */
-@media (max-width: 820px){
-  .wrap{
-    width: min(980px, 94vw);
-  }
-  body{
-    overflow-x: hidden; /* 念のため */
-  }
-
-  /* Result card: 横→縦 */
-  .card{
-    flex-direction: column;
-  }
-  .left{
-    width: 100%;
-    min-width: 0;
-  }
-  .right{
-    min-width: 0;
-  }
-  .series{
-    padding-right: 110px; /* ボタン避けは維持 */
-  }
-
-  /* Filters: 3列→1列 */
-  .filters{
-    grid-template-columns: 1fr;
-  }
-
-  /* filter-side はグリッド跨ぎ指定を解除 */
-  .filter-side{
-    grid-column: auto;
-  }
-
-  /* 上段(色+トグル)も縦に */
-  .side-top{
-    grid-template-columns: 1fr;
-  }
-
-  /* ヒット件数は右寄せだと崩れやすいので左寄せ推奨 */
-  .hits{
-    justify-content: flex-start;
-  }
-
-  /* ボタンは確実に中央 */
-  .bottom{
-    justify-content: center;
-  }
-  .btn-list{
-    width: 100%;
-    max-width: 520px;
-  }
-}
-
-/* さらに小さいスマホ用（任意） */
-@media (max-width: 420px){
-  .field{
-    grid-template-columns: 130px 1fr;
-  }
-  .field .k{ font-size: 18px; }
-  .control{ font-size: 18px; }
-}
-
   </style>
 </head>
 
@@ -1059,10 +996,30 @@
 
     let characters = [];
 
-    async function loadCharacters(){ 
-      const res = await fetch("./characters/index.json", { cache:"no-store" }); 
-      if(!res.ok) throw new Error("characters.json 読めない");  
-      characters = await res.json();
+    async function loadCharacters(){
+      // 1) 一覧を読む
+      const res = await fetch("./characters/index.json", { cache:"no-store" });
+      if(!res.ok) throw new Error("characters/index.json が読めない");
+      const files = await res.json();
+
+      if(!Array.isArray(files)) throw new Error("index.json は配列にしてくれ（例: [\"a.json\",\"b.json\"]）");
+
+      // 2) それぞれのJSONを読む（並列）
+      const results = await Promise.all(
+        files.map(async (file)=>{
+          const url = `./characters/${file}`;
+          const r = await fetch(url, { cache:"no-store" });
+          if(!r.ok) throw new Error(`${url} が読めない`);
+          const data = await r.json();
+
+          // 各ファイルは「キャラ配列」で統一しろ
+          if(!Array.isArray(data)) throw new Error(`${url} の中身はキャラ配列にしてくれ`);
+          return data;
+        })
+      );
+
+      // 3) 配列を平坦化して characters に
+      characters = results.flat();
     }
 
     const COLOR_ITEMS = [
