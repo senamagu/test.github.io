@@ -638,8 +638,15 @@
                 text-overflow:ellipsis;
               }
               .hitlist::-webkit-scrollbar{ width:5px; }
-              .hitlist::-webkit-scrollbar-track{ background: #3D7D8C; border-radius:999px; }
-              .hitlist::-webkit-scrollbar-thumb{ background: var(--btn); border-radius:999px; }
+              .hitlist::-webkit-scrollbar-track{
+                background: #3D7D8C;
+                border-radius:999px;
+              .hitlist::-webkit-scrollbar-thumb{
+                background: var(--btn);
+                border-radius:999px;
+                border:2px solid transparent; /* ←これが「枠内に収める」本体 */
+                background-clip: content-box;}              
+              }
           
               /* 17 */
               .bottom{
