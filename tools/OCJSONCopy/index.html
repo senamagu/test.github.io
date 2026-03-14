@@ -4,107 +4,419 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>OCJSONCopy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0f1115; --panel:#171a21; --panel2:#131a24; --text:#e7e9ee; --muted:#a9b0bf;
-      --line:#2a3040; --acc:#7aa2ff; --danger:#ff5b5b; --ok:#47d18c; --warn:#f5b329;
-      --shadow: 0 10px 30px rgba(0,0,0,.25);
-      --radius: 14px;
+      --bg:       #f6fdfb;
+      --surface:  #ffffff;
+      --surface2: #eef8f4;
+      --green:    #34c38e;
+      --teal:     #3d7c8d;
+      --red:      #f37679;
+      --text:     #1a2e29;
+      --muted:    #6b8f87;
+      --line:     #cce8de;
+      --line2:    #daf0e8;
+      --acc:      #34c38e;
+      --radius:   10px;
+      --rS:       6px;
     }
-    *{ box-sizing:border-box; }
-    body{ margin:0; background:linear-gradient(180deg,#0f1115,#0b0e13); color:var(--text);
-      font-family:system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif; }
+    *, *::before, *::after{ box-sizing:border-box; margin:0; padding:0; }
+
+    body{
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
     header{
-      position:sticky; top:0; z-index:50;
-      background:rgba(15,17,21,.92); backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--line);
-      padding:10px 12px;
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      position: sticky; top: 0; z-index: 50;
+      background: var(--surface);
+      border-bottom: 2px solid var(--green);
+      padding: 0 16px;
+      height: 52px;
+      display: flex; gap: 12px; align-items: center; justify-content: space-between;
     }
-    .leftHeader{ display:flex; gap:10px; align-items:center; flex:1; min-width:0; }
-    .rightHeader{ display:flex; gap:10px; align-items:center; }
-    .brand{ font-weight:800; letter-spacing:.3px; opacity:.9; white-space:nowrap; }
-    .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid var(--line);
-      border-radius:999px; background:rgba(255,255,255,.03); color:var(--muted); font-size:12px; }
+    .leftHeader{ display:flex; gap:12px; align-items:center; flex:1; min-width:0; }
+    .rightHeader{ display:flex; gap:8px; align-items:center; }
+
+    .brand{
+      font-weight: 900;
+      font-size: 15px;
+      color: var(--teal);
+      letter-spacing: .5px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand::before{
+      content: '';
+      display: block;
+      width: 8px; height: 24px;
+      background: var(--green);
+      border-radius: 3px;
+    }
+
+    .pill{
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── Inputs ── */
     input[type="text"], input[type="url"], input[type="number"], select, textarea{
-      width:100%; background:rgba(255,255,255,.04); border:1px solid var(--line);
-      border-radius:12px; padding:10px 12px; color:var(--text); outline:none;
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--line);
+      border-radius: var(--rS);
+      padding: 8px 10px;
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color .15s;
     }
-    textarea{ min-height:120px; resize:vertical; }
-    input:focus, select:focus, textarea:focus{ border-color:rgba(122,162,255,.7); box-shadow:0 0 0 3px rgba(122,162,255,.15); }
+    textarea{ min-height: 110px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      border-color: var(--green);
+      background: #fff;
+    }
+
+    /* ── Buttons ── */
     button{
-      border:1px solid var(--line); background:rgba(255,255,255,.04);
-      color:var(--text); border-radius:12px; padding:10px 12px;
-      cursor:pointer; font-weight:700;
+      border: 1.5px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: var(--rS);
+      padding: 8px 14px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 13px;
+      transition: background .12s, border-color .12s, transform .08s;
+      white-space: nowrap;
     }
-    button:hover{ border-color:rgba(255,255,255,.18); background:rgba(255,255,255,.06); }
-    .primary{ border-color:rgba(122,162,255,.55); background:rgba(122,162,255,.12); }
-    .primary:hover{ background:rgba(122,162,255,.16); }
-    .danger{ border-color:rgba(255,91,91,.55); background:rgba(255,91,91,.10); }
-    .danger:hover{ background:rgba(255,91,91,.14); }
-    .ok{ border-color:rgba(71,209,140,.55); background:rgba(71,209,140,.10); }
-    .ok:hover{ background:rgba(71,209,140,.14); }
-    .warn{ border-color:rgba(245,179,41,.55); background:rgba(245,179,41,.10); }
-    .warn:hover{ background:rgba(245,179,41,.14); }
-    .iconBtn{ display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; padding:0; border-radius:12px; }
-    .grid{ display:grid; grid-template-columns: 440px minmax(320px, 1fr); gap:12px; padding:12px; }
-    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
-    .panel{ background:rgba(23,26,33,.70); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
-    .panelHead{ padding:12px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:10px; background:rgba(19,26,36,.55); }
-    .panelHead .title{ font-weight:900; letter-spacing:.2px; }
-    .panelBody{ padding:12px; }
-    .split{ display:grid; grid-template-rows: auto 1fr; min-height: calc(100vh - 74px); }
-    .leftCols{ display:grid; grid-template-columns: 1fr; gap:12px; }
-    .list{ display:flex; flex-direction:column; gap:10px; max-height: 240px; overflow:auto; padding-right:6px; }
-    .list.big{ max-height: calc(100vh - 470px); min-height: 220px; }
-    .itemBtn{ text-align:left; border:1px solid var(--line); background:rgba(255,255,255,.03);
-      padding:10px 12px; border-radius:14px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-    .itemBtn.active{ border-color:rgba(122,162,255,.7); background:rgba(122,162,255,.10); }
-    .itemMeta{ color:var(--muted); font-size:12px; margin-top:3px; }
-    .row{ display:flex; gap:10px; align-items:center; }
-    .row > *{ flex:1; }
-    .mini{ font-size:12px; color:var(--muted); }
-    .hr{ height:1px; background:var(--line); margin:12px 0; opacity:.8; }
-    .sortbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    .sortbar select{ width:auto; min-width:180px; }
-    .charCard{ border:1px solid var(--line); background:rgba(255,255,255,.03); border-radius:16px; padding:10px 12px;
-      display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:start; }
-    .charCard.active{ border-color:rgba(122,162,255,.7); background:rgba(122,162,255,.10); }
-    .charName{ font-size:18px; font-weight:1000; letter-spacing:.2px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .idTag{ font-size:12px; font-weight:800; color:var(--muted); border:1px solid var(--line); padding:4px 8px; border-radius:999px; background:rgba(0,0,0,.18); }
-    .metaGrid{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-    .chip{ font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:4px 8px; background:rgba(0,0,0,.14); }
-    .cardActions{ display:flex; gap:8px; }
-    .toast{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
-      background:rgba(23,26,33,.92); border:1px solid var(--line); border-radius:999px; padding:10px 14px; font-weight:800;
-      box-shadow:var(--shadow); display:none; z-index:200; }
-    .formGrid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-    @media (max-width: 980px){ .formGrid{ grid-template-columns: 1fr; } }
-    label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
-    .field{ display:flex; flex-direction:column; gap:6px; }
-    .imgRow{ display:grid; grid-template-columns: 1fr 120px; gap:10px; align-items:start; }
-    .imgPreview{ width:120px; height:120px; border-radius:14px; border:1px solid var(--line);
-      background:rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .imgPreview img{ max-width:100%; max-height:100%; display:block; }
-    .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:12px; }
-    .bottomCopy{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-    @media (max-width: 980px){ .bottomCopy{ grid-template-columns: 1fr; } }
-    .hint{ border-left:3px solid rgba(245,179,41,.75); padding:10px 12px; background:rgba(245,179,41,.08); border-radius:12px; color:var(--text); font-size:13px; }
-    .smallBtns{ display:flex; gap:8px; flex-wrap:wrap; }
-    .badge{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color:var(--muted); }
-    .dot{ width:8px; height:8px; border-radius:999px; background:var(--muted); display:inline-block; }
-    .dot.warn{ background:var(--warn); }
-    dialog{ width:min(860px, 96vw); border:none; border-radius:16px; padding:0; background:rgba(23,26,33,.96);
-      color:var(--text); border:1px solid var(--line); box-shadow:var(--shadow); }
-    dialog::backdrop{ background:rgba(0,0,0,.55); backdrop-filter: blur(2px); }
-    .dlgHead{ padding:12px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
-    .dlgBody{ padding:12px; }
-    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
-    .tab{ padding:8px 10px; border-radius:999px; }
-    .tab.active{ border-color:rgba(122,162,255,.7); background:rgba(122,162,255,.12); }
-    .twoCols{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-    @media (max-width: 980px){ .twoCols{ grid-template-columns: 1fr; } }
-    .errBox{ border-left:3px solid rgba(255,91,91,.85); background:rgba(255,91,91,.08); padding:10px 12px; border-radius:12px; display:none; }
+    button:hover{ background: var(--surface2); border-color: var(--green); }
+    button:active{ transform: scale(.97); }
+
+    .primary{
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+    .primary:hover{ background: #29b07e; border-color: #29b07e; }
+
+    .danger{
+      border-color: #f9b8ba;
+      background: #fff4f4;
+      color: var(--red);
+    }
+    .danger:hover{ background: #fee0e1; border-color: var(--red); }
+
+    .ok{
+      border-color: var(--line);
+      background: var(--surface2);
+      color: var(--teal);
+    }
+    .ok:hover{ background: #d4f0e8; border-color: var(--teal); }
+
+    .warn{
+      border-color: #fde8c0;
+      background: #fffbf0;
+      color: #b07c10;
+    }
+    .warn:hover{ background: #fdefd4; border-color: #e8a020; }
+
+    .iconBtn{
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px;
+      padding: 0;
+      border-radius: var(--rS);
+      font-size: 15px;
+    }
+
+    /* ── Layout ── */
+    .grid{
+      display: grid;
+      grid-template-columns: 400px minmax(300px, 1fr);
+      gap: 0;
+      min-height: calc(100vh - 52px);
+    }
+    @media(max-width:980px){ .grid{ grid-template-columns: 1fr; } }
+
+    /* ── Panel ── */
+    .panel{
+      background: var(--surface);
+      border: 1.5px solid var(--line2);
+      border-radius: var(--radius);
+    }
+    .panelHead{
+      padding: 10px 14px;
+      border-bottom: 1.5px solid var(--line2);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: var(--surface2);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .panelHead .title{ font-weight: 900; font-size: 13px; color: var(--teal); letter-spacing: .3px; }
+    .panelBody{ padding: 12px; }
+
+    /* ── Left column ── */
+    .leftSide{
+      border-right: 2px solid var(--line2);
+      display: flex;
+      flex-direction: column;
+      background: #f0faf5;
+    }
+    .leftTop{
+      padding: 12px;
+      border-bottom: 1.5px solid var(--line2);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .leftScroll{
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Right column ── */
+    .rightSide{
+      display: flex;
+      flex-direction: column;
+    }
+    .rightHead{
+      padding: 10px 16px;
+      border-bottom: 1.5px solid var(--line2);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: var(--surface);
+      position: sticky; top: 52px; z-index: 10;
+    }
+    .rightBody{
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    /* ── List items ── */
+    .list{ display: flex; flex-direction: column; gap: 6px; }
+    .list.big{ max-height: calc(100vh - 380px); overflow-y: auto; min-height: 180px; }
+
+    .itemBtn{
+      text-align: left;
+      border: 1.5px solid var(--line2);
+      background: var(--surface);
+      padding: 8px 12px;
+      border-radius: var(--rS);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      transition: border-color .12s, background .12s;
+    }
+    .itemBtn:hover{ border-color: var(--green); background: #f0fdf8; }
+    .itemBtn.active{
+      border-color: var(--green);
+      background: #e6f9f1;
+      color: var(--teal);
+    }
+    .itemMeta{ color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+    /* ── Char cards ── */
+    .charCard{
+      border: 1.5px solid var(--line2);
+      background: var(--surface);
+      border-radius: var(--rS);
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px; align-items: start;
+      cursor: pointer;
+      transition: border-color .12s, background .12s;
+    }
+    .charCard:hover{ border-color: var(--green); background: #f6fefb; }
+    .charCard.active{ border-color: var(--green); background: #e6f9f1; }
+
+    .charName{
+      font-size: 15px; font-weight: 900;
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      color: var(--text);
+    }
+    .idTag{
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 500;
+      color: var(--muted);
+      border: 1.5px solid var(--line);
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--surface2);
+    }
+    .metaGrid{ display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .chip{
+      font-size: 11px; color: var(--muted);
+      border: 1.5px solid var(--line2);
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: var(--surface2);
+    }
+    .cardActions{ display: flex; gap: 6px; align-items: center; }
+
+    /* ── Misc ── */
+    .row{ display: flex; gap: 10px; align-items: center; }
+    .row > *{ flex: 1; }
+    .mini{ font-size: 11px; color: var(--muted); }
+    .hr{ height: 1.5px; background: var(--line2); margin: 14px 0; }
+
+    .sortbar{ display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .sortbar select{ width: auto; min-width: 160px; }
+
+    .hint{
+      border-left: 3px solid var(--green);
+      padding: 8px 12px;
+      background: #e8f9f2;
+      border-radius: var(--rS);
+      color: var(--teal);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .warnHint{
+      border-left: 3px solid #e8a020;
+      padding: 8px 12px;
+      background: #fffbf0;
+      border-radius: var(--rS);
+      color: #7a5a10;
+      font-size: 12px;
+    }
+
+    .smallBtns{ display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .badge{
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; color: var(--muted);
+    }
+    .dot{ width: 7px; height: 7px; border-radius: 999px; background: var(--line); display: inline-block; transition: background .2s; }
+    .dot.warn{ background: #e8a020; }
+
+    /* ── Form ── */
+    .formGrid{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:980px){ .formGrid{ grid-template-columns: 1fr; } }
+    label{ display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+    .field{ display: flex; flex-direction: column; gap: 4px; }
+
+    .imgRow{ display: grid; grid-template-columns: 1fr 100px; gap: 10px; align-items: start; }
+    .imgPreview{
+      width: 100px; height: 100px;
+      border-radius: var(--rS);
+      border: 1.5px solid var(--line);
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .imgPreview img{ max-width: 100%; max-height: 100%; display: block; }
+
+    .kbd{ font-family: 'DM Mono', monospace; font-size: 12px; }
+
+    .bottomCopy{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:980px){ .bottomCopy{ grid-template-columns: 1fr; } }
+
+    /* ── Toast ── */
+    .toast{
+      position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+      background: var(--teal);
+      color: #fff;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-weight: 700; font-size: 13px;
+      box-shadow: 0 4px 16px rgba(61,124,141,.3);
+      display: none; z-index: 200;
+      animation: toastIn .18s ease;
+    }
+    @keyframes toastIn{
+      from{ opacity:0; transform: translateX(-50%) translateY(8px); }
+      to  { opacity:1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ── Error ── */
+    .errBox{
+      border-left: 3px solid var(--red);
+      background: #fff4f4;
+      padding: 8px 12px;
+      border-radius: var(--rS);
+      display: none;
+      color: #9b2c2e;
+      font-size: 12px;
+    }
+
+    /* ── Dialog ── */
+    dialog{
+      width: min(800px, 96vw);
+      border: none;
+      border-radius: 12px;
+      padding: 0;
+      background: var(--surface);
+      color: var(--text);
+      border: 1.5px solid var(--line);
+      box-shadow: 0 20px 60px rgba(61,124,141,.18);
+    }
+    dialog::backdrop{ background: rgba(20,50,44,.35); }
+    .dlgHead{
+      padding: 12px 16px;
+      border-bottom: 1.5px solid var(--line2);
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface2);
+      border-radius: 12px 12px 0 0;
+    }
+    .dlgBody{ padding: 16px; }
+
+    .tabs{ display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tab{ padding: 6px 14px; border-radius: 999px; font-size: 12px; }
+    .tab.active{ border-color: var(--green); background: #e6f9f1; color: var(--teal); }
+
+    .twoCols{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:700px){ .twoCols{ grid-template-columns: 1fr; } }
+
+    /* Section label */
+    .sectionLabel{
+      font-size: 10px; font-weight: 900; letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 0 6px;
+      border-bottom: 1.5px solid var(--line2);
+      margin-bottom: 10px;
+    }
+
+    /* color inputs */
+    input[type="color"]{
+      width: 44px; height: 38px;
+      border-radius: var(--rS);
+      border: 1.5px solid var(--line);
+      padding: 3px;
+      cursor: pointer;
+      background: var(--surface2);
+      flex-shrink: 0;
+    }
+    .colorRow{ display: flex; gap: 8px; align-items: center; }
+    .colorRow input[type="text"]{ flex: 1; }
+
+    /* copy textareas */
+    textarea.kbd{
+      background: #f0fdf8;
+      border-color: var(--line);
+      color: var(--teal);
+      font-size: 11px;
+    }
   </style>
 </head>
 <body>
@@ -116,54 +428,54 @@
   </div>
   <div class="rightHeader">
     <button class="warn" id="btnReloadRemote">公式データ再読込</button>
-    <button class="primary" id="btnAdd">新規キャラ追加</button>
+    <button class="primary" id="btnAdd">＋ 新規キャラ追加</button>
   </div>
 </header>
 
 <div class="grid">
-  <section class="panel split">
-    <div class="panelHead">
-      <div>
-        <div class="title">一覧</div>
-        <div class="mini">MAGOCgacha/characters/index.json → 子json → キャラ一覧</div>
+
+  <!-- ========= LEFT ========= -->
+  <section class="leftSide">
+    <div class="leftTop">
+      <div class="row">
+        <button id="btnLoad" class="ok">index.json 読込</button>
+        <button id="btnClearDraft" class="danger">ローカル消去</button>
+        <div class="badge" id="draftBadge"><span class="dot"></span><span>未保存</span></div>
       </div>
-      <div class="badge" id="draftBadge"><span class="dot"></span><span>ローカル未保存</span></div>
+      <div class="hint">
+        GitHub Pages のJSだけではリポジトリのJSONは直接更新できません。<br>
+        編集 → <b>カテゴリJSON書き出し / コピー</b> → 手動差し替えが確実です。
+      </div>
+      <div class="errBox" id="errBox"><b>エラー：</b><span id="errText"></span></div>
     </div>
 
-    <div class="panelBody leftCols">
-      <div class="panel" style="background:rgba(0,0,0,.0); border:0; box-shadow:none;">
-        <div class="row">
-          <button id="btnLoad" class="ok">index.json 読込</button>
-          <button id="btnClearDraft" class="danger">ローカル消去</button>
-        </div>
-        <div class="hint" style="margin-top:10px;">
-          ※ GitHub Pages上のJSだけじゃリポジトリのJSONは直接更新できない。<br>
-          編集 → <b>カテゴリJSONを書き出し / コピー</b> → 手動で差し替え、が確実ルート。
-        </div>
-        <div class="errBox" id="errBox"><b>エラー：</b><span id="errText"></span></div>
-      </div>
+    <div class="leftScroll">
 
+      <!-- 子json一覧 -->
       <div class="panel">
         <div class="panelHead">
           <div class="title">子json一覧</div>
           <div class="mini kbd" id="childPathHint"></div>
         </div>
-        <div class="panelBody"><div class="list" id="childList"></div></div>
+        <div class="panelBody">
+          <div class="list" id="childList"></div>
+        </div>
       </div>
 
+      <!-- キャラ一覧 -->
       <div class="panel">
         <div class="panelHead">
           <div class="title">キャラ一覧</div>
           <div class="sortbar">
             <select id="sortMode">
-              <option value="order">並び：JSON順</option>
-              <option value="name">並び：name</option>
-              <option value="yomi">並び：yomi</option>
-              <option value="age">並び：age</option>
-              <option value="height">並び：height</option>
-              <option value="colorTag">並び：colorTag</option>
-              <option value="series">並び：series</option>
-              <option value="genre">並び：genre</option>
+              <option value="order">JSON順</option>
+              <option value="name">name</option>
+              <option value="yomi">yomi</option>
+              <option value="age">age</option>
+              <option value="height">height</option>
+              <option value="colorTag">colorTag</option>
+              <option value="series">series</option>
+              <option value="genre">genre</option>
             </select>
             <select id="sortDir">
               <option value="asc">昇順</option>
@@ -171,127 +483,137 @@
             </select>
           </div>
         </div>
-        <div class="panelBody"><div class="list big" id="charList"></div></div>
+        <div class="panelBody">
+          <div class="list big" id="charList"></div>
+        </div>
       </div>
+
     </div>
   </section>
 
-  <section class="panel split">
-    <div class="panelHead">
+  <!-- ========= RIGHT ========= -->
+  <section class="rightSide">
+    <div class="rightHead">
       <div>
-        <div class="title">キャラ編集</div>
+        <div style="font-weight:900; font-size:14px; color:var(--teal);">キャラ編集</div>
         <div class="mini" id="editTitle">キャラ未選択</div>
       </div>
       <div class="smallBtns">
-        <button id="btnApply" class="ok">反映</button>
-        <button id="btnReloadChar" class="warn">選択キャラを再読込</button>
+        <button id="btnApply" class="primary">反映</button>
+        <button id="btnReloadChar" class="warn">再読込</button>
         <button id="btnDeleteChar" class="danger">削除</button>
       </div>
     </div>
 
-    <div class="panelBody">
-      <div id="noSel" class="hint">左のキャラを選べ。右で編集できる。</div>
+    <div class="rightBody">
+      <div id="noSel" class="hint" style="max-width:420px;">左のキャラを選択してください。ここで編集できます。</div>
 
       <div id="editor" style="display:none;">
+
+        <!-- Basic -->
+        <div class="sectionLabel">基本情報</div>
         <div class="formGrid">
           <div class="field">
-            <label>id（自動採番：{子}_{001}）</label>
+            <label>id（自動採番）</label>
             <input id="f_id" type="text" disabled />
-            <div class="mini">※ 書き出し時にカテゴリ内を上から連番に揃える。</div>
+            <div class="mini">書き出し時にカテゴリ内を連番に揃えます。</div>
           </div>
           <div class="field"><label>name</label><input id="f_name" type="text" /></div>
           <div class="field"><label>yomi</label><input id="f_yomi" type="text" /></div>
-
           <div class="field">
-            <label>series（既存から選択 / 手入力）</label>
+            <label>series</label>
             <input id="f_series" list="dl_series" type="text" />
             <datalist id="dl_series"></datalist>
           </div>
-
           <div class="field">
-            <label>genre（既存から選択 / 手入力）</label>
+            <label>genre</label>
             <input id="f_genre" list="dl_genre" type="text" />
             <datalist id="dl_genre"></datalist>
           </div>
-
           <div class="field">
-            <label>colorTag（既存から選択 / 手入力）</label>
+            <label>colorTag</label>
             <input id="f_colorTag" list="dl_colorTag" type="text" />
             <datalist id="dl_colorTag"></datalist>
           </div>
+        </div>
 
+        <div class="hr"></div>
+        <div class="sectionLabel">プロフィール</div>
+        <div class="formGrid">
           <div class="field">
-            <label>gender（male/female/other）</label>
+            <label>gender</label>
             <select id="f_gender">
               <option value="female">female（女性）</option>
               <option value="male">male（男性）</option>
               <option value="other">other（自由記入）</option>
             </select>
           </div>
-
           <div class="field">
-            <label>genderlabel（otherの中身）</label>
+            <label>genderlabel（other時のみ）</label>
             <input id="f_genderlabel" type="text" placeholder="例：中性 / 無性 / 不明 など" />
-            <div class="mini">genderがotherの時だけ使う。female/maleなら空推奨。</div>
           </div>
-
           <div class="field"><label>age</label><input id="f_age" type="number" step="1" placeholder="未登録なら空" /></div>
           <div class="field"><label>heightCm</label><input id="f_height" type="number" step="1" placeholder="未登録なら空" /></div>
           <div class="field"><label>birthday</label><input id="f_birthday" type="text" placeholder="11/11 / 不明 / 空など" /></div>
-
           <div class="field">
-            <label>color（#RRGGBB）</label>
-            <div class="row" style="gap:8px;">
+            <label>color</label>
+            <div class="colorRow">
               <input id="f_color" type="text" placeholder="#34C38E" />
-              <input id="f_colorPick" type="color" value="#34c38e" style="max-width:90px; padding:4px; height:42px; border-radius:12px;" />
+              <input id="f_colorPick" type="color" value="#34c38e" />
             </div>
           </div>
 
           <div class="field" style="grid-column:1/-1;">
-            <label>personality（改行OK → JSONでは \\n）</label>
-            <textarea id="f_personality" placeholder="改行して書け。反映/書き出しでちゃんと \\n になる。"></textarea>
+            <label>personality（改行OK → JSON内では \\n）</label>
+            <textarea id="f_personality" placeholder="改行して書いてください。書き出し時に \\n になります。"></textarea>
           </div>
+        </div>
 
+        <div class="hr"></div>
+        <div class="sectionLabel">メディア・リンク</div>
+        <div class="formGrid">
           <div class="field" style="grid-column:1/-1;">
             <label>image（MAGOCgacha/images/index.json から選択）</label>
             <div class="imgRow">
-              <div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
                 <select id="f_imageSel"></select>
-                <div class="mini">保存される値：<span class="kbd" id="imgSavedVal"></span></div>
+                <div class="mini kbd">保存値：<span id="imgSavedVal"></span></div>
               </div>
               <div class="imgPreview" id="imgPreview"><span class="mini">no image</span></div>
             </div>
           </div>
-
           <div class="field"><label>docUrl</label><input id="f_docUrl" type="url" placeholder="https://..." /></div>
           <div class="field"><label>shareQuote</label><input id="f_shareQuote" type="text" placeholder="一言" /></div>
         </div>
 
         <div class="hr"></div>
 
+        <!-- Copy areas -->
         <div class="bottomCopy">
-          <div class="panel" style="background:rgba(0,0,0,0); box-shadow:none;">
+          <div class="panel">
             <div class="panelHead">
-              <div class="title">子json内を一括コピー</div>
+              <div class="title">子json一括コピー</div>
               <div class="smallBtns">
-                <button class="primary" id="btnCopyCategory">コピー</button>
-                <button class="warn" id="btnDownloadCategory">JSON書き出し</button>
+                <button class="ok" id="btnCopyCategory">コピー</button>
+                <button class="warn" id="btnDownloadCategory">書き出し</button>
               </div>
             </div>
-            <div class="panelBody">
+            <div class="panelBody" style="display:flex;flex-direction:column;gap:6px;">
               <textarea id="taCategory" class="kbd" readonly></textarea>
-              <div class="mini">カテゴリ（子json）をまるごと。idは {子}_001 連番にして出す。</div>
+              <div class="mini">カテゴリ（子json）まるごと。id は連番で出力します。</div>
             </div>
           </div>
 
-          <div class="panel" style="background:rgba(0,0,0,0); box-shadow:none;">
+          <div class="panel">
             <div class="panelHead">
-              <div class="title">キャラのJSONコピー</div>
-              <div class="smallBtns"><button class="primary" id="btnCopyChar">コピー</button></div>
+              <div class="title">キャラJSONコピー</div>
+              <div class="smallBtns">
+                <button class="ok" id="btnCopyChar">コピー</button>
+              </div>
             </div>
-            <div class="panelBody">
+            <div class="panelBody" style="display:flex;flex-direction:column;gap:6px;">
               <textarea id="taChar" class="kbd" readonly></textarea>
-              <div class="mini">選択キャラだけ。</div>
+              <div class="mini">選択キャラのみ。</div>
             </div>
           </div>
         </div>
@@ -299,19 +621,22 @@
         <div class="hr"></div>
 
         <div class="smallBtns">
-          <button class="warn" id="btnDownloadIndex">index.json 書き出し（子一覧）</button>
-          <button class="primary" id="btnCopyIndex">index.json コピー（子一覧）</button>
+          <button class="warn" id="btnDownloadIndex">index.json 書き出し</button>
+          <button class="ok" id="btnCopyIndex">index.json コピー</button>
         </div>
-      </div>
+
+      </div><!-- /editor -->
     </div>
   </section>
+
 </div>
 
 <div class="toast" id="toast">OK</div>
 
+<!-- ===== Add Dialog ===== -->
 <dialog id="dlgAdd">
   <div class="dlgHead">
-    <div style="font-weight:1000;">新規キャラ追加</div>
+    <div style="font-weight:900; color:var(--teal);">新規キャラ追加</div>
     <button class="iconBtn" id="btnCloseAdd">✕</button>
   </div>
   <div class="dlgBody">
@@ -322,32 +647,28 @@
 
     <div id="tab_paste">
       <div class="twoCols">
-        <div>
-          <div class="mini" style="margin-bottom:8px;">キャラ1人分のJSONを貼れ（オブジェクト）。配列でも先頭1件だけ拾う。</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="mini">キャラ1人分のJSONを貼り付けてください（オブジェクト）。配列の場合は先頭1件のみ取得します。</div>
           <textarea id="taPaste" class="kbd" placeholder='{"name":"名無し","series":"未分類","genre":"不明","gender":"other"}'></textarea>
-          <div class="smallBtns" style="margin-top:10px;"><button class="ok" id="btnAddFromPaste">追加</button></div>
+          <div><button class="primary" id="btnAddFromPaste">追加</button></div>
         </div>
-        <div>
-          <div class="hint">
-            ・genderがfemale/male以外なら other 扱い<br>
-            ・idは書き出し時に自動採番（貼ったidは無視）<br>
-            ・imageは "images/xxx.png" 推奨
-          </div>
+        <div class="hint">
+          ・gender が female/male 以外は other 扱い<br>
+          ・id は書き出し時に自動採番（貼ったidは無視）<br>
+          ・image は "images/xxx.png" を推奨
         </div>
       </div>
     </div>
 
     <div id="tab_fromChild" style="display:none;">
       <div class="twoCols">
-        <div>
-          <div class="mini" style="margin-bottom:8px;">追加先の子jsonを選べ。seriesは先頭キャラのseries（無ければ子名）。</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="mini">追加先の子jsonを選択してください。series は先頭キャラの series（なければ子名）が入ります。</div>
           <select id="selAddChild"></select>
-          <div class="smallBtns" style="margin-top:10px;"><button class="ok" id="btnAddBlank">空キャラを追加</button></div>
+          <div><button class="primary" id="btnAddBlank">空キャラを追加</button></div>
         </div>
-        <div>
-          <div class="hint">
-            空キャラ：name「新規キャラ」/ gender other / genre 不明 / series 自動
-          </div>
+        <div class="hint">
+          空キャラ：name「新規キャラ」/ gender other / genre 不明 / series 自動
         </div>
       </div>
     </div>
@@ -356,16 +677,14 @@
 
 <script>
 (() => {
-  // ===== Paths（OCJSONCopy と MAGOCgacha は tools 配下で兄弟フォルダ想定）=====
   const BASE = "../MAGOCgacha/";
   const CHAR_DIR = BASE + "characters/";
   const IMG_DIR  = BASE + "images/";
   const INDEX_PATH = CHAR_DIR + "index.json";
   const IMG_INDEX_PATH = IMG_DIR + "index.json";
 
-  // ===== State =====
   let childFiles = [];
-  let childData = new Map(); // file -> { remote:[], draft:[], loadedAt }
+  let childData = new Map();
   let images = [];
   let selectedChild = "";
   let selectedCharIdx = -1;
@@ -374,7 +693,6 @@
   let sortDir = "asc";
   let searchText = "";
 
-  // ===== DOM =====
   const $ = (id)=>document.getElementById(id);
   const statusPill = $("statusPill");
   const draftBadge = $("draftBadge");
@@ -393,7 +711,6 @@
   const errText = $("errText");
   $("childPathHint").textContent = CHAR_DIR;
 
-  // Fields
   const f_id=$("f_id"), f_name=$("f_name"), f_yomi=$("f_yomi"), f_series=$("f_series"),
         f_genre=$("f_genre"), f_colorTag=$("f_colorTag"), f_gender=$("f_gender"),
         f_genderlabel=$("f_genderlabel"), f_age=$("f_age"), f_height=$("f_height"),
@@ -402,30 +719,27 @@
         f_imageSel=$("f_imageSel"), imgPreview=$("imgPreview"),
         imgSavedVal=$("imgSavedVal"), f_docUrl=$("f_docUrl"), f_shareQuote=$("f_shareQuote");
 
-  // Dialog add
   const dlgAdd=$("dlgAdd"), btnAdd=$("btnAdd"), btnCloseAdd=$("btnCloseAdd"),
         tabs=dlgAdd.querySelectorAll(".tab"), tabPaste=$("tab_paste"), tabFromChild=$("tab_fromChild"),
         taPaste=$("taPaste"), btnAddFromPaste=$("btnAddFromPaste"),
         selAddChild=$("selAddChild"), btnAddBlank=$("btnAddBlank");
 
-  // Buttons
   const btnLoad=$("btnLoad"), btnReloadRemote=$("btnReloadRemote"), btnClearDraft=$("btnClearDraft");
   const btnApply=$("btnApply"), btnReloadChar=$("btnReloadChar"), btnDeleteChar=$("btnDeleteChar");
   const btnCopyCategory=$("btnCopyCategory"), btnDownloadCategory=$("btnDownloadCategory");
   const btnCopyChar=$("btnCopyChar"), btnDownloadIndex=$("btnDownloadIndex"), btnCopyIndex=$("btnCopyIndex");
 
-  // ===== Utils =====
   function showToast(msg="OK"){
     toast.textContent = msg;
     toast.style.display = "block";
     clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> toast.style.display="none", 1100);
+    showToast._t = setTimeout(()=> toast.style.display="none", 1200);
   }
   async function copyText(text){
-    try{ await navigator.clipboard.writeText(text); showToast("コピーした"); }
+    try{ await navigator.clipboard.writeText(text); showToast("コピーしました"); }
     catch{
       const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
-      ta.select(); document.execCommand("copy"); ta.remove(); showToast("コピーした");
+      ta.select(); document.execCommand("copy"); ta.remove(); showToast("コピーしました");
     }
   }
   function setStatus(t){ statusPill.textContent=t; }
@@ -466,7 +780,6 @@
     out.age=safeNum(out.age);
     out.heightCm=safeNum(out.heightCm);
     if(out.gender!=="other") out.genderlabel="";
-    // image "xxx.png"だけなら images/xxx.png に寄せる
     if(out.image && !out.image.includes("/") && !out.image.includes("\\")) out.image="images/"+out.image;
     return out;
   }
@@ -502,8 +815,8 @@
     const on = hasAnyDraft() || !!localStorage.getItem(draftKey());
     const dot = draftBadge.querySelector(".dot");
     const text = draftBadge.querySelector("span:last-child");
-    if(on){ dot.classList.add("warn"); text.textContent="ローカル保存あり（途中復帰）"; }
-    else{ dot.classList.remove("warn"); text.textContent="ローカル未保存"; }
+    if(on){ dot.classList.add("warn"); text.textContent="ローカル保存あり"; }
+    else{ dot.classList.remove("warn"); text.textContent="未保存"; }
   }
 
   function fillDatalist(id, values){
@@ -524,7 +837,6 @@
     fillDatalist("dl_genre",[...genre].sort());
     fillDatalist("dl_colorTag",[...colorTag].sort());
   }
-
   function ensureDraftForSelected(){
     if(!selectedChild) return;
     const info=childData.get(selectedChild);
@@ -578,7 +890,7 @@
       btn.className="itemBtn"+(file===selectedChild?" active":"");
       btn.innerHTML = `
         <div style="min-width:0;">
-          <div style="font-weight:1000;">${file}</div>
+          <div style="font-weight:700;">${file}</div>
           <div class="itemMeta">キャラ数: ${arr.length}</div>
         </div>
         <div class="smallBtns"><button class="iconBtn" data-copy="${file}" title="カテゴリをコピー">⧉</button></div>
@@ -603,7 +915,6 @@
     const arr=currentArr();
     const filtered=applySearchFilter(arr);
     const view=sortList(filtered);
-
     charList.innerHTML="";
     view.forEach(c=>{
       const realIdx=arr.indexOf(c);
@@ -638,7 +949,7 @@
     if(view.length===0){
       const empty=document.createElement("div");
       empty.className="hint";
-      empty.textContent="該当なし。検索条件を変えろ。";
+      empty.textContent="該当なし。検索条件を変更してください。";
       charList.appendChild(empty);
     }
   }
@@ -650,7 +961,6 @@
     noSel.style.display="block";
     editor.style.display="none";
     editTitle.textContent="キャラ未選択";
-
     renderChildList();
     renderCharList();
     ensureArrays();
@@ -664,7 +974,6 @@
     if(current?.startsWith("images/")) curFile=current.slice("images/".length);
     else if(current?.includes("/")) curFile=current.split("/").pop();
     else curFile=current||"";
-
     f_imageSel.innerHTML = `<option value="">（画像なし）</option>` +
       images.map(fn=>`<option value="${fn}">${fn}</option>`).join("");
     f_imageSel.value = images.includes(curFile) ? curFile : "";
@@ -675,11 +984,7 @@
   function updateImagePreview(){
     const fn=f_imageSel.value;
     imgPreview.innerHTML="";
-    if(!fn){
-      imgPreview.innerHTML=`<span class="mini">no image</span>`;
-      imgSavedVal.textContent="";
-      return;
-    }
+    if(!fn){ imgPreview.innerHTML=`<span class="mini">no image</span>`; imgSavedVal.textContent=""; return; }
     const url=IMG_DIR+fn;
     const img=document.createElement("img");
     img.src=url;
@@ -693,33 +998,19 @@
     const info=childData.get(selectedChild);
     const arr=(info?.draft||info?.remote||[]);
     if(idx<0||idx>=arr.length) return;
-
     selectedCharIdx=idx;
     const raw=normalizeChar(arr[idx]);
     raw.id=computeId(selectedChild, idx+1);
     selectedCharSnapshot=deepClone(raw);
-
     noSel.style.display="none";
     editor.style.display="block";
     editTitle.textContent=`${selectedChild} / #${pad3(idx+1)} を編集中`;
-
-    f_id.value=raw.id;
-    f_name.value=raw.name;
-    f_yomi.value=raw.yomi;
-    f_series.value=raw.series;
-    f_genre.value=raw.genre;
-    f_colorTag.value=raw.colorTag;
-    f_gender.value=raw.gender;
-    f_genderlabel.value=raw.genderlabel;
-    f_age.value=(raw.age==null?"":raw.age);
-    f_height.value=(raw.heightCm==null?"":raw.heightCm);
-    f_birthday.value=raw.birthday;
-    f_personality.value=raw.personality;
-    f_color.value=raw.color;
+    f_id.value=raw.id; f_name.value=raw.name; f_yomi.value=raw.yomi; f_series.value=raw.series;
+    f_genre.value=raw.genre; f_colorTag.value=raw.colorTag; f_gender.value=raw.gender; f_genderlabel.value=raw.genderlabel;
+    f_age.value=(raw.age==null?"":raw.age); f_height.value=(raw.heightCm==null?"":raw.heightCm);
+    f_birthday.value=raw.birthday; f_personality.value=raw.personality; f_color.value=raw.color;
     if(raw.color && /^#([0-9a-f]{6})$/i.test(raw.color)) f_colorPick.value=raw.color;
-    f_docUrl.value=raw.docUrl;
-    f_shareQuote.value=raw.shareQuote;
-
+    f_docUrl.value=raw.docUrl; f_shareQuote.value=raw.shareQuote;
     buildImageSelect(raw.image);
     updateCopyAreas();
     renderCharList();
@@ -727,21 +1018,14 @@
 
   function collectFromFields(){
     const obj=normalizeChar({
-      name: f_name.value.trim(),
-      yomi: f_yomi.value.trim(),
-      series: f_series.value.trim(),
-      genre: f_genre.value.trim(),
-      gender: normalizeGender(f_gender.value),
-      genderlabel: f_genderlabel.value.trim(),
-      age: safeNum(f_age.value),
-      heightCm: safeNum(f_height.value),
-      birthday: f_birthday.value.trim(),
-      personality: toLF(f_personality.value),
-      color: f_color.value.trim(),
+      name: f_name.value.trim(), yomi: f_yomi.value.trim(), series: f_series.value.trim(),
+      genre: f_genre.value.trim(), gender: normalizeGender(f_gender.value),
+      genderlabel: f_genderlabel.value.trim(), age: safeNum(f_age.value),
+      heightCm: safeNum(f_height.value), birthday: f_birthday.value.trim(),
+      personality: toLF(f_personality.value), color: f_color.value.trim(),
       colorTag: f_colorTag.value.trim(),
       image: f_imageSel.value ? ("images/"+f_imageSel.value) : "",
-      docUrl: f_docUrl.value.trim(),
-      shareQuote: f_shareQuote.value.trim()
+      docUrl: f_docUrl.value.trim(), shareQuote: f_shareQuote.value.trim()
     });
     if(obj.gender!=="other") obj.genderlabel="";
     return obj;
@@ -750,22 +1034,14 @@
   function updateCopyAreas(){
     if(selectedChild){
       const arr=currentArr();
-      const out=arr.map((c,i)=>{
-        const cc=normalizeChar(c);
-        cc.id=computeId(selectedChild, i+1);
-        return cc;
-      });
+      const out=arr.map((c,i)=>{ const cc=normalizeChar(c); cc.id=computeId(selectedChild,i+1); return cc; });
       taCategory.value=prettyJson(out);
     }else taCategory.value="";
-
     if(selectedChild && selectedCharIdx>=0){
       const arr=currentArr();
       const c=arr[selectedCharIdx];
-      if(c){
-        const out=normalizeChar(c);
-        out.id=computeId(selectedChild, selectedCharIdx+1);
-        taChar.value=prettyJson(out);
-      }else taChar.value="";
+      if(c){ const out=normalizeChar(c); out.id=computeId(selectedChild,selectedCharIdx+1); taChar.value=prettyJson(out); }
+      else taChar.value="";
     }else taChar.value="";
   }
 
@@ -780,20 +1056,12 @@
   }
 
   async function loadAll(remoteOverwrite=false){
-    setErr("");
-    setStatus("読込中...");
+    setErr(""); setStatus("読込中...");
     try{
       const idx = await fetchJson(INDEX_PATH);
-      if(!Array.isArray(idx)) throw new Error("characters/index.json は配列じゃないとダメ");
+      if(!Array.isArray(idx)) throw new Error("characters/index.json は配列が必要です");
       childFiles = idx;
-
-      try{
-        const im = await fetchJson(IMG_INDEX_PATH);
-        images = Array.isArray(im) ? im : [];
-      }catch{
-        images = [];
-      }
-
+      try{ const im = await fetchJson(IMG_INDEX_PATH); images = Array.isArray(im) ? im : []; }catch{ images = []; }
       const newMap=new Map();
       for(const file of childFiles){
         const arrRaw = await fetchJson(CHAR_DIR+file);
@@ -803,8 +1071,6 @@
         newMap.set(file,{ remote: arr, draft: keepDraft ? prev.draft : null, loadedAt: Date.now() });
       }
       childData=newMap;
-
-      // local restore
       const saved=loadDraftAll();
       if(saved?.childData && !remoteOverwrite){
         for(const file of childFiles){
@@ -815,62 +1081,46 @@
           }
         }
       }
-
-      ensureArrays();
-      renderChildList();
-
+      ensureArrays(); renderChildList();
       if(!selectedChild && childFiles.length) selectedChild=childFiles[0];
       if(selectedChild && !childFiles.includes(selectedChild)) selectedChild=childFiles[0]||"";
       if(selectedChild) selectChild(selectedChild);
-
-      saveDraftAll();
-      updateDraftBadge();
+      saveDraftAll(); updateDraftBadge();
       setStatus("読込完了");
-      showToast(saved ? "ローカル復元" : "読込OK");
+      showToast(saved ? "ローカルから復元しました" : "読込しました");
     }catch(e){
-      console.error(e);
-      setStatus("読込失敗");
-      setErr(String(e?.message||e));
+      console.error(e); setStatus("読込失敗"); setErr(String(e?.message||e));
     }
   }
 
-  // ===== Events =====
+  // Events
   btnLoad.addEventListener("click",()=>loadAll(false));
   btnReloadRemote.addEventListener("click",()=>loadAll(true));
   btnClearDraft.addEventListener("click",()=>{
-    if(confirm("ローカル保存（途中復帰）を全消しする。いいか？")){
+    if(confirm("ローカル保存（途中復帰）を全消しします。よろしいですか？")){
       clearDraftAll();
       for(const [,info] of childData.entries()) info.draft=null;
       if(selectedChild) selectChild(selectedChild);
-      showToast("消した");
+      showToast("消去しました");
     }
   });
-
   search.addEventListener("input",()=>{ searchText=search.value; renderCharList(); });
   sortModeSel.addEventListener("change",()=>{ sortMode=sortModeSel.value; renderCharList(); });
   sortDirSel.addEventListener("change",()=>{ sortDir=sortDirSel.value; renderCharList(); });
-
   f_colorPick.addEventListener("input",()=>{ f_color.value=f_colorPick.value; });
   f_color.addEventListener("input",()=>{
     const v=f_color.value.trim();
     if(/^#([0-9a-f]{6})$/i.test(v)) f_colorPick.value=v;
   });
   f_imageSel.addEventListener("change",()=>updateImagePreview());
-
   btnApply.addEventListener("click",()=>{
     if(!selectedChild || selectedCharIdx<0) return;
     ensureDraftForSelected();
     const info=childData.get(selectedChild);
-    const arr=info.draft;
-    arr[selectedCharIdx]=collectFromFields();
-    ensureArrays();
-    saveDraftAll();
-    updateCopyAreas();
-    renderChildList();
-    renderCharList();
-    showToast("反映した");
+    info.draft[selectedCharIdx]=collectFromFields();
+    ensureArrays(); saveDraftAll(); updateCopyAreas(); renderChildList(); renderCharList();
+    showToast("反映しました");
   });
-
   btnReloadChar.addEventListener("click",()=>{
     if(!selectedCharSnapshot) return;
     const s=deepClone(selectedCharSnapshot);
@@ -881,59 +1131,48 @@
     if(s.color && /^#([0-9a-f]{6})$/i.test(s.color)) f_colorPick.value=s.color;
     f_docUrl.value=s.docUrl; f_shareQuote.value=s.shareQuote;
     buildImageSelect(s.image);
-    showToast("戻した");
+    showToast("戻しました");
   });
-
   btnDeleteChar.addEventListener("click",()=>{
     if(!selectedChild || selectedCharIdx<0) return;
-    if(!confirm("このキャラを削除する。いいか？")) return;
+    if(!confirm("このキャラを削除します。よろしいですか？")) return;
     ensureDraftForSelected();
     const info=childData.get(selectedChild);
     info.draft.splice(selectedCharIdx,1);
     selectedCharIdx=-1; selectedCharSnapshot=null;
     noSel.style.display="block"; editor.style.display="none"; editTitle.textContent="キャラ未選択";
     ensureArrays(); saveDraftAll(); renderChildList(); renderCharList(); updateCopyAreas();
-    showToast("削除した");
+    showToast("削除しました");
   });
-
   btnCopyCategory.addEventListener("click",()=>copyText(taCategory.value||""));
-  btnDownloadCategory.addEventListener("click",()=>{
-    if(!selectedChild) return;
-    downloadText(selectedChild, taCategory.value||"[]");
-    showToast("書き出した");
-  });
+  btnDownloadCategory.addEventListener("click",()=>{ if(!selectedChild) return; downloadText(selectedChild, taCategory.value||"[]"); showToast("書き出しました"); });
   btnCopyChar.addEventListener("click",()=>copyText(taChar.value||""));
   btnCopyIndex.addEventListener("click",()=>copyText(prettyJson(childFiles)));
-  btnDownloadIndex.addEventListener("click",()=>{ downloadText("index.json", prettyJson(childFiles)); showToast("書き出した"); });
-
-  // add dialog
+  btnDownloadIndex.addEventListener("click",()=>{ downloadText("index.json", prettyJson(childFiles)); showToast("書き出しました"); });
   btnAdd.addEventListener("click",()=>{
-    if(!childFiles.length){ alert("先に index.json 読み込め。"); return; }
+    if(!childFiles.length){ alert("先に index.json を読み込んでください。"); return; }
     selAddChild.value = selectedChild || childFiles[0];
     dlgAdd.showModal();
   });
   btnCloseAdd.addEventListener("click",()=>dlgAdd.close());
   tabs.forEach(t=>{
     t.addEventListener("click",()=>{
-      tabs.forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
+      tabs.forEach(x=>x.classList.remove("active")); t.classList.add("active");
       const tab=t.dataset.tab;
       tabPaste.style.display = (tab==="paste") ? "" : "none";
       tabFromChild.style.display = (tab==="fromChild") ? "" : "none";
     });
   });
-
   btnAddFromPaste.addEventListener("click",()=>{
-    if(!selectedChild){ alert("追加先の子jsonを先に選べ。"); return; }
+    if(!selectedChild){ alert("追加先の子jsonを先に選択してください。"); return; }
     let data;
-    try{ data=JSON.parse(taPaste.value||""); }catch{ alert("JSONが壊れてる。"); return; }
+    try{ data=JSON.parse(taPaste.value||""); }catch{ alert("JSONが壊れています。"); return; }
     const obj = Array.isArray(data) ? (data[0]||{}) : (data||{});
     ensureDraftForSelected();
     childData.get(selectedChild).draft.push(normalizeChar(obj));
     ensureArrays(); saveDraftAll(); renderChildList(); renderCharList(); updateCopyAreas();
-    dlgAdd.close(); showToast("追加した");
+    dlgAdd.close(); showToast("追加しました");
   });
-
   btnAddBlank.addEventListener("click",()=>{
     const dest=selAddChild.value;
     if(!dest) return;
@@ -946,10 +1185,9 @@
     ensureArrays(); saveDraftAll(); renderChildList();
     selectChild(dest);
     selectChar(info.draft.length-1);
-    dlgAdd.close(); showToast("追加した");
+    dlgAdd.close(); showToast("追加しました");
   });
 
-  // ===== boot =====
   loadAll(false);
 })();
 </script>
