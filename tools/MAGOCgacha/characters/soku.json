@@ -1,5 +1,22 @@
 [
-  {"id":"soku_001","name":"くるみ","yomi":"未登録","series":"即世界の溜まり場","genre":"人間","gender":"other"},
+  {
+  "id": "soku_001",
+  "name": "くるみ",
+  "yomi": "",
+  "series": "即世界の溜まり場",
+  "genre": "人間",
+  "gender": "female",
+  "genderlabel": "",
+  "age": 17,
+  "heightCm": 159,
+  "birthday": "12/12",
+  "personality": "見た目からに他人に対して執着心が強いと思われがちだがただの元気な女の子。\n遊びを探求している。",
+  "color": "#2CBDAB",
+  "colorTag": "",
+  "image": "",
+  "docUrl": "",
+  "shareQuote": "ねえねえそこの君！私と遊ばない？"
+},
   {"id":"soku_002","name":"ヤク","yomi":"未登録","series":"即世界の溜まり場","genre":"棒人間","gender":"other"},
   {"id":"soku_003","name":"不明(紫髪ウルフカット)","yomi":"紫髪ウルフカット","series":"即世界の溜まり場","genre":"棒人間","gender":"other"},
   {"id":"soku_004","name":"不明(金髪ウルフカット)","yomi":"金髪ウルフカット","series":"即世界の溜まり場","genre":"棒人間","gender":"other"},
