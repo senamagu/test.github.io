@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMAGE FX MAKER</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;500;700&display=swap');
+  :root {
+    --bg: #0a0a12; --panel: #12121e; --border: #2a2a3e;
+    --text: #e8e8f0; --muted: #6b6b8a; --accent: #fb227c;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Noto Sans JP',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+  header { padding:16px 28px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+  .logo { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; letter-spacing:.2em; background:linear-gradient(90deg,#fb227c,#5815a0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .logo-sub { font-family:'Space Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:.3em; margin-top:2px; }
+  .main { display:grid; grid-template-columns:320px 1fr; flex:1; overflow:hidden; height:calc(100vh - 57px); }
+  .controls { border-right:1px solid var(--border); overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+  .section { background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .section-header { padding:10px 14px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); }
+  .section-num { font-family:'Space Mono',monospace; font-size:9px; color:var(--accent); letter-spacing:.2em; }
+  .section-title { font-size:11px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; }
+  .section-body { padding:14px; display:flex; flex-direction:column; gap:12px; }
+  .label { font-size:10px; color:var(--muted); letter-spacing:.1em; margin-bottom:4px; font-family:'Space Mono',monospace; }
+  .slider-row { display:flex; align-items:center; gap:10px; }
+  input[type=range] { -webkit-appearance:none; flex:1; height:3px; background:var(--border); border-radius:2px; outline:none; cursor:pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--accent); border:2px solid var(--bg); cursor:pointer; box-shadow:0 0 8px rgba(251,34,124,.5); }
+  .val { font-family:'Space Mono',monospace; font-size:10px; min-width:26px; text-align:right; }
+  .upload-zone { border:2px dashed var(--border); border-radius:8px; padding:24px; text-align:center; cursor:pointer; transition:all .2s; position:relative; }
+  .upload-zone:hover { border-color:var(--accent); background:rgba(251,34,124,.05); }
+  .upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .upload-icon { font-size:24px; margin-bottom:6px; }
+  .upload-text { font-size:11px; color:var(--muted); line-height:1.6; }
+  #curveCanvas { display:block; border:1px solid var(--border); border-radius:6px; cursor:crosshair; background:#0d0d18; width:100%; }
+  .curve-hint { font-size:9px; color:var(--muted); text-align:center; margin-top:5px; font-family:'Space Mono',monospace; }
+  .curve-btns { display:flex; gap:6px; margin-top:8px; }
+  .btn-sm { flex:1; padding:6px; border:1px solid var(--border); border-radius:5px; background:transparent; color:var(--muted); font-size:9px; font-family:'Space Mono',monospace; letter-spacing:.1em; cursor:pointer; transition:all .15s; }
+  .btn-sm:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-sm.active-shape { border-color:var(--accent); color:var(--accent); }
+  .grad-preview { height:24px; border-radius:5px; border:1px solid var(--border); }
+  .grad-colors { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-top:4px; }
+  .color-swatch { height:20px; border-radius:4px; border:1px solid var(--border); cursor:pointer; position:relative; }
+  .color-swatch input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .toggle-row { display:flex; align-items:center; justify-content:space-between; }
+  .toggle { position:relative; width:34px; height:18px; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .toggle-track { position:absolute; inset:0; background:var(--border); border-radius:9px; cursor:pointer; transition:background .2s; }
+  .toggle input:checked + .toggle-track { background:var(--accent); }
+  .toggle-track::after { content:''; position:absolute; left:2px; top:2px; width:14px; height:14px; background:white; border-radius:50%; transition:transform .2s; }
+  .toggle input:checked + .toggle-track::after { transform:translateX(16px); }
+  .apply-btn { width:100%; padding:13px; background:linear-gradient(135deg,#fb227c,#5815a0); border:none; border-radius:8px; color:white; font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.2em; cursor:pointer; transition:all .2s; }
+  .apply-btn:hover { opacity:.9; transform:translateY(-1px); }
+  .download-btn { width:100%; padding:9px; background:transparent; border:1px solid var(--border); border-radius:8px; color:var(--muted); font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.15em; cursor:pointer; transition:all .2s; }
+  .download-btn:hover { border-color:var(--accent); color:var(--text); }
+  .download-btn:disabled { opacity:.3; cursor:not-allowed; }
+  .preview-area { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px; position:relative; overflow:hidden; background:repeating-conic-gradient(#16162a 0% 25%,var(--bg) 0% 50%) 0 0/20px 20px; }
+  #outputCanvas { max-width:100%; max-height:calc(100vh - 120px); display:block; border:1px solid var(--border); border-radius:4px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  .empty-state { text-align:center; color:var(--muted); }
+  .empty-state .big { font-size:48px; margin-bottom:12px; opacity:.3; }
+  .empty-state p { font-size:12px; letter-spacing:.1em; line-height:2; }
+  .processing { position:absolute; inset:0; background:rgba(10,10,18,.8); display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+  .processing.active { display:flex; }
+  .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  canvas { display:none; }
+  .shape-btns { display:flex; gap:6px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">IMAGE FX MAKER</div>
+    <div class="logo-sub">DOTMATRIX · TONE CURVE · GRADIENT MAP</div>
+  </div>
+</header>
+<div class="main">
+  <div class="controls">
+    <!-- Upload -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">INPUT</span><span class="section-title">画像を選択</span></div>
+      <div class="section-body">
+        <div class="upload-zone">
+          <input type="file" id="fileInput" accept="image/*">
+          <div class="upload-icon">🖼</div>
+          <div class="upload-text">クリックまたはドラッグ＆ドロップ</div>
+        </div>
+      </div>
+    </div>
+    <!-- Step 1 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">STEP 01</span><span class="section-title">ドット化</span></div>
+      <div class="section-body">
+        <div class="toggle-row"><span class="label" style="margin:0">有効</span><label class="toggle"><input type="checkbox" id="dotEnabled" checked><div class="toggle-track"></div></label></div>
+        <div>
+          <div class="label">ドットサイズ</div>
+          <div class="slider-row"><input type="range" id="dotSize" min="2" max="24" value="6"><span class="val" id="dotSizeVal">6</span></div>
+        </div>
+        <div>
+          <div class="label">ギャップ（隙間）</div>
+          <div class="slider-row"><input type="range" id="dotGap" min="0" max="90" value="0"><span class="val" id="dotGapVal">0</span></div>
+        </div>
+        <div>
+          <div class="label">形状</div>
+          <div class="shape-btns">
+            <button class="btn-sm active-shape" data-shape="circle">● 丸</button>
+            <button class="btn-sm" data-shape="square">■ 四角</button>
+            <button class="btn-sm" data-shape="diamond">◆ ダイヤ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Step 1.5: Posterize -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">STEP 02</span><span class="section-title">諧調化</span></div>
+      <div class="section-body">
+        <div class="toggle-row"><span class="label" style="margin:0">有効</span><label class="toggle"><input type="checkbox" id="posterEnabled" checked><div class="toggle-track"></div></label></div>
+        <div>
+          <div class="label">諧調数（少ない＝ポスター風）</div>
+          <div class="slider-row"><input type="range" id="posterLevels" min="2" max="32" value="6"><span class="val" id="posterLevelsVal">6</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- Step 3 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">STEP 03</span><span class="section-title">トーンカーブ</span></div>
+      <div class="section-body">
+        <div class="toggle-row"><span class="label" style="margin:0">有効</span><label class="toggle"><input type="checkbox" id="curveEnabled" checked><div class="toggle-track"></div></label></div>
+        <canvas id="curveCanvas" width="280" height="190"></canvas>
+        <div class="curve-hint">クリック→点追加 / ドラッグ→移動 / 右クリック→削除</div>
+        <div class="curve-btns">
+          <button class="btn-sm" id="curveReset">リセット</button>
+          <button class="btn-sm" id="curveSBright">S字（明）</button>
+          <button class="btn-sm" id="curveDark">暗め</button>
+        </div>
+      </div>
+    </div>
+    <!-- Step 4 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">STEP 04</span><span class="section-title">グラデーションマップ</span></div>
+      <div class="section-body">
+        <div class="toggle-row"><span class="label" style="margin:0">有効</span><label class="toggle"><input type="checkbox" id="gradEnabled" checked><div class="toggle-track"></div></label></div>
+        <div class="label">カラーストップ（クリックで変更）</div>
+        <div class="grad-preview" id="gradPreview"></div>
+        <div class="grad-colors" id="gradColors"></div>
+        <div>
+          <div class="label">不透明度</div>
+          <div class="slider-row"><input type="range" id="gradOpacity" min="0" max="100" value="100"><span class="val" id="gradOpacityVal">100</span></div>
+        </div>
+      </div>
+    </div>
+    <button class="apply-btn" id="applyBtn">▶ APPLY EFFECTS</button>
+    <button class="download-btn" id="downloadBtn" disabled>↓ DOWNLOAD PNG</button>
+  </div>
+  <div class="preview-area">
+    <div class="empty-state" id="emptyState">
+      <div class="big">✦</div>
+      <p>画像をアップロードして<br>APPLY EFFECTSを押してください</p>
+    </div>
+    <canvas id="outputCanvas" style="display:none"></canvas>
+    <div class="processing" id="processing"><div class="spinner"></div></div>
+  </div>
+</div>
+<canvas id="workCanvas"></canvas>
+
+<script>
+let srcImage = null;
+let curvePoints = [{x:0,y:0},{x:255,y:255}];
+let dotShape = 'circle';
+let gradColors = ['#111069','#5815a0','#fb227c','#ffbdbd','#dad6d6','#f5f5f5'];
+let draggingIdx = null;
+
+const outputCanvas = document.getElementById('outputCanvas');
+const workCanvas = document.getElementById('workCanvas');
+const curveCanvas = document.getElementById('curveCanvas');
+const ctx = outputCanvas.getContext('2d');
+const wCtx = workCanvas.getContext('2d');
+const cCtx = curveCanvas.getContext('2d');
+const CW = 280, CH = 190;
+
+// --- FILE ---
+document.getElementById('fileInput').addEventListener('change', e => { if(e.target.files[0]) loadFile(e.target.files[0]); });
+const uploadZone = document.querySelector('.upload-zone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); });
+uploadZone.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => { srcImage = img; };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// --- SLIDERS ---
+['dotSize','dotGap','posterLevels','gradOpacity'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => { document.getElementById(id+'Val').textContent = el.value; });
+});
+
+// --- DOT SHAPE ---
+document.querySelectorAll('[data-shape]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-shape]').forEach(b => b.classList.remove('active-shape'));
+    btn.classList.add('active-shape');
+    dotShape = btn.dataset.shape;
+  });
+});
+
+// --- GRAD COLORS ---
+function buildGradUI() {
+  const container = document.getElementById('gradColors');
+  container.innerHTML = '';
+  gradColors.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'color-swatch';
+    div.style.background = c;
+    const inp = document.createElement('input');
+    inp.type = 'color';
+    inp.value = c;
+    inp.addEventListener('input', e => {
+      gradColors[i] = e.target.value;
+      div.style.background = e.target.value;
+      updateGradPreview();
+    });
+    div.appendChild(inp);
+    container.appendChild(div);
+  });
+  updateGradPreview();
+}
+function updateGradPreview() {
+  document.getElementById('gradPreview').style.background = `linear-gradient(90deg,${gradColors.join(',')})`;
+}
+buildGradUI();
+
+// --- TONE CURVE ---
+function drawCurve() {
+  cCtx.clearRect(0, 0, CW, CH);
+  // grid
+  cCtx.strokeStyle = 'rgba(255,255,255,0.05)'; cCtx.lineWidth = 1;
+  for(let i=1;i<4;i++){
+    cCtx.beginPath(); cCtx.moveTo(CW/4*i,0); cCtx.lineTo(CW/4*i,CH); cCtx.stroke();
+    cCtx.beginPath(); cCtx.moveTo(0,CH/4*i); cCtx.lineTo(CW,CH/4*i); cCtx.stroke();
+  }
+  // diagonal
+  cCtx.strokeStyle='rgba(255,255,255,0.08)';
+  cCtx.beginPath(); cCtx.moveTo(0,CH); cCtx.lineTo(CW,0); cCtx.stroke();
+  // curve
+  const sorted = [...curvePoints].sort((a,b)=>a.x-b.x);
+  const lut = buildLUT(sorted);
+  cCtx.strokeStyle='#fb227c'; cCtx.lineWidth=2;
+  cCtx.shadowColor='#fb227c'; cCtx.shadowBlur=8;
+  cCtx.beginPath();
+  for(let x=0;x<=255;x++){
+    const px=x/255*CW, py=(1-lut[x]/255)*CH;
+    x===0?cCtx.moveTo(px,py):cCtx.lineTo(px,py);
+  }
+  cCtx.stroke(); cCtx.shadowBlur=0;
+  // points
+  sorted.forEach(pt => {
+    const px=pt.x/255*CW, py=(1-pt.y/255)*CH;
+    cCtx.beginPath(); cCtx.arc(px,py,5,0,Math.PI*2);
+    cCtx.fillStyle='#fb227c'; cCtx.fill();
+    cCtx.strokeStyle='white'; cCtx.lineWidth=1.5; cCtx.stroke();
+  });
+}
+
+function buildLUT(sorted) {
+  const lut = new Uint8Array(256);
+  for(let i=0;i<256;i++){
+    const t = i/255;
+    const xi = t*(sorted.length-1);
+    const idx = Math.min(Math.floor(xi), sorted.length-2);
+    const frac = xi-idx;
+    const p0=sorted[Math.max(0,idx-1)], p1=sorted[idx], p2=sorted[idx+1], p3=sorted[Math.min(sorted.length-1,idx+2)];
+    const v=0.5*((2*p1.y)+(-p0.y+p2.y)*frac+(2*p0.y-5*p1.y+4*p2.y-p3.y)*frac*frac+(-p0.y+3*p1.y-3*p2.y+p3.y)*frac*frac*frac);
+    lut[i]=Math.max(0,Math.min(255,Math.round(v)));
+  }
+  return lut;
+}
+
+function evtPos(e, rect) {
+  const scaleX=CW/rect.width, scaleY=CH/rect.height;
+  const ex=(e.clientX-rect.left)*scaleX, ey=(e.clientY-rect.top)*scaleY;
+  return {x:Math.max(0,Math.min(255,ex/CW*255)), y:Math.max(0,Math.min(255,(1-ey/CH)*255))};
+}
+function nearestPt(e, rect, threshold=14) {
+  const scaleX=CW/rect.width, scaleY=CH/rect.height;
+  const ex=(e.clientX-rect.left), ey=(e.clientY-rect.top);
+  for(let i=0;i<curvePoints.length;i++){
+    const cpx=curvePoints[i].x/255*CW/scaleX, cpy=(1-curvePoints[i].y/255)*CH/scaleY;
+    if(Math.hypot(ex-cpx,ey-cpy)<threshold) return i;
+  }
+  return -1;
+}
+curveCanvas.addEventListener('mousedown', e => {
+  const rect=curveCanvas.getBoundingClientRect();
+  const ni=nearestPt(e,rect);
+  if(ni>=0){draggingIdx=ni;}
+  else{const pt=evtPos(e,rect);curvePoints.push(pt);draggingIdx=curvePoints.length-1;drawCurve();}
+});
+curveCanvas.addEventListener('mousemove', e => {
+  if(draggingIdx===null)return;
+  curvePoints[draggingIdx]=evtPos(e,curveCanvas.getBoundingClientRect());
+  drawCurve();
+});
+curveCanvas.addEventListener('mouseup',()=>{draggingIdx=null;});
+curveCanvas.addEventListener('mouseleave',()=>{draggingIdx=null;});
+curveCanvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const rect=curveCanvas.getBoundingClientRect();
+  const ni=nearestPt(e,rect);
+  if(ni>=0 && curvePoints.length>2){curvePoints.splice(ni,1);drawCurve();}
+});
+// touch
+curveCanvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const touch=e.touches[0];
+  const rect=curveCanvas.getBoundingClientRect();
+  const ni=nearestPt(touch,rect,20);
+  if(ni>=0)draggingIdx=ni;
+  else{const pt=evtPos(touch,rect);curvePoints.push(pt);draggingIdx=curvePoints.length-1;drawCurve();}
+},{passive:false});
+curveCanvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(draggingIdx===null)return;
+  curvePoints[draggingIdx]=evtPos(e.touches[0],curveCanvas.getBoundingClientRect());
+  drawCurve();
+},{passive:false});
+curveCanvas.addEventListener('touchend',()=>{draggingIdx=null;});
+document.getElementById('curveReset').onclick=()=>{curvePoints=[{x:0,y:0},{x:255,y:255}];drawCurve();};
+document.getElementById('curveSBright').onclick=()=>{curvePoints=[{x:0,y:0},{x:64,y:90},{x:128,y:148},{x:192,y:210},{x:255,y:255}];drawCurve();};
+document.getElementById('curveDark').onclick=()=>{curvePoints=[{x:0,y:0},{x:128,y:85},{x:255,y:200}];drawCurve();};
+drawCurve();
+
+// --- APPLY ---
+document.getElementById('applyBtn').addEventListener('click', applyEffects);
+
+async function applyEffects() {
+  if(!srcImage){alert('画像を選択してください');return;}
+  document.getElementById('processing').classList.add('active');
+  await new Promise(r=>setTimeout(r,30));
+  const W=srcImage.naturalWidth, H=srcImage.naturalHeight;
+  workCanvas.width=W; workCanvas.height=H;
+  wCtx.drawImage(srcImage,0,0);
+  let id=wCtx.getImageData(0,0,W,H);
+  let d=new Uint8ClampedArray(id.data);
+
+  // Step 1: dot
+  if(document.getElementById('dotEnabled').checked){
+    d=applyDot(d,W,H,parseInt(document.getElementById('dotSize').value),dotShape,parseInt(document.getElementById('dotGap').value));
+  }
+  // Step 2: posterize（諧調化）
+  if(document.getElementById('posterEnabled').checked){
+    const levels=parseInt(document.getElementById('posterLevels').value);
+    const step=255/(levels-1);
+    for(let i=0;i<d.length;i+=4){
+      d[i]  =Math.round(Math.round(d[i]  /step)*step);
+      d[i+1]=Math.round(Math.round(d[i+1]/step)*step);
+      d[i+2]=Math.round(Math.round(d[i+2]/step)*step);
+    }
+  }
+  // Step 3: tone curve
+  if(document.getElementById('curveEnabled').checked){
+    const lut=buildLUT([...curvePoints].sort((a,b)=>a.x-b.x));
+    for(let i=0;i<d.length;i+=4){d[i]=lut[d[i]];d[i+1]=lut[d[i+1]];d[i+2]=lut[d[i+2]];}
+  }
+  // Step 4: grad map
+  if(document.getElementById('gradEnabled').checked){
+    const op=parseInt(document.getElementById('gradOpacity').value)/100;
+    const glut=buildGradLUT();
+    for(let i=0;i<d.length;i+=4){
+      const lum=Math.round(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]);
+      const [gr,gg,gb]=glut[lum];
+      d[i]=Math.round(d[i]*(1-op)+gr*op);
+      d[i+1]=Math.round(d[i+1]*(1-op)+gg*op);
+      d[i+2]=Math.round(d[i+2]*(1-op)+gb*op);
+    }
+  }
+
+  outputCanvas.width=W; outputCanvas.height=H;
+  ctx.putImageData(new ImageData(d,W,H),0,0);
+  outputCanvas.style.display='block';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('processing').classList.remove('active');
+  document.getElementById('downloadBtn').disabled=false;
+}
+
+function applyDot(d,W,H,sz,shape,gap=0) {
+  const out=new Uint8ClampedArray(d.length);
+  for(let i=0;i<out.length;i+=4){out[i]=15;out[i+1]=15;out[i+2]=24;out[i+3]=255;}
+  // ドットサイズは全て一定。gapで隙間を作る
+  const margin = (gap / 100) * sz * 0.5;
+  const radius = sz * 0.5 - margin;
+  if(radius <= 0) return out;
+  const rows=Math.ceil(H/sz), cols=Math.ceil(W/sz);
+  for(let row=0;row<rows;row++){
+    for(let col=0;col<cols;col++){
+      const cx = col*sz + sz/2;
+      const cy = row*sz + sz/2;
+      const sx = Math.min(Math.round(cx), W-1);
+      const sy = Math.min(Math.round(cy), H-1);
+      const si = (sy*W + sx)*4;
+      const r=d[si], g=d[si+1], b=d[si+2];
+      for(let dy=-sz;dy<=sz;dy++){
+        for(let dx=-sz;dx<=sz;dx++){
+          const nx=Math.round(cx+dx), ny=Math.round(cy+dy);
+          if(nx<0||ny<0||nx>=W||ny>=H)continue;
+          let inside=false;
+          if(shape==='circle') inside=Math.hypot(dx,dy)<=radius;
+          else if(shape==='square') inside=Math.abs(dx)<=radius && Math.abs(dy)<=radius;
+          else if(shape==='diamond') inside=(Math.abs(dx)+Math.abs(dy))<=radius*1.4;
+          if(inside){const oi=(ny*W+nx)*4; out[oi]=r; out[oi+1]=g; out[oi+2]=b; out[oi+3]=255;}
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function buildGradLUT() {
+  const stops=gradColors.map((h,i)=>({
+    pos:i/(gradColors.length-1),
+    r:parseInt(h.slice(1,3),16),
+    g:parseInt(h.slice(3,5),16),
+    b:parseInt(h.slice(5,7),16)
+  }));
+  const lut=[];
+  for(let i=0;i<256;i++){
+    const t=i/255;
+    let s0=stops[0],s1=stops[stops.length-1];
+    for(let j=0;j<stops.length-1;j++){
+      if(t>=stops[j].pos&&t<=stops[j+1].pos){s0=stops[j];s1=stops[j+1];break;}
+    }
+    const seg=s1.pos===s0.pos?0:(t-s0.pos)/(s1.pos-s0.pos);
+    const sm=seg*seg*(3-2*seg);
+    lut.push([
+      Math.round(s0.r+(s1.r-s0.r)*sm),
+      Math.round(s0.g+(s1.g-s0.g)*sm),
+      Math.round(s0.b+(s1.b-s0.b)*sm)
+    ]);
+  }
+  return lut;
+}
+
+// --- DOWNLOAD ---
+document.getElementById('downloadBtn').addEventListener('click',()=>{
+  outputCanvas.toBlob(blob=>{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='imagefx_output.png'; a.click();
+    URL.revokeObjectURL(url);
+  },'image/png');
+});
+</script>
+</body>
+</html>
