@@ -216,11 +216,93 @@ document.addEventListener('click', e => {
     if (!contextMenu.contains(e.target)) hideContextMenu();
 });
 
-function exportToFile(){}
+function exportToFile() {
+    const rows = document.querySelectorAll('.item-row');
+    const dataToSave = [];
+    rows.forEach(row => {
+        const type = row.dataset.type;
+        if (type === 'custom') {
+            const units = [];
+            row.querySelectorAll('.custom-unit').forEach(u => {
+                units.push({ unitType: u.dataset.unitType, val: u.querySelector('textarea').value });
+            });
+            dataToSave.push({ type, units });
+        } else {
+            const textEl = row.querySelector('.text-input');
+            const text = textEl ? textEl.value : '';
+            let label = '', labelPost = '';
+            if (type === 'sandwich') {
+                label = row.querySelector('.label-pre').value;
+                labelPost = row.querySelector('.label-post').value;
+            } else {
+                const labelInput = row.querySelector('.label-input');
+                label = labelInput ? labelInput.value : '';
+            }
+            dataToSave.push({ type, label, labelPost, text });
+        }
+    });
+
+    const blob = new Blob([JSON.stringify(dataToSave, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'syntax_data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
 function triggerFileInput(){ document.getElementById('file-input').click(); }
-function importFromFile(){}
-function copyAll(){}
-function textclearAll(){}
+function importFromFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const dataArray = JSON.parse(e.target.result);
+            if (confirm('現在の内容を消去してファイルを読み込みますか？')) {
+                itemList.innerHTML = '';
+                dataArray.forEach(item => addItem(item.type, item));
+            }
+        } catch (err) {
+            alert('形式エラー');
+        }
+        input.value = '';
+    };
+    reader.readAsText(file);
+}
+function copyAll() {
+    const rows = document.querySelectorAll('.item-row');
+    let fullText = '';
+    rows.forEach(row => {
+        const type = row.dataset.type;
+        if (type === 'custom') {
+            row.querySelectorAll('.custom-unit textarea').forEach(ta => fullText += ta.value);
+            fullText += '
+';
+        } else {
+            const textEl = row.querySelector('.text-input');
+            const text = textEl ? textEl.value : '';
+            if (type === 'right') fullText += `${row.querySelector('.label-input').value}${text}
+`;
+            else if (type === 'below') fullText += `${row.querySelector('.label-input').value}
+${text}
+`;
+            else if (type === 'sandwich') fullText += `${row.querySelector('.label-pre').value}${text}${row.querySelector('.label-post').value}
+`;
+            else if (type === 'only') fullText += `${row.querySelector('.label-input').value}
+`;
+        }
+    });
+    navigator.clipboard.writeText(fullText.trim()).then(() => alert('コピーしました！'));
+}
+function textclearAll() {
+    if (confirm('入力テキストをすべて消去しますか？')) {
+        document.querySelectorAll('.text-input').forEach(input => {
+            input.value = '';
+            autoResize(input);
+        });
+    }
+}
 function clearAll(){ if (confirm('すべて削除しますか？')) itemList.innerHTML = ''; }
 
 addItem('right');
