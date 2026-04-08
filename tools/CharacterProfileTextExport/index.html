@@ -97,9 +97,19 @@
         push(`${l}…${value}`);
       });
       push();
-      [["feature","▰ 特徴表"],["profile","▰ ᴾʳᵒᶠⁱˡᵉ"],["voice","▰ ˢᵃᵐᵖˡᵉ ⱽᵒⁱᶜᵉ"],["background","▰ ᴮᵃᶜᵏᴳʳᵒᵘⁿᵈ"],["origin","▰ 由来"]].forEach(([k,t]) => {
+            [["feature","▰ 特徴表"],["voice","▰ ˢᵃᵐᵖˡᵉ ⱽᵒⁱᶜᵉ"],["background","▰ ᴮᵃᶜᵏᴳʳᵒᵘⁿᵈ"],["origin","▰ 由来"]].forEach(([k,t]) => {
         if (enabled[k]) { push(t); push(values[k] || fallback); push(); }
       });
+
+      if (enabled.profile) {
+        push("▰ ᴾʳᵒᶠⁱˡᵉ");
+        push(values.profile || fallback);
+        if (enabled.firstPerson) push(`✶一人称…${values.firstPerson || fallback}`);
+        if (enabled.secondPerson) push(`✶二人称…${values.secondPerson || fallback}`);
+        if (enabled.hate) push(`✶嫌い…${values.hate || fallback}`);
+        if (enabled.like) push(`✶好き…${values.like || fallback}`);
+        push();
+      }
       return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
     }
 
