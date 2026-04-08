@@ -60,7 +60,7 @@
       wrap.className = "field";
       wrap.innerHTML = `
         <label><input type="checkbox" checked data-key="${key}" class="toggle"> ${label} をコピー範囲に含める</label>
-        ${multiline ? `<textarea data-key="${key}" placeholder="${fallback}"></textarea>` : `<input type="text" data-key="${key}" placeholder="${fallback}">`}
+        ${multiline ? `<textarea data-key="${key}"></textarea>` : `<input type="text" data-key="${key}">` }
       `;
       fieldsRoot.appendChild(wrap);
     });
@@ -88,8 +88,13 @@
         if (enabled.reading) push(`(${values.reading || "よみがな"})`);
         push();
       }
-      [["job","✶職業"],["age","✶年齢"],["gender","✶性別"],["height","✶身長"],["birthday","✶誕生日"]].forEach(([k,l]) => {
-        if (enabled[k]) push(`${l}…${values[k] || fallback}`);
+            [["job","✶職業"],["age","✶年齢"],["gender","✶性別"],["height","✶身長"],["birthday","✶誕生日"]].forEach(([k,l]) => {
+        if (!enabled[k]) return;
+        let value = values[k] || fallback;
+        if (k === "age" && values[k]) value = `${values[k]}歳`;
+        if (k === "height" && values[k]) value = `${values[k]}cm`;
+        if (k === "birthday" && values[k]) value = values[k];
+        push(`${l}…${value}`);
       });
       push();
       [["feature","▰ 特徴表"],["profile","▰ ᴾʳᵒᶠⁱˡᵉ"],["voice","▰ ˢᵃᵐᵖˡᵉ ⱽᵒⁱᶜᵉ"],["background","▰ ᴮᵃᶜᵏᴳʳᵒᵘⁿᵈ"],["origin","▰ 由来"]].forEach(([k,t]) => {
