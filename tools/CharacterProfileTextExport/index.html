@@ -96,18 +96,39 @@
         if (k === "birthday" && values[k]) value = values[k];
         push(`${l}…${value}`);
       });
-      push();
-            [["feature","▰ 特徴表"],["voice","▰ ˢᵃᵐᵖˡᵉ ⱽᵒⁱᶜᵉ"],["background","▰ ᴮᵃᶜᵏᴳʳᵒᵘⁿᵈ"],["origin","▰ 由来"]].forEach(([k,t]) => {
-        if (enabled[k]) { push(t); push(values[k] || fallback); push(); }
-      });
+      push();      if (enabled.feature) {
+        push("▰ 特徴表");
+        push(values.feature || fallback);
+        push();
+      }
 
       if (enabled.profile) {
         push("▰ ᴾʳᵒᶠⁱˡᵉ");
         push(values.profile || fallback);
+        push();
         if (enabled.firstPerson) push(`✶一人称…${values.firstPerson || fallback}`);
         if (enabled.secondPerson) push(`✶二人称…${values.secondPerson || fallback}`);
+        push();
         if (enabled.hate) push(`✶嫌い…${values.hate || fallback}`);
         if (enabled.like) push(`✶好き…${values.like || fallback}`);
+        push();
+      }
+
+      if (enabled.voice) {
+        push("▰ ˢᵃᵐᵖˡᵉ ⱽᵒⁱᶜᵉ");
+        push(values.voice || fallback);
+        push();
+      }
+
+      if (enabled.background) {
+        push("▰ ᴮᵃᶜᵏᴳʳᵒᵘⁿᵈ");
+        push(values.background || fallback);
+        push();
+      }
+
+      if (enabled.origin) {
+        push("▰ 由来");
+        push(values.origin || fallback);
         push();
       }
       return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
