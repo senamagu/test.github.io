@@ -1,222 +1,144 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-
-export default function CharacterProfileBuilder() {
-  const fieldDefs = [
-    { key: "name", label: "名前" },
-    { key: "reading", label: "よみがな" },
-    { key: "job", label: "職業" },
-    { key: "age", label: "年齢" },
-    { key: "gender", label: "性別" },
-    { key: "height", label: "身長" },
-    { key: "birthday", label: "誕生日" },
-    { key: "feature", label: "特徴表", multiline: true },
-    { key: "profile", label: "Profile", multiline: true },
-    { key: "firstPerson", label: "一人称" },
-    { key: "secondPerson", label: "二人称" },
-    { key: "hate", label: "嫌い" },
-    { key: "like", label: "好き" },
-    { key: "voice", label: "Sample Voice", multiline: true },
-    { key: "background", label: "Background", multiline: true },
-    { key: "origin", label: "由来", multiline: true },
-  ];
-
-  const initial = Object.fromEntries(fieldDefs.map((f) => [f.key, ""]));
-  const initialEnabled = Object.fromEntries(fieldDefs.map((f) => [f.key, true]));
-
-  const [values, setValues] = useState(initial);
-  const [enabled, setEnabled] = useState(initialEnabled);
-  const [pngPreviewUrl, setPngPreviewUrl] = useState("");
-  const [status, setStatus] = useState("");
-  const previewRef = useRef(null);
-
-  const setValue = (key, value) => setValues((prev) => ({ ...prev, [key]: value }));
-  const toggle = (key) => setEnabled((prev) => ({ ...prev, [key]: !prev[key] }));
-
-  const fallback = "不明";
-
-  const output = useMemo(() => {
-    const lines = [];
-    if (enabled.name) {
-      lines.push("【名前】");
-      lines.push(values.name || fallback);
-      if (enabled.reading) lines.push(`(${values.reading || "よみがな"})`);
-      lines.push("");
-    }
-
-    [["job", "✶職業"], ["age", "✶年齢"], ["gender", "✶性別"], ["height", "✶身長"], ["birthday", "✶誕生日"]]
-      .forEach(([key, label]) => {
-        if (enabled[key]) lines.push(`${label}…${values[key] || fallback}`);
-      });
-
-    lines.push("");
-
-    const addBlock = (flag, title, value) => {
-      if (!flag) return;
-      lines.push(title);
-      lines.push(value || fallback);
-      lines.push("");
-    };
-
-    addBlock(enabled.feature, "▰ 特徴表", values.feature);
-
-    if (enabled.profile) {
-      lines.push("▰ ᴾʳᵒᶠⁱˡᵉ");
-      lines.push(values.profile || fallback);
-      if (enabled.firstPerson) lines.push(`✶一人称…${values.firstPerson || fallback}`);
-      if (enabled.secondPerson) lines.push(`✶二人称…${values.secondPerson || fallback}`);
-      if (enabled.hate) lines.push(`✶嫌い…${values.hate || fallback}`);
-      if (enabled.like) lines.push(`✶好き…${values.like || fallback}`);
-      lines.push("");
-    }
-
-    addBlock(enabled.voice, "▰ ˢᵃᵐᵖˡᵉ ⱽᵒⁱᶜᵉ", values.voice);
-    addBlock(enabled.background, "▰ ᴮᵃᶜᵏᴳʳᵒᵘⁿᵈ", values.background);
-
-    if (enabled.origin) {
-      lines.push("▰ 由来");
-      lines.push(values.origin || fallback);
-    }
-
-    return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
-  }, [values, enabled]);
-
-  const copyText = async () => {
-    await navigator.clipboard.writeText(output);
-    alert("コピーできたぞ同士よ");
-  };
-
-  const downloadBlob = (blob, filename) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
-
-  const saveText = () => {
-    downloadBlob(new Blob([output], { type: "text/plain;charset=utf-8" }), `${values.name || "character_profile"}.txt`);
-    setStatus("TXTを保存したぞ");
-  };
-
-  const saveAsPng = async () => {
-    try {
-      const width = 1240;
-      const padding = 80;
-      const lineHeight = 52;
-      const maxTextWidth = width - padding * 2;
-      const approxCharsPerLine = 34;
-
-      const sourceLines = output.split("\n");
-      const wrappedLines = [];
-
-      sourceLines.forEach((line) => {
-        const text = line || " ";
-        if (text.length <= approxCharsPerLine) {
-          wrappedLines.push(text);
-          return;
-        }
-        for (let i = 0; i < text.length; i += approxCharsPerLine) {
-          wrappedLines.push(text.slice(i, i + approxCharsPerLine));
-        }
-      });
-
-      const minHeight = 1754;
-      const dynamicHeight = padding * 2 + wrappedLines.length * lineHeight;
-      const height = Math.max(minHeight, dynamicHeight);
-
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, width, height);
-      ctx.fillStyle = "#222222";
-      ctx.font = "32px monospace";
-
-      let y = padding;
-      wrappedLines.forEach((line) => {
-        ctx.fillText(line, padding, y, maxTextWidth);
-        y += lineHeight;
-      });
-
-      const dataUrl = canvas.toDataURL("image/png");
-      setPngPreviewUrl(dataUrl);
-      setStatus(`PNGプレビューを生成したぞ（高さ ${height}px）`);
-    } catch (e) {
-      setStatus("PNG生成でエラーが起きた");
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (pngPreviewUrl && pngPreviewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(pngPreviewUrl);
-      }
-    };
-  }, [pngPreviewUrl]);
-
-  const styles = {
-    page: { minHeight: "100vh", background: "#f5f5f5", padding: 24, color: "#222" },
-    grid: { maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 },
-    card: { background: "#ffffff", border: "1px solid #d4d4d4", borderRadius: 24, padding: 24 },
-    field: { border: "1px solid #d4d4d4", borderRadius: 16, padding: 12, marginBottom: 12 },
-    input: { width: "100%", border: "1px solid #cfcfcf", borderRadius: 12, padding: 12, boxSizing: "border-box" },
-    textarea: { width: "100%", minHeight: 96, border: "1px solid #cfcfcf", borderRadius: 12, padding: 12, boxSizing: "border-box" },
-    previewOuter: { minHeight: "60vh", border: "1px solid #d4d4d4", borderRadius: 16, padding: 16, background: "#fff" },
-    previewInner: { maxWidth: 794, minHeight: 1123, margin: "0 auto", whiteSpace: "pre-wrap", border: "1px solid #d4d4d4", padding: 32, fontFamily: "monospace", fontSize: 14, lineHeight: 1.7, boxSizing: "border-box" },
-    buttons: { display: "flex", gap: 12, marginTop: 16 },
-    buttonDark: { borderRadius: 16, padding: "12px 16px", border: "1px solid #111", background: "#111", color: "#fff", cursor: "pointer" },
-    button: { borderRadius: 16, padding: "12px 16px", border: "1px solid #cfcfcf", background: "#fff", cursor: "pointer" },
-  };
-
-  return (
-    <div style={styles.page}>
-      <div style={styles.grid}>
-        <div style={styles.card}>
-          <h1>キャラプロフィールTXTメーカー</h1>
-          {fieldDefs.map((field) => (
-            <div key={field.key} style={styles.field}>
-              <label style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                <input type="checkbox" checked={enabled[field.key]} onChange={() => toggle(field.key)} />
-                {field.label} をコピー範囲に含める
-              </label>
-              {field.multiline ? (
-                <textarea style={styles.textarea} value={values[field.key]} onChange={(e) => setValue(field.key, e.target.value)} placeholder={fallback} />
-              ) : (
-                <input style={styles.input} value={values[field.key]} onChange={(e) => setValue(field.key, e.target.value)} placeholder={fallback} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div style={styles.card}>
-          <h2>出力プレビュー</h2>
-          <div ref={previewRef} style={styles.previewOuter}>
-            <div style={styles.previewInner}>{output}</div>
-          </div>
-          <div style={styles.buttons}>
-            <button onClick={copyText} style={styles.buttonDark}>コピー</button>
-            <button onClick={saveText} style={styles.button}>TXT保存</button>
-            <button onClick={saveAsPng} style={styles.button}>PNGプレビュー生成</button>
-          </div>
-          {status && <p style={{ marginTop: 12 }}>{status}</p>}
-          {pngPreviewUrl && (
-            <div style={{ marginTop: 24 }}>
-              <h3>PNGプレビュー（長押し・右クリックで保存）</h3>
-              <img
-                src={pngPreviewUrl}
-                alt="PNG preview"
-                style={{ width: "100%", border: "1px solid #d4d4d4", borderRadius: 16 }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>キャラプロフィールTXTメーカー</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f5f5f5; color: #222; }
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card { background: #fff; border: 1px solid #d4d4d4; border-radius: 24px; padding: 24px; }
+    .field { border: 1px solid #d4d4d4; border-radius: 16px; padding: 12px; margin-bottom: 12px; }
+    input[type="text"], textarea { width: 100%; box-sizing: border-box; border: 1px solid #cfcfcf; border-radius: 12px; padding: 12px; }
+    textarea { min-height: 96px; }
+    .preview { min-height: 60vh; border: 1px solid #d4d4d4; border-radius: 16px; padding: 16px; white-space: pre-wrap; font-family: monospace; line-height: 1.7; }
+    .buttons { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    button { border-radius: 16px; padding: 12px 16px; border: 1px solid #cfcfcf; background: #fff; cursor: pointer; }
+    .primary { background: #111; color: #fff; border-color: #111; }
+    #pngPreview img { width: 100%; border: 1px solid #d4d4d4; border-radius: 16px; margin-top: 16px; }
+    @media (max-width: 900px) { .page { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <h1>キャラプロフィールTXTメーカー</h1>
+      <div id="fields"></div>
     </div>
-  );
-}
+    <div class="card">
+      <h2>出力プレビュー</h2>
+      <div id="preview" class="preview"></div>
+      <div class="buttons">
+        <button class="primary" onclick="copyText()">コピー</button>
+        <button onclick="saveText()">TXT保存</button>
+        <button onclick="savePngPreview()">PNGプレビュー生成</button>
+      </div>
+      <p id="status"></p>
+      <div id="pngPreview"></div>
+    </div>
+  </div>
+
+  <script>
+    const fields = [
+      ["name", "名前", false], ["reading", "よみがな", false], ["job", "職業", false],
+      ["age", "年齢", false], ["gender", "性別", false], ["height", "身長", false],
+      ["birthday", "誕生日", false], ["feature", "特徴表", true], ["profile", "Profile", true],
+      ["firstPerson", "一人称", false], ["secondPerson", "二人称", false],
+      ["hate", "嫌い", false], ["like", "好き", false], ["voice", "Sample Voice", true],
+      ["background", "Background", true], ["origin", "由来", true]
+    ];
+
+    const values = {};
+    const enabled = {};
+    const fallback = "不明";
+
+    const fieldsRoot = document.getElementById("fields");
+    fields.forEach(([key, label, multiline]) => {
+      values[key] = "";
+      enabled[key] = true;
+      const wrap = document.createElement("div");
+      wrap.className = "field";
+      wrap.innerHTML = `
+        <label><input type="checkbox" checked data-key="${key}" class="toggle"> ${label} をコピー範囲に含める</label>
+        ${multiline ? `<textarea data-key="${key}" placeholder="${fallback}"></textarea>` : `<input type="text" data-key="${key}" placeholder="${fallback}">`}
+      `;
+      fieldsRoot.appendChild(wrap);
+    });
+
+    fieldsRoot.addEventListener("input", (e) => {
+      const key = e.target.dataset.key;
+      if (!key) return;
+      values[key] = e.target.value;
+      render();
+    });
+
+    fieldsRoot.addEventListener("change", (e) => {
+      if (!e.target.classList.contains("toggle")) return;
+      const key = e.target.dataset.key;
+      enabled[key] = e.target.checked;
+      render();
+    });
+
+    function buildOutput() {
+      const lines = [];
+      const push = (text = "") => lines.push(text);
+      if (enabled.name) {
+        push("【名前】");
+        push(values.name || fallback);
+        if (enabled.reading) push(`(${values.reading || "よみがな"})`);
+        push();
+      }
+      [["job","✶職業"],["age","✶年齢"],["gender","✶性別"],["height","✶身長"],["birthday","✶誕生日"]].forEach(([k,l]) => {
+        if (enabled[k]) push(`${l}…${values[k] || fallback}`);
+      });
+      push();
+      [["feature","▰ 特徴表"],["profile","▰ ᴾʳᵒᶠⁱˡᵉ"],["voice","▰ ˢᵃᵐᵖˡᵉ ⱽᵒⁱᶜᵉ"],["background","▰ ᴮᵃᶜᵏᴳʳᵒᵘⁿᵈ"],["origin","▰ 由来"]].forEach(([k,t]) => {
+        if (enabled[k]) { push(t); push(values[k] || fallback); push(); }
+      });
+      return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    }
+
+    function render() {
+      document.getElementById("preview").textContent = buildOutput();
+    }
+
+    function copyText() {
+      navigator.clipboard.writeText(buildOutput());
+      document.getElementById("status").textContent = "コピーしたぞ";
+    }
+
+    function saveText() {
+      const blob = new Blob([buildOutput()], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${values.name || "character_profile"}.txt`;
+      a.click();
+      document.getElementById("status").textContent = "TXTを保存したぞ";
+    }
+
+    function savePngPreview() {
+      const text = buildOutput();
+      const width = 1240, padding = 80, lineHeight = 52, perLine = 34;
+      const wrapped = [];
+      text.split("\n").forEach(line => {
+        const t = line || " ";
+        for (let i = 0; i < t.length; i += perLine) wrapped.push(t.slice(i, i + perLine));
+        if (t.length === 0) wrapped.push(" ");
+      });
+      const height = Math.max(1754, padding * 2 + wrapped.length * lineHeight);
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0,0,width,height);
+      ctx.fillStyle = "#222"; ctx.font = "32px monospace";
+      let y = padding;
+      wrapped.forEach(line => { ctx.fillText(line, padding, y); y += lineHeight; });
+      const url = canvas.toDataURL("image/png");
+      document.getElementById("pngPreview").innerHTML = `<h3>PNGプレビュー（長押し・右クリック保存）</h3><img src="${url}" alt="preview">`;
+      document.getElementById("status").textContent = `PNG生成OK 高さ ${height}px`;
+    }
+
+    render();
+  </script>
+</body>
+</html>
