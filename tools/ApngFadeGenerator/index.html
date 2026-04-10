@@ -24,6 +24,7 @@ button{cursor:pointer;background:#333;color:#fff;margin-top:10px}
 <div>
 <label>イージング</label>
 <select id="easing">
+<option value="none">なし（線形）</option>
 <option value="in">イーズイン</option>
 <option value="out">イーズアウト</option>
 <option value="inout">イーズイン+アウト</option>
@@ -111,6 +112,7 @@ async function buildFrames(limit5mb=false){
    const alphas = [];
    const easing = document.getElementById('easing').value;
    const ease = (t)=>{
+     if(easing==='none') return t;
      if(easing==='in') return t*t;
      if(easing==='out') return 1-(1-t)*(1-t);
      return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
