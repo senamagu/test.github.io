@@ -101,7 +101,8 @@ async function buildApng(limit5mb=false){
      ctx.clearRect(0,0,w,h);
      ctx.globalAlpha = alpha;
      ctx.drawImage(sourceImg,0,0,w,h);
-     frames.push(ctx.getImageData(0,0,w,h).data.buffer);
+     const imageData = ctx.getImageData(0,0,w,h);
+     frames.push(imageData.data.slice().buffer);
      delays.push(1000/fpsNum);
    }
 
@@ -114,7 +115,7 @@ async function buildApng(limit5mb=false){
    }
 
    const apng = UPNG.encode(frames,w,h,cnum,delays);
-   blob = new Blob([apng], {type:'image/png'});
+   blob = new Blob([apng], {type:'image/apng'});
    if(!limit5mb || blob.size <= 5*1024*1024) break;
    if(cnum===0) cnum = 256;
    else if(cnum>2) cnum = Math.max(2, cnum/2);
