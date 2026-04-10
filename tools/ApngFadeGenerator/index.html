@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>APNG Fade Generator</title>
-<script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
 body{font-family:sans-serif;max-width:900px;margin:0 auto;padding:20px;background:#111;color:#eee}
 .panel{background:#1b1b1b;border-radius:16px;padding:16px;margin-bottom:16px}
@@ -30,8 +30,8 @@ button{cursor:pointer;background:#333;color:#fff;margin-top:10px}
 </select>
 </div>
 <div>
-<label>フェード時間（秒）</label>
-<input id="duration" type="number" min="0.1" max="10" step="0.1" value="0.5" />
+<label>フェード枚数</label>
+<input id="frameCount" type="number" min="2" max="120" step="1" value="12" />
 </div>
 </div>
 <div class="row">
@@ -46,9 +46,9 @@ button{cursor:pointer;background:#333;color:#fff;margin-top:10px}
 </div>
 <button id="generate">生成</button>
 <button id="optimize">5MB以内に抑える</button>
-<a id="download" download="fade.apng"><button>APNG保存</button></a>
+<button id="saveAll">連番PNGを一括保存（ZIP）</button>
 <div class="small" id="size">サイズ: -</div>
-<img id="preview" class="preview" />
+<div id="preview" class="preview" style="padding:12px; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:8px;"></div>
 </div>
 <script>
 const fps = document.getElementById('fps');
@@ -77,62 +77,75 @@ document.getElementById('file').onchange = e => {
  img.src = URL.createObjectURL(file);
 };
 
-async function buildApng(limit5mb=false){
+let generatedFrames = [];
+async function buildFrames(limit5mb=false){
  if(!sourceImg) return;
  let fpsNum = +fps.value;
- let cnum = colorSteps[+colors.value];
- let duration = +document.getElementById('duration').value;
- const mode = document.getElementById('mode').value;
+ let count = +document.getElementById('frameCount').value;
  let scale = 1;
- let blob;
+ generatedFrames = [];
+ preview.innerHTML = '';
+ let totalSize = 0;
 
  while(true){
+   generatedFrames = [];
+   preview.innerHTML = '';
+   totalSize = 0;
    const w = Math.round(sourceImg.width * scale);
    const h = Math.round(sourceImg.height * scale);
    const canvas = document.createElement('canvas');
    canvas.width = w; canvas.height = h;
    const ctx = canvas.getContext('2d');
-   const fadeFrames = Math.max(2, Math.round(duration * fpsNum));
+   const mode = document.getElementById('mode').value;
    const holdFrames = mode === 'inout' ? Math.max(1, Math.round(fpsNum*0.5)) : 0;
-   const frames = [];
-   const delays = [];
 
-   function push(alpha){
+   const alphas = [];
+   if(mode==='in') for(let i=0;i<count;i++) alphas.push(i/(count-1));
+   if(mode==='out') for(let i=0;i<count;i++) alphas.push(1-(i/(count-1)));
+   if(mode==='inout') {
+     for(let i=0;i<count;i++) alphas.push(i/(count-1));
+     for(let i=0;i<holdFrames;i++) alphas.push(1);
+     for(let i=0;i<count;i++) alphas.push(1-(i/(count-1)));
+   }
+
+   for (let i=0;i<alphas.length;i++) {
      ctx.clearRect(0,0,w,h);
-     ctx.globalAlpha = alpha;
+     ctx.globalAlpha = alphas[i];
      ctx.drawImage(sourceImg,0,0,w,h);
-     const imageData = ctx.getImageData(0,0,w,h);
-     frames.push(imageData.data.slice().buffer);
-     delays.push(1000/fpsNum);
+     const dataUrl = canvas.toDataURL('image/png');
+     generatedFrames.push(dataUrl);
+     totalSize += Math.ceil((dataUrl.length * 3) / 4);
    }
 
-   if(mode==='in') for(let i=0;i<fadeFrames;i++) push(i/(fadeFrames-1));
-   if(mode==='out') for(let i=0;i<fadeFrames;i++) push(1-(i/(fadeFrames-1)));
-   if(mode==='inout'){
-     for(let i=0;i<fadeFrames;i++) push(i/(fadeFrames-1));
-     for(let i=0;i<holdFrames;i++) push(1);
-     for(let i=0;i<fadeFrames;i++) push(1-(i/(fadeFrames-1)));
-   }
-
-   const apng = UPNG.encode(frames,w,h,cnum,delays);
-   blob = new Blob([apng], {type:'image/apng'});
-   if(!limit5mb || blob.size <= 5*1024*1024) break;
-   if(cnum===0) cnum = 256;
-   else if(cnum>2) cnum = Math.max(2, cnum/2);
-   else if(fpsNum>8) fpsNum -= 4;
-   else scale -= 0.1;
-   if(scale <= 0.4) break;
+   if(!limit5mb || totalSize <= 5*1024*1024 || scale <= 0.4) break;
+   scale -= 0.1;
  }
 
- if(lastBlob) URL.revokeObjectURL(lastBlob);
- lastBlob = URL.createObjectURL(blob);
- preview.src = lastBlob;
- download.href = lastBlob;
- sizeText.textContent = `サイズ: ${(blob.size/1024/1024).toFixed(2)} MB`;
+ generatedFrames.forEach((src, i) => {
+   const img = document.createElement('img');
+   img.src = src;
+   img.style.width = '100%';
+   img.style.borderRadius = '8px';
+   img.title = `frame_${String(i+1).padStart(3,'0')}.png`;
+   preview.appendChild(img);
+ });
+ sizeText.textContent = `合計サイズ目安: ${(totalSize/1024/1024).toFixed(2)} MB / ${generatedFrames.length}枚`;
 }
 
-document.getElementById('generate').onclick = ()=>buildApng(false);
-document.getElementById('optimize').onclick = ()=>buildApng(true);
+document.getElementById('generate').onclick = ()=>buildFrames(false);
+document.getElementById('optimize').onclick = ()=>buildFrames(true);
+document.getElementById('saveAll').onclick = async ()=>{
+  if(!generatedFrames.length) return;
+  const zip = new JSZip();
+  generatedFrames.forEach((src,i)=>{
+    zip.file(`frame_${String(i+1).padStart(3,'0')}.png`, src.split(',')[1], {base64:true});
+  });
+  const blob = await zip.generateAsync({type:'blob'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'fade_frames.zip';
+  a.click();
+};
 </script>
 </body>
 </html>
