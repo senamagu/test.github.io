@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>APNG Fade Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.min.js"></script>
+<style>
+body{font-family:sans-serif;max-width:900px;margin:0 auto;padding:20px;background:#111;color:#eee}
+.panel{background:#1b1b1b;border-radius:16px;padding:16px;margin-bottom:16px}
+label{display:block;margin:10px 0 4px}
+input,select,button{width:100%;padding:10px;border-radius:10px;border:none}
+button{cursor:pointer;background:#333;color:#fff;margin-top:10px}
+.preview{max-width:100%;max-height:420px;display:block;margin:10px auto;background:repeating-conic-gradient(#222 0 25%, #2b2b2b 0 50%) 50%/20px 20px;border-radius:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.small{font-size:14px;color:#bbb}
+</style>
+</head>
+<body>
+<div class="panel">
+<h2>APNG フェードジェネレーター</h2>
+<input id="file" type="file" accept="image/png,image/webp,image/jpeg" />
+<div class="row">
+<div>
+<label>モード</label>
+<select id="mode">
+<option value="in">フェードIN</option>
+<option value="out">フェードOUT</option>
+<option value="inout">IN → 表示 → OUT</option>
+</select>
+</div>
+<div>
+<label>フェード時間（秒）</label>
+<input id="duration" type="number" min="0.1" max="10" step="0.1" value="0.5" />
+</div>
+</div>
+<div class="row">
+<div>
+<label>フレームレート: <span id="fpsVal">24</span> FPS</label>
+<input id="fps" type="range" min="1" max="60" value="24" />
+</div>
+<div>
+<label>減色: <span id="colorVal">フルカラー</span></label>
+<input id="colors" type="range" min="0" max="8" value="0" />
+</div>
+</div>
+<button id="generate">生成</button>
+<button id="optimize">5MB以内に抑える</button>
+<a id="download" download="fade.apng"><button>APNG保存</button></a>
+<div class="small" id="size">サイズ: -</div>
+<img id="preview" class="preview" />
+</div>
+<script>
+const fps = document.getElementById('fps');
+const fpsVal = document.getElementById('fpsVal');
+const colors = document.getElementById('colors');
+const colorVal = document.getElementById('colorVal');
+const preview = document.getElementById('preview');
+const sizeText = document.getElementById('size');
+const download = document.getElementById('download');
+let sourceImg = null;
+let lastBlob = null;
+
+const colorSteps = [0,256,128,64,32,16,8,4,2];
+function updateLabels(){
+ fpsVal.textContent = fps.value;
+ const c = colorSteps[+colors.value];
+ colorVal.textContent = c===0 ? 'フルカラー' : `${c}色`;
+}
+fps.oninput = colors.oninput = updateLabels; updateLabels();
+
+document.getElementById('file').onchange = e => {
+ const file = e.target.files[0];
+ if(!file) return;
+ const img = new Image();
+ img.onload = ()=>{ sourceImg = img; preview.src = img.src; };
+ img.src = URL.createObjectURL(file);
+};
+
+async function buildApng(limit5mb=false){
+ if(!sourceImg) return;
+ let fpsNum = +fps.value;
+ let cnum = colorSteps[+colors.value];
+ let duration = +document.getElementById('duration').value;
+ const mode = document.getElementById('mode').value;
+ let scale = 1;
+ let blob;
+
+ while(true){
+   const w = Math.round(sourceImg.width * scale);
+   const h = Math.round(sourceImg.height * scale);
+   const canvas = document.createElement('canvas');
+   canvas.width = w; canvas.height = h;
+   const ctx = canvas.getContext('2d');
+   const fadeFrames = Math.max(2, Math.round(duration * fpsNum));
+   const holdFrames = mode === 'inout' ? Math.max(1, Math.round(fpsNum*0.5)) : 0;
+   const frames = [];
+   const delays = [];
+
+   function push(alpha){
+     ctx.clearRect(0,0,w,h);
+     ctx.globalAlpha = alpha;
+     ctx.drawImage(sourceImg,0,0,w,h);
+     frames.push(ctx.getImageData(0,0,w,h).data.buffer);
+     delays.push(1000/fpsNum);
+   }
+
+   if(mode==='in') for(let i=0;i<fadeFrames;i++) push(i/(fadeFrames-1));
+   if(mode==='out') for(let i=0;i<fadeFrames;i++) push(1-(i/(fadeFrames-1)));
+   if(mode==='inout'){
+     for(let i=0;i<fadeFrames;i++) push(i/(fadeFrames-1));
+     for(let i=0;i<holdFrames;i++) push(1);
+     for(let i=0;i<fadeFrames;i++) push(1-(i/(fadeFrames-1)));
+   }
+
+   const apng = UPNG.encode(frames,w,h,cnum,delays);
+   blob = new Blob([apng], {type:'image/png'});
+   if(!limit5mb || blob.size <= 5*1024*1024) break;
+   if(cnum===0) cnum = 256;
+   else if(cnum>2) cnum = Math.max(2, cnum/2);
+   else if(fpsNum>8) fpsNum -= 4;
+   else scale -= 0.1;
+   if(scale <= 0.4) break;
+ }
+
+ if(lastBlob) URL.revokeObjectURL(lastBlob);
+ lastBlob = URL.createObjectURL(blob);
+ preview.src = lastBlob;
+ download.href = lastBlob;
+ sizeText.textContent = `サイズ: ${(blob.size/1024/1024).toFixed(2)} MB`;
+}
+
+document.getElementById('generate').onclick = ()=>buildApng(false);
+document.getElementById('optimize').onclick = ()=>buildApng(true);
+</script>
+</body>
+</html>
