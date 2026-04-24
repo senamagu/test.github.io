@@ -40,7 +40,7 @@ button{width:100%;padding:14px;border:none;border-radius:16px;background:#18181b
 </div>
 
 <div class="card">
-<svg id="ratioSvg" viewBox="0 0 300 520" width="100%" height="520" xmlns="http://www.w3.org/2000/svg"></svg>
+<svg id="ratioSvg" viewBox="0 0 300 520" width="100%" height="520"></svg>
 <img id="preview">
 </div>
 </div>
@@ -58,25 +58,28 @@ preview:document.getElementById('preview')
 
 function render(){
 
-const height=Math.max(1,parseFloat(els.height.value)||1);
-const headRatio=parseFloat(els.headRatio.value);
-const legSplit=parseFloat(els.legSplit.value);
-const lineWidth=parseInt(els.lineWidth.value);
+// ★ 絶対止まらない安全処理
+const height = Math.max(1, parseFloat(els.height.value) || 1);
+const headRatio = parseFloat(els.headRatio.value) || 7.5;
+const legSplit = parseFloat(els.legSplit.value) || 0.5;
+const lineWidth = parseInt(els.lineWidth.value) || 4;
 
-document.getElementById('headRatioLabel').textContent=headRatio.toFixed(1);
-document.getElementById('upperLabel').textContent=Math.round((1-legSplit)*100);
-document.getElementById('lowerLabel').textContent=Math.round(legSplit*100);
-document.getElementById('lineWidthLabel').textContent=lineWidth;
+// UI表示更新
+headRatioLabel.textContent = headRatio.toFixed(1);
+upperLabel.textContent = Math.round((1-legSplit)*100);
+lowerLabel.textContent = Math.round(legSplit*100);
+lineWidthLabel.textContent = lineWidth;
 
-const head=height/headRatio;
-const lower=height*legSplit;
-const upper=Math.max(0,height-lower-head);
-const heads=height/head;
+// 計算
+const head = height / headRatio;
+const lower = height * legSplit;
+const upper = Math.max(0, height - lower - head);
+const heads = height / head;
 
-const scale=420/height;
-const headPx=head*scale;
-const upperPx=upper*scale;
-const lowerPx=lower*scale;
+const scale = 420 / height;
+const headPx = head * scale;
+const upperPx = upper * scale;
+const lowerPx = lower * scale;
 
 const topY=40;
 const neckY=topY+headPx;
@@ -84,7 +87,8 @@ const hipY=neckY+upperPx;
 const footY=hipY+lowerPx;
 const cx=150;
 
-els.svg.innerHTML=`
+// SVG更新（確実描画）
+els.svg.innerHTML = `
 <circle cx="${cx}" cy="${topY+headPx/2}" r="${headPx/2}" fill="none" stroke="black" stroke-width="${lineWidth}" />
 <line x1="${cx-35}" y1="${neckY}" x2="${cx+35}" y2="${neckY}" stroke="black" stroke-width="${lineWidth}" />
 <line x1="${cx}" y1="${neckY}" x2="${cx}" y2="${footY}" stroke="black" stroke-width="${lineWidth}" />
@@ -98,20 +102,17 @@ els.svg.innerHTML=`
 `;
 }
 
+// PNG出力
 function exportPNG(){
 const clone=els.svg.cloneNode(true);
-
-// テキスト削除（クリーン書き出し）
 clone.querySelectorAll('text').forEach(n=>n.remove());
-
 const source=new XMLSerializer().serializeToString(clone);
-const img=new Image();
 
+const img=new Image();
 img.onload=()=>{
 const canvas=document.createElement('canvas');
 canvas.width=1200;
 canvas.height=2080;
-
 const ctx=canvas.getContext('2d');
 
 if(!els.transparentBg.checked){
@@ -126,13 +127,15 @@ els.preview.src=canvas.toDataURL('image/png');
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(source);
 }
 
-// イベント（安定版）
-els.height.addEventListener('input',render);
-els.height.addEventListener('change',render);
+// ★ イベント全部拾う（これが決定打）
+['input','change','keyup','blur'].forEach(ev=>{
+  els.height.addEventListener(ev,render);
+});
 els.headRatio.addEventListener('input',render);
 els.legSplit.addEventListener('input',render);
 els.lineWidth.addEventListener('input',render);
 
+// 初期描画
 render();
 </script>
 
