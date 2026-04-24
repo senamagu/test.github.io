@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>身体比率ビジュアライザー 修正版</title>
+<title>身体比率ビジュアライザー</title>
 <style>
 body{font-family:sans-serif;background:#f4f4f5;margin:0;padding:24px;color:#18181b}
 .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:24px}
@@ -16,25 +16,35 @@ button{width:100%;padding:14px;border:none;border-radius:16px;background:#18181b
 </style>
 </head>
 <body>
+
 <div class="wrap">
 <div class="card">
 <h1>身体比率ビジュアライザー</h1>
+
 <p>身長 (cm)</p>
 <input id="height" type="number" value="170" min="1" step="0.1">
+
 <p>頭身: <span id="headRatioLabel">7.5</span></p>
 <input id="headRatio" type="range" min="4" max="10" step="0.1" value="7.5">
+
 <p>比率: 頭+上半身 <span id="upperLabel">50</span>% / 下半身 <span id="lowerLabel">50</span>%</p>
 <input id="legSplit" type="range" min="0.35" max="0.65" step="0.01" value="0.5">
+
 <p>線の太さ: <span id="lineWidthLabel">4</span>px</p>
 <input id="lineWidth" type="range" min="1" max="12" step="1" value="4">
-<label><input id="transparentBg" type="checkbox" checked> 透過PNGで書き出す</label><br><br>
+
+<label><input id="transparentBg" type="checkbox" checked> 透過PNGで書き出す</label>
+<br><br>
+
 <button onclick="exportPNG()">PNGを書き出して下に表示</button>
 </div>
+
 <div class="card">
 <svg id="ratioSvg" viewBox="0 0 300 520" width="100%" height="520" xmlns="http://www.w3.org/2000/svg"></svg>
 <img id="preview">
 </div>
 </div>
+
 <script>
 const els={
 height:document.getElementById('height'),
@@ -45,59 +55,86 @@ transparentBg:document.getElementById('transparentBg'),
 svg:document.getElementById('ratioSvg'),
 preview:document.getElementById('preview')
 };
+
 function render(){
-const height=parseFloat(els.height.value);
-if(isNaN(height)||height<=0)return;
+
+const height=Math.max(1,parseFloat(els.height.value)||1);
 const headRatio=parseFloat(els.headRatio.value);
 const legSplit=parseFloat(els.legSplit.value);
 const lineWidth=parseInt(els.lineWidth.value);
+
 document.getElementById('headRatioLabel').textContent=headRatio.toFixed(1);
 document.getElementById('upperLabel').textContent=Math.round((1-legSplit)*100);
 document.getElementById('lowerLabel').textContent=Math.round(legSplit*100);
 document.getElementById('lineWidthLabel').textContent=lineWidth;
+
 const head=height/headRatio;
 const lower=height*legSplit;
 const upper=Math.max(0,height-lower-head);
+const heads=height/head;
+
 const scale=420/height;
 const headPx=head*scale;
 const upperPx=upper*scale;
 const lowerPx=lower*scale;
+
 const topY=40;
 const neckY=topY+headPx;
 const hipY=neckY+upperPx;
 const footY=hipY+lowerPx;
 const cx=150;
-els.svg.innerHTML=`<circle cx="${cx}" cy="${topY+headPx/2}" r="${headPx/2}" fill="none" stroke="black" stroke-width="${lineWidth}" />
+
+els.svg.innerHTML=`
+<circle cx="${cx}" cy="${topY+headPx/2}" r="${headPx/2}" fill="none" stroke="black" stroke-width="${lineWidth}" />
 <line x1="${cx-35}" y1="${neckY}" x2="${cx+35}" y2="${neckY}" stroke="black" stroke-width="${lineWidth}" />
 <line x1="${cx}" y1="${neckY}" x2="${cx}" y2="${footY}" stroke="black" stroke-width="${lineWidth}" />
 <line x1="${cx-25}" y1="${hipY}" x2="${cx+25}" y2="${hipY}" stroke="black" stroke-width="${lineWidth}" />
 <line x1="${cx-25}" y1="${footY}" x2="${cx+25}" y2="${footY}" stroke="black" stroke-width="${lineWidth}" />
+
 <text x="195" y="${topY+10}" font-size="22">頭 ${head.toFixed(1)}cm</text>
 <text x="195" y="${neckY+upperPx/2}" font-size="22">上半身 ${upper.toFixed(1)}cm</text>
 <text x="195" y="${hipY+lowerPx/2}" font-size="22">下半身 ${lower.toFixed(1)}cm</text>
-<text x="195" y="${footY+30}" font-size="22">${headRatio.toFixed(2)}頭身</text>`;
+<text x="195" y="${footY+30}" font-size="22">${heads.toFixed(2)}頭身</text>
+`;
 }
+
 function exportPNG(){
 const clone=els.svg.cloneNode(true);
+
+// テキスト削除（クリーン書き出し）
 clone.querySelectorAll('text').forEach(n=>n.remove());
+
 const source=new XMLSerializer().serializeToString(clone);
 const img=new Image();
+
 img.onload=()=>{
 const canvas=document.createElement('canvas');
-canvas.width=1200;canvas.height=2080;
+canvas.width=1200;
+canvas.height=2080;
+
 const ctx=canvas.getContext('2d');
-if(!els.transparentBg.checked){ctx.fillStyle='white';ctx.fillRect(0,0,canvas.width,canvas.height);}
+
+if(!els.transparentBg.checked){
+ctx.fillStyle='white';
+ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+
 ctx.drawImage(img,0,0,canvas.width,canvas.height);
 els.preview.src=canvas.toDataURL('image/png');
 };
+
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(source);
 }
+
+// イベント（安定版）
 els.height.addEventListener('input',render);
+els.height.addEventListener('change',render);
 els.headRatio.addEventListener('input',render);
 els.legSplit.addEventListener('input',render);
 els.lineWidth.addEventListener('input',render);
-els.transparentBg.addEventListener('change',render);
+
 render();
 </script>
+
 </body>
 </html>
