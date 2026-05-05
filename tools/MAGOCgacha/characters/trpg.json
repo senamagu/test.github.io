@@ -11,7 +11,7 @@
   {"id":"trpg_010","name":"雲梯 蝦蛄","yomi":"ウンテイ シャコ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_011","name":"音楽 奏太郎","yomi":"オンガク カナデタロウ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_012","name":"無弱ミディア","yomi":"ムジャク","series":"TRPG探索者","genre":"人間","gender":"other"},
-  {"id":"trpg_013","name":"ムチャ","yomi":"未登録","series":"TRPG探索者","genre":"人間","gender":"other"},
+  {"id":"trpg_013","name":"ムチャ","yomi":" ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_014","name":"久野 一桜","yomi":"ヒサノ チハル","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_015","name":"筋 多汰","yomi":"スジ タタ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_016","name":"トフィ・マープル","yomi":"Toffee・Marple","series":"TRPG探索者","genre":"人間","gender":"other"},
@@ -28,7 +28,7 @@
   {"id":"trpg_027","name":"城座 雲雀","yomi":"ギザ ヒハバリ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_028","name":"沃天 万金","yomi":"ヨウテン バンキン","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_029","name":"靈鞍 瑠嶺","yomi":"タマクラ ルネ","series":"TRPG探索者","genre":"人間","gender":"other"},
-  {"id":"trpg_030","name":"ムクナ","yomi":"未登録","series":"TRPG探索者","genre":"人間","gender":"other"},
+  {"id":"trpg_030","name":"ムクナ","yomi":" ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_031","name":"名田 宇凪","yomi":"ナタ ウナ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_032","name":"狛夜 星羅","yomi":"コマヤ セイラ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_033","name":"優天 才勝","yomi":"ユウテン マサノリ","series":"TRPG探索者","genre":"人間","gender":"other"},
@@ -37,8 +37,8 @@
   {"id":"trpg_036","name":"キッド","yomi":"Kid","series":"TRPG探索者","genre":"人外","gender":"other"},
   {"id":"trpg_037","name":"尾良 己乱","yomi":"オラ オラン","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_038","name":"冨呂 大輔","yomi":"フロ ダイスケ","series":"TRPG探索者","genre":"人間","gender":"other"},
-  {"id":"trpg_039","name":"有杉 達史稀","yomi":"アリスギ タチシキ","series":"TRPG探索者","genre":"人間","gender":"other"}
-  {"id":"trpg_040","name":"ロレンツォ・ヴェルデ","yomi":"Lorenzo・Verde","series":"TRPG探索者","genre":"人間","gender":"other"}
-  {"id":"trpg_041","name":"玄陸 兎姫","yomi":"クロリク トキ","series":"TRPG探索者","genre":"人間","gender":"other"}
+  {"id":"trpg_039","name":"有杉 達史稀","yomi":"アリスギ タチシキ","series":"TRPG探索者","genre":"人間","gender":"other"},
+  {"id":"trpg_040","name":"ロレンツォ・ヴェルデ","yomi":"Lorenzo・Verde","series":"TRPG探索者","genre":"人間","gender":"other"},
+  {"id":"trpg_041","name":"玄陸 兎姫","yomi":"クロリク トキ","series":"TRPG探索者","genre":"人間","gender":"other"},
   {"id":"trpg_042","name":"霖堂 茉白","yomi":"リンドウ マシロ","series":"TRPG探索者","genre":"人間","gender":"other"}
 ]
