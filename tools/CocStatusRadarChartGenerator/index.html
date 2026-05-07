@@ -17,7 +17,6 @@ body {
 }
 
 #controls {
-  width: 100%;
   overflow-y: auto;
   background: #1b1b1b;
   padding: 16px;
@@ -26,16 +25,13 @@ body {
 }
 
 #preview {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   transition: background 0.2s ease;
 }
 
 canvas {
-  background: transparent;
   max-width: 90vh;
   max-height: 90vh;
   width: auto;
@@ -51,35 +47,34 @@ canvas {
 
 .panel h2 {
   margin-top: 0;
-  font-size: 18px;
-}
-
-input[type="number"],
-input[type="text"] {
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 8px;
-  background: #222;
-  border: 1px solid #444;
-  color: white;
-  padding: 6px;
-  border-radius: 6px;
 }
 
 label {
   display: block;
-  margin-top: 6px;
+  margin-top: 8px;
   margin-bottom: 4px;
 }
 
-button {
-  background: #333;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
+input[type="number"],
+input[type="text"],
+textarea {
   width: 100%;
+  box-sizing: border-box;
+  background: #222;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+button {
+  width: 100%;
+  background: #333;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
   margin-top: 8px;
 }
 
@@ -89,36 +84,58 @@ button:hover {
 
 .character-block {
   border: 1px solid #444;
-  padding: 10px;
   border-radius: 10px;
+  padding: 10px;
   margin-bottom: 12px;
 }
 
-.small {
-  font-size: 12px;
-  color: #aaa;
+.character-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.character-title {
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.character-content.closed {
+  display: none;
+}
+
+.toggle-button {
+  width: 40px;
+  padding: 6px;
+  margin-top: 0;
 }
 </style>
 </head>
 <body>
-
 <div id="controls">
   <div class="panel">
     <h2>グラフ設定</h2>
 
     <label>目盛り線・テキストカラー</label>
-    <input type="color" id="gridColor" value="#ffffff" oninput="drawChart()" />
+    <input type="color" id="gridColor" value="#ffffff" />
 
     <label>キャンバスサイズ</label>
     <input type="number" id="canvasSize" value="1200" min="500" max="4000" />
 
-    <button onclick="downloadPNG()">透過PNG保存</button>
+    <label>いあきゃらチャパレ貼り付け</label>
+    <textarea id="chatPaletteInput" rows="10"></textarea>
+
+    <button id="importButton">ステータス読み込み</button>
+    <button id="downloadButton">透過PNG保存</button>
   </div>
 
   <div class="panel">
     <h2>探索者</h2>
     <div id="characters"></div>
-    <button onclick="addCharacter()">探索者を追加</button>
+    <button id="addButton">探索者を追加</button>
   </div>
 </div>
 
@@ -130,11 +147,17 @@ button:hover {
 const labels = ["STR", "CON", "POW", "DEX", "APP", "SIZ", "INT", "EDU"];
 const baseMax = 18;
 const scaleMarks = [0, 5, 10, 15, 18];
-
 const characters = [];
+
+function randomColor() {
+  return `#${Math.floor(Math.random() * 16777215)
+    .toString(16)
+    .padStart(6, "0")}`;
+}
 
 function createDefaultCharacter(index) {
   return {
+    collapsed: false,
     name: `探索者${index + 1}`,
     color: randomColor(),
     opacity: 0.3,
@@ -147,18 +170,38 @@ function createDefaultCharacter(index) {
       APP: 10,
       SIZ: 10,
       INT: 10,
-      EDU: 10,
+      EDU: 10
     }
   };
 }
 
-function randomColor() {
-  return `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
+function addCharacter(characterData = null) {
+  const character = characterData || createDefaultCharacter(characters.length);
+  characters.push(character);
+  renderCharacterControls();
+  drawChart();
 }
 
-function addCharacter() {
-  characters.push(createDefaultCharacter(characters.length));
+function removeCharacter(index) {
+  characters.splice(index, 1);
   renderCharacterControls();
+  drawChart();
+}
+
+function toggleCharacter(index) {
+  characters[index].collapsed = !characters[index].collapsed;
+  renderCharacterControls();
+}
+
+function updateCharacter(index, key, value) {
+  characters[index][key] = value;
+  renderCharacterControls();
+  drawChart();
+}
+
+function updateStat(index, stat, value) {
+  const parsed = Number(value);
+  characters[index].stats[stat] = Number.isFinite(parsed) ? parsed : 0;
   drawChart();
 }
 
@@ -170,170 +213,105 @@ function renderCharacterControls() {
     const block = document.createElement("div");
     block.className = "character-block";
 
-    let html = `
-      <label>名前</label>
-      <input type="text" value="${char.name}" onchange="updateName(${index}, this.value)">
+    const header = document.createElement("div");
+    header.className = "character-header";
 
-      <label>カラー</label>
-      <input type="color" value="${char.color}" onchange="updateColor(${index}, this.value)">
+    const title = document.createElement("div");
+    title.className = "character-title";
+    title.textContent = char.name;
 
-      <label>透明度 (${Math.round(char.opacity * 100)}%)</label>
-      <input type="range" min="0" max="1" step="0.05" value="${char.opacity}" onchange="updateOpacity(${index}, this.value)">
+    const toggle = document.createElement("button");
+    toggle.className = "toggle-button";
+    toggle.textContent = char.collapsed ? "▼" : "▲";
+    toggle.addEventListener("click", () => toggleCharacter(index));
 
-      <label>線の太さ</label>
-      <input type="number" min="1" max="10" value="${char.lineWidth}" onchange="updateLineWidth(${index}, this.value)">
-    `;
+    header.appendChild(title);
+    header.appendChild(toggle);
+    block.appendChild(header);
+
+    const content = document.createElement("div");
+    content.className = `character-content ${char.collapsed ? "closed" : ""}`;
+
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = "名前";
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.value = char.name;
+    nameInput.addEventListener("input", event => {
+      updateCharacter(index, "name", event.target.value);
+    });
+
+    const colorLabel = document.createElement("label");
+    colorLabel.textContent = "カラー";
+
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.value = char.color;
+    colorInput.addEventListener("input", event => {
+      characters[index].color = event.target.value;
+      drawChart();
+    });
+
+    const opacityLabel = document.createElement("label");
+    opacityLabel.textContent = `透明度 (${Math.round(char.opacity * 100)}%)`;
+
+    const opacityInput = document.createElement("input");
+    opacityInput.type = "range";
+    opacityInput.min = "0";
+    opacityInput.max = "1";
+    opacityInput.step = "0.05";
+    opacityInput.value = char.opacity;
+    opacityInput.addEventListener("input", event => {
+      characters[index].opacity = Number(event.target.value);
+      renderCharacterControls();
+      drawChart();
+    });
+
+    const widthLabel = document.createElement("label");
+    widthLabel.textContent = "線の太さ";
+
+    const widthInput = document.createElement("input");
+    widthInput.type = "number";
+    widthInput.min = "1";
+    widthInput.max = "10";
+    widthInput.value = char.lineWidth;
+    widthInput.addEventListener("input", event => {
+      characters[index].lineWidth = Number(event.target.value);
+      drawChart();
+    });
+
+    content.appendChild(nameLabel);
+    content.appendChild(nameInput);
+    content.appendChild(colorLabel);
+    content.appendChild(colorInput);
+    content.appendChild(opacityLabel);
+    content.appendChild(opacityInput);
+    content.appendChild(widthLabel);
+    content.appendChild(widthInput);
 
     labels.forEach(label => {
-      html += `
-        <label>${label}</label>
-        <input type="number" value="${char.stats[label]}" onchange="updateStat(${index}, '${label}', this.value)">
-      `;
+      const statLabel = document.createElement("label");
+      statLabel.textContent = label;
+
+      const statInput = document.createElement("input");
+      statInput.type = "number";
+      statInput.value = char.stats[label];
+      statInput.addEventListener("input", event => {
+        updateStat(index, label, event.target.value);
+      });
+
+      content.appendChild(statLabel);
+      content.appendChild(statInput);
     });
 
-    html += `<button onclick="removeCharacter(${index})">削除</button>`;
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "削除";
+    deleteButton.addEventListener("click", () => removeCharacter(index));
 
-    block.innerHTML = html;
+    content.appendChild(deleteButton);
+    block.appendChild(content);
     container.appendChild(block);
-  });
-}
-
-function updateName(index, value) {
-  characters[index].name = value;
-  drawChart();
-}
-
-function updateColor(index, value) {
-  characters[index].color = value;
-  drawChart();
-}
-
-function updateOpacity(index, value) {
-  characters[index].opacity = parseFloat(value);
-  renderCharacterControls();
-  drawChart();
-}
-
-function updateLineWidth(index, value) {
-  characters[index].lineWidth = parseFloat(value);
-  drawChart();
-}
-
-function updateStat(index, stat, value) {
-  characters[index].stats[stat] = parseFloat(value);
-  drawChart();
-}
-
-function removeCharacter(index) {
-  characters.splice(index, 1);
-  renderCharacterControls();
-  drawChart();
-}
-
-function drawChart() {
-  const canvas = document.getElementById("chartCanvas");
-  const size = parseInt(document.getElementById("canvasSize").value);
-
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const centerX = size / 2;
-  const centerY = size / 2;
-
-  const maxStat = Math.max(baseMax, ...characters.flatMap(c => Object.values(c.stats)));
-
-  const radius = size * 0.32;
-  const outerRadius = radius * (maxStat / baseMax);
-
-  const gridColor = document.getElementById("gridColor").value;
-
-  updatePreviewBackground(gridColor);
-
-  ctx.strokeStyle = gridColor;
-  ctx.lineWidth = 1;
-
-  scaleMarks.forEach(mark => {
-    const r = radius * (mark / baseMax);
-
-    ctx.beginPath();
-
-    labels.forEach((_, i) => {
-      const angle = (-Math.PI / 2) + (Math.PI * 2 / labels.length) * i;
-      const x = centerX + Math.cos(angle) * r;
-      const y = centerY + Math.sin(angle) * r;
-
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-
-    ctx.closePath();
-    ctx.stroke();
-
-    ctx.fillStyle = gridColor;
-    ctx.font = `${size * 0.015}px sans-serif`;
-    ctx.fillText(mark, centerX + 5, centerY - r);
-  });
-
-  labels.forEach((label, i) => {
-    const angle = (-Math.PI / 2) + (Math.PI * 2 / labels.length) * i;
-
-    const x = centerX + Math.cos(angle) * outerRadius;
-    const y = centerY + Math.sin(angle) * outerRadius;
-
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-
-    const labelX = centerX + Math.cos(angle) * (outerRadius + size * 0.05);
-    const labelY = centerY + Math.sin(angle) * (outerRadius + size * 0.05);
-
-    ctx.fillStyle = gridColor;
-    ctx.font = `${size * 0.02}px sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(label, labelX, labelY);
-  });
-
-  characters.forEach((char, charIndex) => {
-    ctx.beginPath();
-
-    labels.forEach((label, i) => {
-      const value = char.stats[label];
-      const scaled = value / baseMax;
-      const r = radius * scaled;
-
-      const angle = (-Math.PI / 2) + (Math.PI * 2 / labels.length) * i;
-
-      const x = centerX + Math.cos(angle) * r;
-      const y = centerY + Math.sin(angle) * r;
-
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-
-    ctx.closePath();
-
-    ctx.fillStyle = hexToRGBA(char.color, char.opacity);
-    ctx.fill();
-
-    ctx.strokeStyle = char.color;
-    ctx.lineWidth = char.lineWidth;
-    ctx.stroke();
-
-    const legendX = size * 0.08;
-    const legendY = size * 0.08 + charIndex * size * 0.04;
-
-    ctx.fillStyle = char.color;
-    ctx.fillRect(legendX, legendY, size * 0.02, size * 0.02);
-
-    ctx.fillStyle = gridColor;
-    ctx.font = `${size * 0.018}px sans-serif`;
-    ctx.textAlign = "left";
-    ctx.fillText(char.name, legendX + size * 0.03, legendY + size * 0.01);
   });
 }
 
@@ -353,11 +331,143 @@ function updatePreviewBackground(color) {
 
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
 
-  if (brightness < 80) {
-    preview.style.background = "#d9d9d9";
-  } else {
-    preview.style.background = "#111";
-  }
+  preview.style.background = brightness < 80 ? "#d9d9d9" : "#111";
+}
+
+function drawChart() {
+  const canvas = document.getElementById("chartCanvas");
+  const ctx = canvas.getContext("2d");
+  const size = Number(document.getElementById("canvasSize").value) || 1200;
+  const gridColor = document.getElementById("gridColor").value;
+
+  canvas.width = size;
+  canvas.height = size;
+
+  updatePreviewBackground(gridColor);
+
+  ctx.clearRect(0, 0, size, size);
+
+  const centerX = size / 2;
+  const centerY = size / 2;
+
+  const highestStat = Math.max(
+    baseMax,
+    ...characters.flatMap(character => Object.values(character.stats))
+  );
+
+  const radius = size * 0.32;
+  const outerRadius = radius * (highestStat / baseMax);
+
+  ctx.strokeStyle = gridColor;
+  ctx.fillStyle = gridColor;
+  ctx.lineWidth = 1;
+
+  scaleMarks.forEach(mark => {
+    const currentRadius = radius * (mark / baseMax);
+
+    ctx.beginPath();
+
+    labels.forEach((_, index) => {
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / labels.length;
+      const x = centerX + Math.cos(angle) * currentRadius;
+      const y = centerY + Math.sin(angle) * currentRadius;
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.font = `${size * 0.015}px sans-serif`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(mark, centerX + 8, centerY - currentRadius);
+  });
+
+  labels.forEach((label, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / labels.length;
+
+    const lineX = centerX + Math.cos(angle) * outerRadius;
+    const lineY = centerY + Math.sin(angle) * outerRadius;
+
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(lineX, lineY);
+    ctx.stroke();
+
+    const textX = centerX + Math.cos(angle) * (outerRadius + size * 0.05);
+    const textY = centerY + Math.sin(angle) * (outerRadius + size * 0.05);
+
+    ctx.font = `${size * 0.02}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, textX, textY);
+  });
+
+  characters.forEach((character, characterIndex) => {
+    ctx.beginPath();
+
+    labels.forEach((label, index) => {
+      const value = character.stats[label];
+      const pointRadius = radius * (value / baseMax);
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / labels.length;
+
+      const x = centerX + Math.cos(angle) * pointRadius;
+      const y = centerY + Math.sin(angle) * pointRadius;
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+
+    ctx.closePath();
+
+    ctx.fillStyle = hexToRGBA(character.color, character.opacity);
+    ctx.fill();
+
+    ctx.strokeStyle = character.color;
+    ctx.lineWidth = character.lineWidth;
+    ctx.stroke();
+
+    const legendX = size * 0.08;
+    const legendY = size * 0.08 + characterIndex * size * 0.04;
+
+    ctx.fillStyle = character.color;
+    ctx.fillRect(legendX, legendY, size * 0.02, size * 0.02);
+
+    ctx.fillStyle = gridColor;
+    ctx.font = `${size * 0.018}px sans-serif`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(character.name, legendX + size * 0.03, legendY + size * 0.01);
+  });
+}
+
+function importChatPalette() {
+  const text = document.getElementById("chatPaletteInput").value;
+  const newCharacter = createDefaultCharacter(characters.length);
+
+  labels.forEach(label => {
+    const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(
+      `CCB<=\\s*(\\d+)\\*5\\s*【${escapedLabel}\\s*×\\s*5】`,
+      "i"
+    );
+
+    const match = text.match(regex);
+
+    if (match && match[1]) {
+      newCharacter.stats[label] = Number(match[1]);
+    }
+  });
+
+  addCharacter(newCharacter);
 }
 
 function downloadPNG() {
@@ -368,8 +478,13 @@ function downloadPNG() {
   link.click();
 }
 
+document.getElementById("gridColor").addEventListener("input", drawChart);
+document.getElementById("canvasSize").addEventListener("input", drawChart);
+document.getElementById("addButton").addEventListener("click", () => addCharacter());
+document.getElementById("importButton").addEventListener("click", importChatPalette);
+document.getElementById("downloadButton").addEventListener("click", downloadPNG);
+
 addCharacter();
 </script>
-
 </body>
 </html>
