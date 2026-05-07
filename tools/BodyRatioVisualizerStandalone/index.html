@@ -46,94 +46,113 @@ button{width:100%;padding:14px;border:none;border-radius:16px;background:#18181b
 </div>
 
 <script>
-const els={
-height:document.getElementById('height'),
-headRatio:document.getElementById('headRatio'),
-legSplit:document.getElementById('legSplit'),
-lineWidth:document.getElementById('lineWidth'),
-transparentBg:document.getElementById('transparentBg'),
-svg:document.getElementById('ratioSvg'),
-preview:document.getElementById('preview')
+const els = {
+  height: document.getElementById('height'),
+  headRatio: document.getElementById('headRatio'),
+  legSplit: document.getElementById('legSplit'),
+  lineWidth: document.getElementById('lineWidth'),
+  transparentBg: document.getElementById('transparentBg'),
+  svg: document.getElementById('ratioSvg'),
+  preview: document.getElementById('preview'),
+  // ラベルも安全に取得しておくぜ
+  headRatioLabel: document.getElementById('headRatioLabel'),
+  upperLabel: document.getElementById('upperLabel'),
+  lowerLabel: document.getElementById('lowerLabel'),
+  lineWidthLabel: document.getElementById('lineWidthLabel')
 };
 
-function render(){
+// ★ ここがキモ！初期の「頭の大きさ(cm)」を記憶
+let currentHeadSize = 170 / 7.5; 
 
-// ★ 絶対止まらない安全処理
-const height = Math.max(1, parseFloat(els.height.value) || 1);
-const headRatio = parseFloat(els.headRatio.value) || 7.5;
-const legSplit = parseFloat(els.legSplit.value) || 0.5;
-const lineWidth = parseInt(els.lineWidth.value) || 4;
+function render() {
+  const height = Math.max(1, parseFloat(els.height.value) || 1);
+  const headRatio = parseFloat(els.headRatio.value) || 7.5;
+  const legSplit = parseFloat(els.legSplit.value) || 0.5;
+  const lineWidth = parseInt(els.lineWidth.value) || 4;
 
-// UI表示更新
-headRatioLabel.textContent = headRatio.toFixed(1);
-upperLabel.textContent = Math.round((1-legSplit)*100);
-lowerLabel.textContent = Math.round(legSplit*100);
-lineWidthLabel.textContent = lineWidth;
+  // UI表示更新
+  els.headRatioLabel.textContent = headRatio.toFixed(1);
+  els.upperLabel.textContent = Math.round((1 - legSplit) * 100);
+  els.lowerLabel.textContent = Math.round(legSplit * 100);
+  els.lineWidthLabel.textContent = lineWidth;
 
-// 計算
-const head = height / headRatio;
-const lower = height * legSplit;
-const upper = Math.max(0, height - lower - head);
-const heads = height / head;
+  // 計算
+  const head = height / headRatio;
+  const lower = height * legSplit;
+  const upper = Math.max(0, height - lower - head);
+  const heads = height / head;
+  const scale = 420 / height;
+  const headPx = head * scale;
+  const upperPx = upper * scale;
+  const lowerPx = lower * scale;
 
-const scale = 420 / height;
-const headPx = head * scale;
-const upperPx = upper * scale;
-const lowerPx = lower * scale;
+  const topY = 40;
+  const neckY = topY + headPx;
+  const hipY = neckY + upperPx;
+  const footY = hipY + lowerPx;
+  const cx = 150;
 
-const topY=40;
-const neckY=topY+headPx;
-const hipY=neckY+upperPx;
-const footY=hipY+lowerPx;
-const cx=150;
+  // SVG更新
+  els.svg.innerHTML = `
+  <circle cx="${cx}" cy="${topY + headPx / 2}" r="${headPx / 2}" fill="none" stroke="black" stroke-width="${lineWidth}" />
+  <line x1="${cx - 35}" y1="${neckY}" x2="${cx + 35}" y2="${neckY}" stroke="black" stroke-width="${lineWidth}" />
+  <line x1="${cx}" y1="${neckY}" x2="${cx}" y2="${footY}" stroke="black" stroke-width="${lineWidth}" />
+  <line x1="${cx - 25}" y1="${hipY}" x2="${cx + 25}" y2="${hipY}" stroke="black" stroke-width="${lineWidth}" />
+  <line x1="${cx - 25}" y1="${footY}" x2="${cx + 25}" y2="${footY}" stroke="black" stroke-width="${lineWidth}" />
 
-// SVG更新（確実描画）
-els.svg.innerHTML = `
-<circle cx="${cx}" cy="${topY+headPx/2}" r="${headPx/2}" fill="none" stroke="black" stroke-width="${lineWidth}" />
-<line x1="${cx-35}" y1="${neckY}" x2="${cx+35}" y2="${neckY}" stroke="black" stroke-width="${lineWidth}" />
-<line x1="${cx}" y1="${neckY}" x2="${cx}" y2="${footY}" stroke="black" stroke-width="${lineWidth}" />
-<line x1="${cx-25}" y1="${hipY}" x2="${cx+25}" y2="${hipY}" stroke="black" stroke-width="${lineWidth}" />
-<line x1="${cx-25}" y1="${footY}" x2="${cx+25}" y2="${footY}" stroke="black" stroke-width="${lineWidth}" />
-
-<text x="195" y="${topY+10}" font-size="22">頭 ${head.toFixed(1)}cm</text>
-<text x="195" y="${neckY+upperPx/2}" font-size="22">上半身 ${upper.toFixed(1)}cm</text>
-<text x="195" y="${hipY+lowerPx/2}" font-size="22">下半身 ${lower.toFixed(1)}cm</text>
-<text x="195" y="${footY+30}" font-size="22">${heads.toFixed(2)}頭身</text>
-`;
+  <text x="195" y="${topY + 10}" font-size="22">頭 ${head.toFixed(1)}cm</text>
+  <text x="195" y="${neckY + upperPx / 2}" font-size="22">上半身 ${upper.toFixed(1)}cm</text>
+  <text x="195" y="${hipY + lowerPx / 2}" font-size="22">下半身 ${lower.toFixed(1)}cm</text>
+  <text x="195" y="${footY + 30}" font-size="22">${heads.toFixed(2)}頭身</text>
+  `;
 }
 
-// PNG出力
-function exportPNG(){
-const clone=els.svg.cloneNode(true);
-clone.querySelectorAll('text').forEach(n=>n.remove());
-const source=new XMLSerializer().serializeToString(clone);
+function exportPNG() {
+  const clone = els.svg.cloneNode(true);
+  clone.querySelectorAll('text').forEach(n => n.remove());
+  const source = new XMLSerializer().serializeToString(clone);
 
-const img=new Image();
-img.onload=()=>{
-const canvas=document.createElement('canvas');
-canvas.width=1200;
-canvas.height=2080;
-const ctx=canvas.getContext('2d');
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 2080;
+    const ctx = canvas.getContext('2d');
 
-if(!els.transparentBg.checked){
-ctx.fillStyle='white';
-ctx.fillRect(0,0,canvas.width,canvas.height);
+    if (!els.transparentBg.checked) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    els.preview.src = canvas.toDataURL('image/png');
+  };
+
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(source);
 }
 
-ctx.drawImage(img,0,0,canvas.width,canvas.height);
-els.preview.src=canvas.toDataURL('image/png');
-};
-
-img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(source);
+// ★ 身長を変えた時の処理（頭の大きさをキープして頭身を自動計算）
+function onHeightChange() {
+  const height = Math.max(1, parseFloat(els.height.value) || 1);
+  els.headRatio.value = (height / currentHeadSize).toFixed(1);
+  render();
 }
 
-// ★ イベント全部拾う（これが決定打）
-['input','change','keyup','blur'].forEach(ev=>{
-  els.height.addEventListener(ev,render);
+// ★ 頭身スライダーを変えた時の処理（頭の大きさを記憶し直す）
+function onRatioChange() {
+  const height = Math.max(1, parseFloat(els.height.value) || 1);
+  const ratio = parseFloat(els.headRatio.value) || 7.5;
+  currentHeadSize = height / ratio;
+  render();
+}
+
+// イベント登録を整理
+['input', 'change', 'keyup'].forEach(ev => {
+  els.height.addEventListener(ev, onHeightChange);
 });
-els.headRatio.addEventListener('input',render);
-els.legSplit.addEventListener('input',render);
-els.lineWidth.addEventListener('input',render);
+els.headRatio.addEventListener('input', onRatioChange);
+els.legSplit.addEventListener('input', render);
+els.lineWidth.addEventListener('input', render);
 
 // 初期描画
 render();
