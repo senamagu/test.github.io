@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CoC ステータスレーダーチャート</title>
 <style>
 body {
@@ -19,9 +19,9 @@ body {
 #controls {
   overflow-y: auto;
   background: #1b1b1b;
+  border-right: 1px solid #333;
   padding: 16px;
   box-sizing: border-box;
-  border-right: 1px solid #333;
 }
 
 #preview {
@@ -67,6 +67,10 @@ textarea {
   padding: 8px;
 }
 
+textarea {
+  resize: vertical;
+}
+
 button {
   width: 100%;
   background: #333;
@@ -74,8 +78,8 @@ button {
   color: white;
   border-radius: 8px;
   padding: 10px;
-  cursor: pointer;
   margin-top: 8px;
+  cursor: pointer;
 }
 
 button:hover {
@@ -91,8 +95,8 @@ button:hover {
 
 .character-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
 
@@ -109,8 +113,8 @@ button:hover {
 
 .toggle-button {
   width: 40px;
-  padding: 6px;
   margin-top: 0;
+  padding: 6px;
 }
 </style>
 </head>
@@ -120,10 +124,10 @@ button:hover {
     <h2>グラフ設定</h2>
 
     <label>目盛り線・テキストカラー</label>
-    <input type="color" id="gridColor" value="#ffffff" />
+    <input type="color" id="gridColor" value="#ffffff">
 
     <label>キャンバスサイズ</label>
-    <input type="number" id="canvasSize" value="1200" min="500" max="4000" />
+    <input type="number" id="canvasSize" value="1200" min="500" max="4000">
 
     <label>いあきゃらチャパレ貼り付け</label>
     <textarea id="chatPaletteInput" rows="10"></textarea>
@@ -144,9 +148,9 @@ button:hover {
 </div>
 
 <script>
-const labels = ["STR", "CON", "POW", "DEX", "APP", "SIZ", "INT", "EDU"];
-const baseMax = 18;
-const scaleMarks = [0, 5, 10, 15, 18];
+const LABELS = ["STR", "CON", "POW", "DEX", "APP", "SIZ", "INT", "EDU"];
+const BASE_MAX = 18;
+const SCALE_MARKS = [0, 5, 10, 15, 18];
 const characters = [];
 
 function randomColor() {
@@ -155,29 +159,32 @@ function randomColor() {
     .padStart(6, "0")}`;
 }
 
-function createDefaultCharacter(index) {
+function createDefaultStats() {
+  return {
+    STR: 10,
+    CON: 10,
+    POW: 10,
+    DEX: 10,
+    APP: 10,
+    SIZ: 10,
+    INT: 10,
+    EDU: 10
+  };
+}
+
+function createCharacter(index) {
   return {
     collapsed: false,
     name: `探索者${index + 1}`,
     color: randomColor(),
     opacity: 0.3,
     lineWidth: 3,
-    stats: {
-      STR: 10,
-      CON: 10,
-      POW: 10,
-      DEX: 10,
-      APP: 10,
-      SIZ: 10,
-      INT: 10,
-      EDU: 10
-    }
+    stats: createDefaultStats()
   };
 }
 
-function addCharacter(characterData = null) {
-  const character = characterData || createDefaultCharacter(characters.length);
-  characters.push(character);
+function addCharacter(character = null) {
+  characters.push(character || createCharacter(characters.length));
   renderCharacterControls();
   drawChart();
 }
@@ -193,135 +200,6 @@ function toggleCharacter(index) {
   renderCharacterControls();
 }
 
-function updateCharacter(index, key, value) {
-  characters[index][key] = value;
-  renderCharacterControls();
-  drawChart();
-}
-
-function updateStat(index, stat, value) {
-  const parsed = Number(value);
-  characters[index].stats[stat] = Number.isFinite(parsed) ? parsed : 0;
-  drawChart();
-}
-
-function renderCharacterControls() {
-  const container = document.getElementById("characters");
-  container.innerHTML = "";
-
-  characters.forEach((char, index) => {
-    const block = document.createElement("div");
-    block.className = "character-block";
-
-    const header = document.createElement("div");
-    header.className = "character-header";
-
-    const title = document.createElement("div");
-    title.className = "character-title";
-    title.textContent = char.name;
-
-    const toggle = document.createElement("button");
-    toggle.className = "toggle-button";
-    toggle.textContent = char.collapsed ? "▼" : "▲";
-    toggle.addEventListener("click", () => toggleCharacter(index));
-
-    header.appendChild(title);
-    header.appendChild(toggle);
-    block.appendChild(header);
-
-    const content = document.createElement("div");
-    content.className = `character-content ${char.collapsed ? "closed" : ""}`;
-
-    const nameLabel = document.createElement("label");
-    nameLabel.textContent = "名前";
-
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.value = char.name;
-    nameInput.addEventListener("input", event => {
-      updateCharacter(index, "name", event.target.value);
-    });
-
-    const colorLabel = document.createElement("label");
-    colorLabel.textContent = "カラー";
-
-    const colorInput = document.createElement("input");
-    colorInput.type = "color";
-    colorInput.value = char.color;
-    colorInput.addEventListener("input", event => {
-      characters[index].color = event.target.value;
-      drawChart();
-    });
-
-    const opacityLabel = document.createElement("label");
-    opacityLabel.textContent = `透明度 (${Math.round(char.opacity * 100)}%)`;
-
-    const opacityInput = document.createElement("input");
-    opacityInput.type = "range";
-    opacityInput.min = "0";
-    opacityInput.max = "1";
-    opacityInput.step = "0.05";
-    opacityInput.value = char.opacity;
-    opacityInput.addEventListener("input", event => {
-      characters[index].opacity = Number(event.target.value);
-      renderCharacterControls();
-      drawChart();
-    });
-
-    const widthLabel = document.createElement("label");
-    widthLabel.textContent = "線の太さ";
-
-    const widthInput = document.createElement("input");
-    widthInput.type = "number";
-    widthInput.min = "1";
-    widthInput.max = "10";
-    widthInput.value = char.lineWidth;
-    widthInput.addEventListener("input", event => {
-      characters[index].lineWidth = Number(event.target.value);
-      drawChart();
-    });
-
-    content.appendChild(nameLabel);
-    content.appendChild(nameInput);
-    content.appendChild(colorLabel);
-    content.appendChild(colorInput);
-    content.appendChild(opacityLabel);
-    content.appendChild(opacityInput);
-    content.appendChild(widthLabel);
-    content.appendChild(widthInput);
-
-    labels.forEach(label => {
-      const statLabel = document.createElement("label");
-      statLabel.textContent = label;
-
-      const statInput = document.createElement("input");
-      statInput.type = "number";
-      statInput.value = char.stats[label];
-      statInput.addEventListener("input", event => {
-        updateStat(index, label, event.target.value);
-      });
-
-      content.appendChild(statLabel);
-      content.appendChild(statInput);
-    });
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "削除";
-    deleteButton.addEventListener("click", () => removeCharacter(index));
-
-    content.appendChild(deleteButton);
-    block.appendChild(content);
-    container.appendChild(block);
-  });
-}
-
-function hexToRGBA(hex, opacity) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-}
-
 function updatePreviewBackground(color) {
   const preview = document.getElementById("preview");
 
@@ -331,7 +209,15 @@ function updatePreviewBackground(color) {
 
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
 
-  preview.style.background = brightness < 80 ? "#d9d9d9" : "#111";
+  preview.style.background = brightness < 80 ? "#dddddd" : "#111111";
+}
+
+function hexToRGBA(hex, opacity) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 function drawChart() {
@@ -351,24 +237,24 @@ function drawChart() {
   const centerY = size / 2;
 
   const highestStat = Math.max(
-    baseMax,
+    BASE_MAX,
     ...characters.flatMap(character => Object.values(character.stats))
   );
 
   const radius = size * 0.32;
-  const outerRadius = radius * (highestStat / baseMax);
+  const outerRadius = radius * (highestStat / BASE_MAX);
 
   ctx.strokeStyle = gridColor;
   ctx.fillStyle = gridColor;
   ctx.lineWidth = 1;
 
-  scaleMarks.forEach(mark => {
-    const currentRadius = radius * (mark / baseMax);
+  SCALE_MARKS.forEach(mark => {
+    const currentRadius = radius * (mark / BASE_MAX);
 
     ctx.beginPath();
 
-    labels.forEach((_, index) => {
-      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / labels.length;
+    LABELS.forEach((_, index) => {
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / LABELS.length;
       const x = centerX + Math.cos(angle) * currentRadius;
       const y = centerY + Math.sin(angle) * currentRadius;
 
@@ -388,8 +274,8 @@ function drawChart() {
     ctx.fillText(mark, centerX + 8, centerY - currentRadius);
   });
 
-  labels.forEach((label, index) => {
-    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / labels.length;
+  LABELS.forEach((label, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / LABELS.length;
 
     const lineX = centerX + Math.cos(angle) * outerRadius;
     const lineY = centerY + Math.sin(angle) * outerRadius;
@@ -411,13 +297,13 @@ function drawChart() {
   characters.forEach((character, characterIndex) => {
     ctx.beginPath();
 
-    labels.forEach((label, index) => {
-      const value = character.stats[label];
-      const pointRadius = radius * (value / baseMax);
-      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / labels.length;
+    LABELS.forEach((label, index) => {
+      const value = Number(character.stats[label]) || 0;
+      const scaledRadius = radius * (value / BASE_MAX);
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / LABELS.length;
 
-      const x = centerX + Math.cos(angle) * pointRadius;
-      const y = centerY + Math.sin(angle) * pointRadius;
+      const x = centerX + Math.cos(angle) * scaledRadius;
+      const y = centerY + Math.sin(angle) * scaledRadius;
 
       if (index === 0) {
         ctx.moveTo(x, y);
@@ -449,12 +335,153 @@ function drawChart() {
   });
 }
 
-function importChatPalette() {
-  const text = document.getElementById("chatPaletteInput").value;
-  const newCharacter = createDefaultCharacter(characters.length);
+function createStatInput(index, label, value) {
+  const input = document.createElement("input");
 
-  labels.forEach(label => {
+  input.type = "number";
+  input.value = value;
+
+  input.addEventListener("input", event => {
+    const parsed = Number(event.target.value);
+    characters[index].stats[label] = Number.isFinite(parsed) ? parsed : 0;
+    drawChart();
+  });
+
+  return input;
+}
+
+function renderCharacterControls() {
+  const container = document.getElementById("characters");
+
+  container.innerHTML = "";
+
+  characters.forEach((character, index) => {
+    const block = document.createElement("div");
+    block.className = "character-block";
+
+    const header = document.createElement("div");
+    header.className = "character-header";
+
+    const title = document.createElement("div");
+    title.className = "character-title";
+    title.textContent = character.name;
+
+    const toggleButton = document.createElement("button");
+    toggleButton.className = "toggle-button";
+    toggleButton.textContent = character.collapsed ? "▼" : "▲";
+
+    toggleButton.addEventListener("click", () => {
+      toggleCharacter(index);
+    });
+
+    header.appendChild(title);
+    header.appendChild(toggleButton);
+
+    const content = document.createElement("div");
+    content.className = `character-content ${character.collapsed ? "closed" : ""}`;
+
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = "名前";
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.value = character.name;
+
+    nameInput.addEventListener("input", event => {
+      character.name = event.target.value;
+      title.textContent = character.name || "探索者";
+      drawChart();
+    });
+
+    const colorLabel = document.createElement("label");
+    colorLabel.textContent = "カラー";
+
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.value = character.color;
+
+    colorInput.addEventListener("input", event => {
+      character.color = event.target.value;
+      drawChart();
+    });
+
+    const opacityLabel = document.createElement("label");
+    opacityLabel.textContent = `透明度 (${Math.round(character.opacity * 100)}%)`;
+
+    const opacityInput = document.createElement("input");
+    opacityInput.type = "range";
+    opacityInput.min = "0";
+    opacityInput.max = "1";
+    opacityInput.step = "0.05";
+    opacityInput.value = character.opacity;
+
+    opacityInput.addEventListener("input", event => {
+      character.opacity = Number(event.target.value);
+      opacityLabel.textContent = `透明度 (${Math.round(character.opacity * 100)}%)`;
+      drawChart();
+    });
+
+    const lineWidthLabel = document.createElement("label");
+    lineWidthLabel.textContent = "線の太さ";
+
+    const lineWidthInput = document.createElement("input");
+    lineWidthInput.type = "number";
+    lineWidthInput.min = "1";
+    lineWidthInput.max = "10";
+    lineWidthInput.value = character.lineWidth;
+
+    lineWidthInput.addEventListener("input", event => {
+      const parsed = Number(event.target.value);
+      character.lineWidth = Number.isFinite(parsed) ? parsed : 1;
+      drawChart();
+    });
+
+    content.appendChild(nameLabel);
+    content.appendChild(nameInput);
+    content.appendChild(colorLabel);
+    content.appendChild(colorInput);
+    content.appendChild(opacityLabel);
+    content.appendChild(opacityInput);
+    content.appendChild(lineWidthLabel);
+    content.appendChild(lineWidthInput);
+
+    LABELS.forEach(label => {
+      const statLabel = document.createElement("label");
+      statLabel.textContent = label;
+
+      content.appendChild(statLabel);
+      content.appendChild(createStatInput(index, label, character.stats[label]));
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "削除";
+
+    deleteButton.addEventListener("click", () => {
+      removeCharacter(index);
+    });
+
+    content.appendChild(deleteButton);
+
+    block.appendChild(header);
+    block.appendChild(content);
+
+    container.appendChild(block);
+  });
+}
+
+function importChatPalette() {
+  const textarea = document.getElementById("chatPaletteInput");
+  const text = textarea.value;
+
+  if (!text.trim()) {
+    return;
+  }
+
+  const character = createCharacter(characters.length);
+
+  LABELS.forEach(label => {
     const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     const regex = new RegExp(
       `CCB<=\\s*(\\d+)\\*5\\s*【${escapedLabel}\\s*×\\s*5】`,
       "i"
@@ -462,17 +489,20 @@ function importChatPalette() {
 
     const match = text.match(regex);
 
-    if (match && match[1]) {
-      newCharacter.stats[label] = Number(match[1]);
+    if (match) {
+      character.stats[label] = Number(match[1]);
     }
   });
 
-  addCharacter(newCharacter);
+  addCharacter(character);
+
+  textarea.value = "";
 }
 
 function downloadPNG() {
   const canvas = document.getElementById("chartCanvas");
   const link = document.createElement("a");
+
   link.download = "coc_radar_chart.png";
   link.href = canvas.toDataURL("image/png");
   link.click();
