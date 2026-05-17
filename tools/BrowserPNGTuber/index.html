@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Browser PNGTuber</title>
+
+<style>
+    body{
+        margin:0;
+        overflow:hidden;
+        height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        font-family:sans-serif;
+        transition:background 0.2s;
+        background:#00ff00;
+    }
+
+    #character{
+        position:relative;
+        width:min(70vw, 500px);
+        aspect-ratio:1/1;
+    }
+
+    #character img{
+        position:absolute;
+        inset:0;
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        transition:
+            transform 0.08s linear,
+            filter 0.08s linear,
+            opacity 0.08s linear,
+            box-shadow 0.08s linear;
+        user-select:none;
+        pointer-events:none;
+    }
+
+    #talk{
+        opacity:0;
+    }
+
+    .hidden{
+        opacity:0 !important;
+    }
+
+    .active{
+        opacity:1 !important;
+    }
+
+    .controls{
+        position:fixed;
+        top:10px;
+        left:10px;
+        width:290px;
+        max-height:90vh;
+        overflow:auto;
+        background:rgba(0,0,0,0.75);
+        color:white;
+        padding:14px;
+        border-radius:14px;
+        z-index:100;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        backdrop-filter:blur(8px);
+    }
+
+    label{
+        font-size:14px;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+    }
+
+    input,
+    select,
+    button{
+        border:none;
+        border-radius:8px;
+        padding:8px;
+        font-size:14px;
+    }
+
+    button{
+        cursor:pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="controls">
+
+    <label>
+        通常立ち絵
+        <input type="file" id="normalUpload" accept="image/*">
+    </label>
+
+    <label>
+        発声立ち絵
+        <input type="file" id="talkUpload" accept="image/*">
+    </label>
+
+    <label>
+        背景色
+        <input type="color" id="bgColor" value="#00ff00">
+    </label>
+
+    <label>
+        感度
+        <input type="range" id="threshold" min="1" max="100" value="20">
+    </label>
+
+    <label>
+        発声エフェクト
+        <select id="effectMode">
+            <option value="none">なし</option>
+            <option value="bounce">ぴょこぴょこ</option>
+            <option value="flash">点滅</option>
+            <option value="glow">発光</option>
+            <option value="border">枠</option>
+        </select>
+    </label>
+
+    <label>
+        無音時エフェクト
+        <select id="idleMode">
+            <option value="none">なし</option>
+            <option value="dark">暗くする</option>
+            <option value="transparent">半透明</option>
+            <option value="small">少し縮小</option>
+        </select>
+    </label>
+
+    <button id="startBtn">START</button>
+
+</div>
+
+<div id="character">
+    <img id="normal">
+    <img id="talk">
+</div>
+
+<script>
+
+const normalImg = document.getElementById("normal");
+const talkImg = document.getElementById("talk");
+
+const bgColor = document.getElementById("bgColor");
+
+bgColor.addEventListener("input", ()=>{
+    document.body.style.background = bgColor.value;
+});
+
+document.getElementById("normalUpload").addEventListener("change",(e)=>{
+    const file = e.target.files[0];
+    if(file){
+        normalImg.src = URL.createObjectURL(file);
+    }
+});
+
+document.getElementById("talkUpload").addEventListener("change",(e)=>{
+    const file = e.target.files[0];
+    if(file){
+        talkImg.src = URL.createObjectURL(file);
+    }
+});
+
+function resetEffects(){
+
+    [normalImg, talkImg].forEach(img=>{
+        img.style.transform = "";
+        img.style.filter = "";
+        img.style.boxShadow = "";
+        img.style.opacity = "";
+    });
+
+}
+
+function applyTalkingEffect(effect){
+
+    switch(effect){
+
+        case "bounce":
+            talkImg.style.transform = "translateY(-12px) scale(1.03)";
+        break;
+
+        case "flash":
+            talkImg.style.filter = "brightness(1.7)";
+        break;
+
+        case "glow":
+            talkImg.style.filter = "brightness(1.3)";
+            talkImg.style.boxShadow = "0 0 40px white";
+        break;
+
+        case "border":
+            talkImg.style.filter =
+                "drop-shadow(0 0 0 white) drop-shadow(0 0 10px white)";
+        break;
+    }
+}
+
+function applyIdleEffect(effect){
+
+    switch(effect){
+
+        case "dark":
+            normalImg.style.filter = "brightness(0.6)";
+        break;
+
+        case "transparent":
+            normalImg.style.opacity = "0.5";
+        break;
+
+        case "small":
+            normalImg.style.transform = "scale(0.96)";
+        break;
+    }
+}
+
+document.getElementById("startBtn").addEventListener("click", async()=>{
+
+    try{
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio:true
+        });
+
+        const audioContext = new AudioContext();
+
+        const source = audioContext.createMediaStreamSource(stream);
+
+        const analyser = audioContext.createAnalyser();
+
+        analyser.fftSize = 256;
+
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        function update(){
+
+            analyser.getByteFrequencyData(dataArray);
+
+            let volume = 0;
+
+            for(let i = 0; i < dataArray.length; i++){
+                volume += dataArray[i];
+            }
+
+            volume /= dataArray.length;
+
+            const threshold =
+                Number(document.getElementById("threshold").value);
+
+            const effectMode =
+                document.getElementById("effectMode").value;
+
+            const idleMode =
+                document.getElementById("idleMode").value;
+
+            resetEffects();
+
+            if(volume > threshold){
+
+                talkImg.classList.add("active");
+                normalImg.classList.add("hidden");
+
+                applyTalkingEffect(effectMode);
+
+            }else{
+
+                talkImg.classList.remove("active");
+                normalImg.classList.remove("hidden");
+
+                applyIdleEffect(idleMode);
+
+            }
+
+            requestAnimationFrame(update);
+
+        }
+
+        update();
+
+    }catch(err){
+
+        alert("マイク許可が必要");
+        console.error(err);
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
