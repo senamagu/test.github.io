@@ -8,20 +8,33 @@
 
 <style>
 
+:root{
+    --characterScale:1;
+}
+
 body{
     margin:0;
     overflow:hidden;
+    width:100vw;
     height:100vh;
+    background:#00ff00;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:#00ff00;
     font-family:sans-serif;
+}
+
+#characterWrap{
+    transform:scale(var(--characterScale));
+    transition:
+        transform 0.25s cubic-bezier(0.22,1,0.36,1),
+        filter 0.2s ease,
+        opacity 0.2s ease;
 }
 
 #character{
     position:relative;
-    width:min(70vw, 500px);
+    width:min(70vw,500px);
     aspect-ratio:1/1;
 }
 
@@ -33,44 +46,61 @@ body{
     object-fit:contain;
 
     transition:
-        transform 0.22s cubic-bezier(0.22,1,0.36,1),
-        opacity 0.12s linear,
-        filter 0.18s ease,
-        box-shadow 0.18s ease;
+        opacity 0.08s linear;
 
     user-select:none;
     pointer-events:none;
 }
 
 .hidden{
-    opacity:0 !important;
-}
-
-.active{
-    opacity:1 !important;
+    opacity:0;
 }
 
 .controls{
+
     position:fixed;
     top:10px;
     left:10px;
 
-    width:290px;
-    max-height:90vh;
+    width:300px;
+    max-height:85vh;
+
     overflow:auto;
 
     background:rgba(0,0,0,0.75);
     color:white;
 
-    padding:14px;
-    border-radius:14px;
+    border-radius:16px;
+    padding:12px;
 
     display:flex;
     flex-direction:column;
     gap:10px;
 
-    z-index:100;
-    backdrop-filter:blur(8px);
+    z-index:999;
+
+    backdrop-filter:blur(10px);
+
+}
+
+.closed{
+    max-height:48px;
+    overflow:hidden;
+}
+
+.section{
+    border-top:1px solid rgba(255,255,255,0.15);
+    padding-top:10px;
+}
+
+.toggleBtn{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:#222;
+    color:white;
+    font-size:14px;
 }
 
 label{
@@ -93,89 +123,171 @@ button{
     cursor:pointer;
 }
 
+.rangeValue{
+    font-size:12px;
+    opacity:0.8;
+}
+
 </style>
 </head>
-
 <body>
 
-<div class="controls">
+<div class="controls" id="controls">
 
-    <label>
-        通常立ち絵
-        <input type="file" id="normalUpload" accept="image/*">
-    </label>
+    <button class="toggleBtn" id="panelToggle">
+        ▲ 閉じる
+    </button>
 
-    <label>
-        発声立ち絵（未設定可）
-        <input type="file" id="talkUpload" accept="image/*">
-    </label>
+    <div class="section">
 
-    <label>
-        背景色
-        <input type="color" id="bgColor" value="#00ff00">
-    </label>
+        <label>
+            通常立ち絵
+            <input type="file" id="normalUpload" accept="image/*">
+        </label>
 
-    <label>
-        感度
-        <input type="range" id="threshold" min="1" max="100" value="20">
-    </label>
+        <label>
+            発声立ち絵（未設定可）
+            <input type="file" id="talkUpload" accept="image/*">
+        </label>
 
-    <label>
-        発声エフェクト
-        <select id="effectMode">
-            <option value="none">なし</option>
-            <option value="bounce">ぴょこぴょこ</option>
-            <option value="border">枠</option>
-        </select>
-    </label>
+        <label>
+            背景色
+            <input type="color" id="bgColor" value="#00ff00">
+        </label>
 
-    <label>
-        無音エフェクト
-        <select id="idleMode">
-            <option value="none">なし</option>
-            <option value="dark">暗くする</option>
-            <option value="transparent">半透明</option>
-            <option value="small">少し縮小</option>
-        </select>
-    </label>
+    </div>
+
+    <div class="section">
+
+        <label>
+            感度
+            <input type="range" id="threshold"
+            min="1" max="100" value="20">
+        </label>
+
+        <label>
+            口パク速度
+            <input type="range" id="swapSpeed"
+            min="40" max="300" value="120">
+            <span class="rangeValue" id="swapSpeedValue"></span>
+        </label>
+
+    </div>
+
+    <div class="section">
+
+        <label>
+            発声エフェクト
+            <select id="effectMode">
+                <option value="none">なし</option>
+                <option value="bounce">ぴょこぴょこ</option>
+                <option value="border">枠</option>
+            </select>
+        </label>
+
+        <label>
+            ぴょこぴょこ強度
+            <input type="range"
+            id="bounceStrength"
+            min="0"
+            max="40"
+            value="10">
+        </label>
+
+    </div>
+
+    <div class="section">
+
+        <label>
+            無音エフェクト
+            <select id="idleMode">
+                <option value="none">なし</option>
+                <option value="dark">暗くする</option>
+                <option value="transparent">半透明</option>
+                <option value="small">少し縮小</option>
+            </select>
+        </label>
+
+        <label>
+            暗さ
+            <input type="range"
+            id="darkStrength"
+            min="0.1"
+            max="1"
+            step="0.05"
+            value="0.6">
+        </label>
+
+        <label>
+            半透明
+            <input type="range"
+            id="transparentStrength"
+            min="0.1"
+            max="1"
+            step="0.05"
+            value="0.5">
+        </label>
+
+        <label>
+            縮小率
+            <input type="range"
+            id="smallStrength"
+            min="0.7"
+            max="1"
+            step="0.01"
+            value="0.95">
+        </label>
+
+    </div>
 
     <button id="startBtn">START</button>
 
 </div>
 
-<div id="character">
-    <img id="normal">
-    <img id="talk">
+<div id="characterWrap">
+    <div id="character">
+        <img id="normal">
+        <img id="talk" class="hidden">
+    </div>
 </div>
 
 <script>
 
 const normalImg = document.getElementById("normal");
 const talkImg = document.getElementById("talk");
+const characterWrap =
+document.getElementById("characterWrap");
 
 let hasTalkImage = false;
 
-document.getElementById("bgColor").addEventListener("input",(e)=>{
-    document.body.style.background = e.target.value;
+document.getElementById("bgColor")
+.addEventListener("input",(e)=>{
+    document.body.style.background =
+    e.target.value;
 });
 
-document.getElementById("normalUpload").addEventListener("change",(e)=>{
+document.getElementById("normalUpload")
+.addEventListener("change",(e)=>{
 
     const file = e.target.files[0];
 
     if(file){
-        normalImg.src = URL.createObjectURL(file);
+        normalImg.src =
+        URL.createObjectURL(file);
     }
 
 });
 
-document.getElementById("talkUpload").addEventListener("change",(e)=>{
+document.getElementById("talkUpload")
+.addEventListener("change",(e)=>{
 
     const file = e.target.files[0];
 
     if(file){
 
-        talkImg.src = URL.createObjectURL(file);
+        talkImg.src =
+        URL.createObjectURL(file);
+
         hasTalkImage = true;
 
     }
@@ -184,14 +296,9 @@ document.getElementById("talkUpload").addEventListener("change",(e)=>{
 
 function resetEffects(){
 
-    [normalImg,talkImg].forEach(img=>{
-
-        img.style.transform = "";
-        img.style.filter = "";
-        img.style.boxShadow = "";
-        img.style.opacity = "";
-
-    });
+    characterWrap.style.transform = "";
+    characterWrap.style.filter = "";
+    characterWrap.style.opacity = "";
 
 }
 
@@ -201,18 +308,24 @@ function applyTalkingEffect(mode){
 
         case "bounce":
 
-            const bounce =
-                Math.sin(Date.now() * 0.02) * 10;
+            const strength =
+            Number(document
+            .getElementById("bounceStrength")
+            .value);
 
-            talkImg.style.transform =
-                `translateY(${bounce}px) scale(1.03)`;
+            const bounce =
+            Math.sin(Date.now()*0.02)
+            * strength;
+
+            characterWrap.style.transform =
+            `translateY(${bounce}px)`;
 
         break;
 
         case "border":
 
-            talkImg.style.filter =
-                "drop-shadow(0 0 0 white) drop-shadow(0 0 12px white)";
+            characterWrap.style.filter =
+            "drop-shadow(0 0 12px white)";
 
         break;
 
@@ -226,19 +339,37 @@ function applyIdleEffect(mode){
 
         case "dark":
 
-            normalImg.style.filter = "brightness(0.6)";
+            const dark =
+            document
+            .getElementById("darkStrength")
+            .value;
+
+            characterWrap.style.filter =
+            `brightness(${dark})`;
 
         break;
 
         case "transparent":
 
-            normalImg.style.opacity = "0.5";
+            const transparent =
+            document
+            .getElementById("transparentStrength")
+            .value;
+
+            characterWrap.style.opacity =
+            transparent;
 
         break;
 
         case "small":
 
-            normalImg.style.transform = "scale(0.95)";
+            const small =
+            document
+            .getElementById("smallStrength")
+            .value;
+
+            characterWrap.style.transform =
+            `scale(${small})`;
 
         break;
 
@@ -246,37 +377,45 @@ function applyIdleEffect(mode){
 
 }
 
-document.getElementById("startBtn")
+document
+.getElementById("startBtn")
 .addEventListener("click", async()=>{
 
     try{
 
         const stream =
-            await navigator.mediaDevices.getUserMedia({
-                audio:true
-            });
+        await navigator
+        .mediaDevices
+        .getUserMedia({
+            audio:true
+        });
 
-        const audioContext = new AudioContext();
+        const audioContext =
+        new AudioContext();
 
         const source =
-            audioContext.createMediaStreamSource(stream);
+        audioContext
+        .createMediaStreamSource(stream);
 
         const analyser =
-            audioContext.createAnalyser();
+        audioContext.createAnalyser();
 
         analyser.fftSize = 256;
 
         source.connect(analyser);
 
         const dataArray =
-            new Uint8Array(analyser.frequencyBinCount);
+        new Uint8Array(
+            analyser.frequencyBinCount
+        );
 
         let swap = false;
         let lastSwap = 0;
 
         function update(){
 
-            analyser.getByteFrequencyData(dataArray);
+            analyser
+            .getByteFrequencyData(dataArray);
 
             let volume = 0;
 
@@ -287,23 +426,40 @@ document.getElementById("startBtn")
             volume /= dataArray.length;
 
             const threshold =
-                Number(document.getElementById("threshold").value);
+            Number(document
+            .getElementById("threshold")
+            .value);
+
+            const swapSpeed =
+            Number(document
+            .getElementById("swapSpeed")
+            .value);
+
+            document
+            .getElementById("swapSpeedValue")
+            .innerText =
+            swapSpeed + "ms";
+
+            const talking =
+            volume > threshold;
 
             const effectMode =
-                document.getElementById("effectMode").value;
+            document
+            .getElementById("effectMode")
+            .value;
 
             const idleMode =
-                document.getElementById("idleMode").value;
+            document
+            .getElementById("idleMode")
+            .value;
 
             resetEffects();
-
-            const talking = volume > threshold;
 
             if(talking){
 
                 const now = Date.now();
 
-                if(now - lastSwap > 120){
+                if(now - lastSwap > swapSpeed){
 
                     swap = !swap;
                     lastSwap = now;
@@ -352,6 +508,32 @@ document.getElementById("startBtn")
 
         alert("マイク許可が必要");
         console.error(err);
+
+    }
+
+});
+
+const panel =
+document.getElementById("controls");
+
+const panelToggle =
+document.getElementById("panelToggle");
+
+let closed = false;
+
+panelToggle.addEventListener("click",()=>{
+
+    closed = !closed;
+
+    if(closed){
+
+        panel.classList.add("closed");
+        panelToggle.innerText = "▼ 開く";
+
+    }else{
+
+        panel.classList.remove("closed");
+        panelToggle.innerText = "▲ 閉じる";
 
     }
 
