@@ -188,10 +188,18 @@ button{
 
         <label>
             発声立ち絵（未設定可）
+
             <input
             type="file"
             id="talkUpload"
             accept="image/*">
+
+            <button
+            type="button"
+            id="removeTalkImage">
+                発声立ち絵を解除
+            </button>
+
         </label>
 
         <label>
@@ -224,9 +232,11 @@ button{
             min="40"
             max="300"
             value="120">
+
             <span
             class="rangeValue"
             id="swapSpeedValue"></span>
+
         </label>
 
     </div>
@@ -235,6 +245,7 @@ button{
 
         <label>
             発声エフェクト
+
             <select id="effectMode">
 
                 <option value="none">
@@ -250,6 +261,7 @@ button{
                 </option>
 
             </select>
+
         </label>
 
         <label
@@ -287,6 +299,7 @@ button{
 
         <label>
             無音エフェクト
+
             <select id="idleMode">
 
                 <option value="none">
@@ -306,6 +319,7 @@ button{
                 </option>
 
             </select>
+
         </label>
 
         <label
@@ -378,6 +392,9 @@ button{
 
 <script>
 
+const STORAGE_KEY =
+"browser_pngtuber_settings";
+
 const normalImg =
 document.getElementById("normal");
 
@@ -429,6 +446,18 @@ document
         hasTalkImage = true;
 
     }
+
+});
+
+document
+.getElementById("removeTalkImage")
+.addEventListener("click",()=>{
+
+    talkImg.src = "";
+
+    hasTalkImage = false;
+
+    showNormal();
 
 });
 
@@ -611,7 +640,132 @@ idleMode.addEventListener(
     updateUIVisibility
 );
 
-updateUIVisibility();
+function saveSettings(){
+
+    const settings = {
+
+        bgColor:
+        document
+        .getElementById("bgColor")
+        .value,
+
+        threshold:
+        document
+        .getElementById("threshold")
+        .value,
+
+        swapSpeed:
+        document
+        .getElementById("swapSpeed")
+        .value,
+
+        effectMode:
+        document
+        .getElementById("effectMode")
+        .value,
+
+        bounceStrength:
+        document
+        .getElementById("bounceStrength")
+        .value,
+
+        bounceSpeed:
+        document
+        .getElementById("bounceSpeed")
+        .value,
+
+        idleMode:
+        document
+        .getElementById("idleMode")
+        .value,
+
+        darkStrength:
+        document
+        .getElementById("darkStrength")
+        .value,
+
+        transparentStrength:
+        document
+        .getElementById("transparentStrength")
+        .value,
+
+        smallStrength:
+        document
+        .getElementById("smallStrength")
+        .value
+
+    };
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(settings)
+    );
+
+}
+
+function loadSettings(){
+
+    const raw =
+    localStorage.getItem(STORAGE_KEY);
+
+    if(!raw) return;
+
+    const settings =
+    JSON.parse(raw);
+
+    for(const key in settings){
+
+        const element =
+        document.getElementById(key);
+
+        if(element){
+
+            element.value =
+            settings[key];
+
+        }
+
+    }
+
+    document.body.style.background =
+    document
+    .getElementById("bgColor")
+    .value;
+
+    updateUIVisibility();
+
+}
+
+[
+    "bgColor",
+    "threshold",
+    "swapSpeed",
+    "effectMode",
+    "bounceStrength",
+    "bounceSpeed",
+    "idleMode",
+    "darkStrength",
+    "transparentStrength",
+    "smallStrength"
+]
+.forEach(id=>{
+
+    const element =
+    document.getElementById(id);
+
+    element.addEventListener(
+        "input",
+        saveSettings
+    );
+
+    element.addEventListener(
+        "change",
+        saveSettings
+    );
+
+});
+
+loadSettings();
 
 document
 .getElementById("startBtn")
@@ -776,6 +930,8 @@ panelToggle.addEventListener("click",()=>{
     }
 
 });
+
+updateUIVisibility();
 
 </script>
 
