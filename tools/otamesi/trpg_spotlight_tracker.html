@@ -1,0 +1,487 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+.app { max-width: 420px; margin: 0 auto; padding: 0 0 80px; min-height: 100vh; background: var(--color-background-tertiary); }
+
+.header { background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); padding: 12px 16px; position: sticky; top: 0; z-index: 10; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.header-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; }
+.scene-badge { font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-secondary); padding: 3px 10px; border-radius: 99px; border: 0.5px solid var(--color-border-tertiary); }
+
+.follow-banner { background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); padding: 10px 16px; }
+.follow-title { font-size: 11px; font-weight: 500; color: var(--color-text-warning); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
+.follow-row { display: flex; gap: 8px; align-items: center; padding: 4px 0; }
+.follow-rank { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); min-width: 20px; }
+.follow-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.follow-info { font-size: 12px; color: var(--color-text-secondary); margin-left: auto; text-align: right; }
+.follow-warn { color: var(--color-text-warning); }
+
+.section { padding: 12px 16px 4px; font-size: 11px; color: var(--color-text-tertiary); letter-spacing: 0.06em; text-transform: uppercase; }
+
+.pl-cards { padding: 0 12px; display: flex; flex-direction: column; gap: 10px; }
+
+.pl-card { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); overflow: hidden; transition: border-color 0.2s; }
+.pl-card.priority-card { border: 1.5px solid #FAC775; }
+.pl-card.alert-card { border-color: var(--color-border-warning); }
+
+.pl-card-header { padding: 12px 14px 8px; display: flex; align-items: flex-start; justify-content: space-between; }
+.pl-name-row { display: flex; align-items: center; gap: 6px; }
+.pl-name { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+.priority-star { color: #EF9F27; font-size: 14px; }
+.alert-badge { font-size: 11px; color: var(--color-text-warning); background: var(--color-background-warning); padding: 2px 8px; border-radius: 99px; margin-top: 2px; }
+.time-text { font-size: 12px; color: var(--color-text-secondary); text-align: right; }
+.time-alert { color: var(--color-text-warning); font-weight: 500; }
+
+.pl-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 0.5px solid var(--color-border-tertiary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.stat-item { padding: 8px 10px; text-align: center; border-right: 0.5px solid var(--color-border-tertiary); }
+.stat-item:last-child { border-right: none; }
+.stat-label { font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.stat-val { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+
+.pl-diff-alert { padding: 6px 14px; font-size: 12px; color: var(--color-text-warning); background: var(--color-background-warning); display: flex; align-items: center; gap: 5px; }
+
+.pl-actions { padding: 10px 14px; display: flex; gap: 8px; }
+.btn-spoke { flex: 1; background: var(--color-background-info); color: var(--color-text-info); border: none; border-radius: var(--border-radius-md); padding: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; transition: opacity 0.15s, transform 0.1s; }
+.btn-spoke:active { transform: scale(0.97); }
+.btn-priority { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; font-size: 13px; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.btn-priority.active { background: #FAEEDA; color: #854F0B; border-color: #FAC775; }
+@media (prefers-color-scheme: dark) { .btn-priority.active { background: #412402; color: #FAC775; border-color: #854F0B; } }
+
+.undo-bar { margin: 4px 14px 8px; padding: 8px 12px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: space-between; border: 0.5px solid var(--color-border-secondary); }
+.undo-text { font-size: 12px; color: var(--color-text-secondary); }
+.btn-undo { background: none; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-primary); font-family: inherit; font-size: 12px; padding: 4px 12px; border-radius: var(--border-radius-md); cursor: pointer; }
+
+.bottom-actions { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; background: var(--color-background-primary); border-top: 0.5px solid var(--color-border-tertiary); padding: 10px 16px 16px; display: flex; gap: 8px; z-index: 10; }
+.btn-scene { flex: 1; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); font-family: inherit; font-size: 13px; font-weight: 500; padding: 10px; border-radius: var(--border-radius-md); cursor: pointer; }
+.btn-settings { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); font-family: inherit; font-size: 13px; padding: 10px 14px; border-radius: var(--border-radius-md); cursor: pointer; }
+.btn-danger { background: var(--color-background-danger); color: var(--color-text-danger); border: none; font-family: inherit; font-size: 13px; padding: 10px 14px; border-radius: var(--border-radius-md); cursor: pointer; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: flex-end; }
+.modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; width: 100%; max-width: 420px; margin: 0 auto; padding: 20px 16px 32px; max-height: 85vh; overflow-y: auto; }
+.modal-title { font-size: 17px; font-weight: 500; margin-bottom: 16px; color: var(--color-text-primary); }
+.modal-input { width: 100%; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; font-family: inherit; font-size: 15px; color: var(--color-text-primary); background: var(--color-background-primary); margin-bottom: 12px; }
+.modal-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.btn-modal-primary { flex: 1; background: var(--color-background-info); color: var(--color-text-info); border: none; font-family: inherit; font-size: 14px; font-weight: 500; padding: 11px; border-radius: var(--border-radius-md); cursor: pointer; }
+.btn-modal-cancel { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); font-family: inherit; font-size: 14px; padding: 11px 16px; border-radius: var(--border-radius-md); cursor: pointer; }
+
+.pl-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.pl-list-name { flex: 1; font-size: 15px; color: var(--color-text-primary); }
+.btn-edit-name { background: none; border: none; font-size: 13px; color: var(--color-text-info); cursor: pointer; font-family: inherit; }
+.btn-del { background: none; border: none; color: var(--color-text-danger); cursor: pointer; font-size: 20px; line-height: 1; padding: 0 4px; }
+
+.alert-num-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.alert-chip { border: 0.5px solid var(--color-border-secondary); border-radius: 99px; padding: 6px 14px; font-size: 13px; font-family: inherit; background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.1s; }
+.alert-chip.selected { background: var(--color-background-info); color: var(--color-text-info); border-color: transparent; }
+
+.history-item { padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.history-scene { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.history-detail { font-size: 12px; color: var(--color-text-secondary); }
+.history-time { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+.edit-name-inline { display: flex; gap: 6px; align-items: center; }
+.edit-name-input { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 4px 8px; font-family: inherit; font-size: 14px; color: var(--color-text-primary); background: var(--color-background-primary); flex: 1; }
+.btn-edit-ok { background: var(--color-background-info); color: var(--color-text-info); border: none; font-family: inherit; font-size: 12px; padding: 5px 10px; border-radius: var(--border-radius-md); cursor: pointer; }
+</style>
+
+<div class="app" id="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-title"><i class="ti ti-spotlight" aria-hidden="true"></i> スポットライトトラッカー</div>
+      <div id="scene-badge" class="scene-badge">シーン未開始</div>
+    </div>
+  </div>
+  <div id="follow-banner" class="follow-banner" style="display:none;"></div>
+  <div class="section">プレイヤー</div>
+  <div class="pl-cards" id="pl-cards"></div>
+</div>
+
+<div class="bottom-actions">
+  <button class="btn-scene" onclick="openModal('scene')"><i class="ti ti-clapperboard" aria-hidden="true"></i> 新規シーン</button>
+  <button class="btn-settings" onclick="openModal('settings')"><i class="ti ti-users" aria-hidden="true"></i> PL管理</button>
+  <button class="btn-settings" onclick="openModal('history')"><i class="ti ti-history" aria-hidden="true"></i> 履歴</button>
+  <button class="btn-danger" onclick="openModal('reset')"><i class="ti ti-trash" aria-hidden="true"></i></button>
+</div>
+
+<div id="modal" class="modal-overlay" style="display:none;" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal-inner"></div>
+</div>
+
+<script>
+var state = {
+  pls: [
+    { id: 1, name: 'リサ', total: 0, scene: 0, lastAt: null, priority: false },
+    { id: 2, name: '健太', total: 0, scene: 0, lastAt: null, priority: false },
+    { id: 3, name: '真琴', total: 0, scene: 0, lastAt: null, priority: false }
+  ],
+  sceneName: '',
+  sceneStart: null,
+  history: [],
+  alertMin: 15,
+  nextId: 4,
+  undos: {}
+};
+
+function now() { return Date.now(); }
+
+function fmt(ms) {
+  if (!ms) return '-';
+  var sec = Math.floor((now() - ms) / 1000);
+  if (sec < 60) return sec + '秒';
+  return Math.floor(sec / 60) + '分';
+}
+
+function fmtMin(ms) {
+  if (!ms) return 0;
+  return Math.floor((now() - ms) / 60000);
+}
+
+function fmtDateTime(ts) {
+  if (!ts) return '';
+  var d = new Date(ts);
+  return d.getMonth()+1 + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function spoke(id) {
+  var pl = state.pls.find(function(p){ return p.id === id; });
+  if (!pl) return;
+  var prev = { total: pl.total, scene: pl.scene, lastAt: pl.lastAt };
+  pl.total++;
+  pl.scene++;
+  pl.lastAt = now();
+  clearTimeout(state.undos[id] && state.undos[id].timer);
+  state.undos[id] = { prev: prev, ts: now() };
+  var t = setTimeout(function(){ delete state.undos[id]; render(); }, 5000);
+  state.undos[id].timer = t;
+  saveLS();
+  render();
+}
+
+function undoSpoke(id) {
+  var u = state.undos[id];
+  if (!u) return;
+  var pl = state.pls.find(function(p){ return p.id === id; });
+  if (!pl) return;
+  pl.total = u.prev.total;
+  pl.scene = u.prev.scene;
+  pl.lastAt = u.prev.lastAt;
+  clearTimeout(u.timer);
+  delete state.undos[id];
+  saveLS();
+  render();
+}
+
+function togglePriority(id) {
+  var pl = state.pls.find(function(p){ return p.id === id; });
+  if (!pl) return;
+  pl.priority = !pl.priority;
+  saveLS();
+  render();
+}
+
+function deletePL(id) {
+  state.pls = state.pls.filter(function(p){ return p.id !== id; });
+  saveLS();
+  render();
+}
+
+function addPL(name) {
+  if (!name.trim()) return;
+  state.pls.push({ id: state.nextId++, name: name.trim(), total: 0, scene: 0, lastAt: null, priority: false });
+  saveLS();
+  render();
+}
+
+function renamePL(id, name) {
+  var pl = state.pls.find(function(p){ return p.id === id; });
+  if (pl && name.trim()) { pl.name = name.trim(); saveLS(); render(); }
+}
+
+function startScene(name) {
+  if (state.sceneName) {
+    var endTs = now();
+    state.history.push({
+      name: state.sceneName,
+      start: state.sceneStart,
+      end: endTs,
+      counts: state.pls.map(function(p){ return { name: p.name, count: p.scene }; })
+    });
+  }
+  state.sceneName = name.trim() || '無名シーン';
+  state.sceneStart = now();
+  state.pls.forEach(function(p){ p.scene = 0; state.undos[p.id] = null; });
+  state.undos = {};
+  saveLS();
+  render();
+}
+
+function saveLS() {
+  try { localStorage.setItem('trpg_tracker', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadLS() {
+  try {
+    var d = localStorage.getItem('trpg_tracker');
+    if (d) { var s = JSON.parse(d); Object.assign(state, s); }
+  } catch(e) {}
+}
+
+function resetAll() {
+  localStorage.removeItem('trpg_tracker');
+  state = {
+    pls: [],
+    sceneName: '',
+    sceneStart: null,
+    history: [],
+    alertMin: 15,
+    nextId: 1,
+    undos: {}
+  };
+  render();
+  closeModal();
+}
+
+function getNonPriorityPLs() {
+  return state.pls.filter(function(p){ return !p.priority; });
+}
+
+function getMaxScene() {
+  var pls = getNonPriorityPLs();
+  if (!pls.length) return 0;
+  return Math.max.apply(null, pls.map(function(p){ return p.scene; }));
+}
+
+function getFollowList() {
+  var pls = state.pls.filter(function(p){ return !p.priority; });
+  return pls.map(function(p) {
+    var mins = p.lastAt ? fmtMin(p.lastAt) : 999;
+    return { pl: p, mins: mins, scene: p.scene };
+  }).sort(function(a, b) {
+    if (b.mins !== a.mins) return b.mins - a.mins;
+    return a.scene - b.scene;
+  });
+}
+
+function renderFollowBanner() {
+  var list = getFollowList().slice(0, 2);
+  var banner = document.getElementById('follow-banner');
+  if (!list.length) { banner.style.display = 'none'; return; }
+  banner.style.display = 'block';
+  var html = '<div class="follow-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> 要フォロー</div>';
+  list.forEach(function(item, i) {
+    var warnTime = item.mins >= state.alertMin;
+    html += '<div class="follow-row">';
+    html += '<span class="follow-rank">' + (i+1) + '位</span>';
+    html += '<span class="follow-name">' + item.pl.name + '</span>';
+    html += '<span class="follow-info' + (warnTime ? ' follow-warn' : '') + '">';
+    if (item.pl.lastAt) {
+      html += item.mins + '分経過<br>';
+    } else {
+      html += 'まだ話していない<br>';
+    }
+    html += 'シーン内' + item.scene + '回</span>';
+    html += '</div>';
+  });
+  banner.innerHTML = html;
+}
+
+function renderCards() {
+  var container = document.getElementById('pl-cards');
+  var maxScene = getMaxScene();
+  var html = '';
+  state.pls.forEach(function(pl) {
+    var mins = pl.lastAt ? fmtMin(pl.lastAt) : null;
+    var isTimeAlert = pl.lastAt && mins >= state.alertMin;
+    var diff = (!pl.priority && maxScene > 0) ? (maxScene - pl.scene) : 0;
+    var isDiffAlert = !pl.priority && diff >= 3;
+    var undo = state.undos[pl.id];
+    var cardClass = 'pl-card' + (pl.priority ? ' priority-card' : '') + (isTimeAlert ? ' alert-card' : '');
+    html += '<div class="' + cardClass + '">';
+    html += '<div class="pl-card-header">';
+    html += '<div>';
+    html += '<div class="pl-name-row">';
+    if (pl.priority) html += '<span class="priority-star">⭐</span>';
+    html += '<span class="pl-name">' + pl.name + '</span>';
+    html += '</div>';
+    if (isTimeAlert) {
+      html += '<div class="alert-badge"><i class="ti ti-clock" aria-hidden="true"></i> ' + mins + '分経過</div>';
+    }
+    html += '</div>';
+    html += '<div>';
+    html += '<div class="time-text' + (isTimeAlert ? ' time-alert' : '') + '">';
+    html += pl.lastAt ? fmt(pl.lastAt) + '前' : '未振';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    html += '<div class="pl-stats">';
+    html += '<div class="stat-item"><div class="stat-label">総回数</div><div class="stat-val">' + pl.total + '</div></div>';
+    html += '<div class="stat-item"><div class="stat-label">シーン内</div><div class="stat-val">' + pl.scene + '</div></div>';
+    html += '<div class="stat-item"><div class="stat-label">優先</div><div class="stat-val" style="font-size:14px;">' + (pl.priority ? '⭐ ON' : 'OFF') + '</div></div>';
+    html += '</div>';
+
+    if (isDiffAlert) {
+      html += '<div class="pl-diff-alert"><i class="ti ti-alert-triangle" aria-hidden="true"></i> 他PLより' + diff + '回少ないです</div>';
+    }
+
+    if (undo) {
+      html += '<div class="undo-bar">';
+      html += '<span class="undo-text">話を振りました</span>';
+      html += '<button class="btn-undo" onclick="undoSpoke(' + pl.id + ')">取り消し</button>';
+      html += '</div>';
+    }
+
+    html += '<div class="pl-actions">';
+    html += '<button class="btn-spoke" onclick="spoke(' + pl.id + ')"><i class="ti ti-message-circle" aria-hidden="true"></i> 話を振った</button>';
+    html += '<button class="btn-priority' + (pl.priority ? ' active' : '') + '" onclick="togglePriority(' + pl.id + ')">';
+    html += pl.priority ? '⭐ 優先中' : '☆ 優先';
+    html += '</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function renderSceneBadge() {
+  var el = document.getElementById('scene-badge');
+  el.textContent = state.sceneName || 'シーン未開始';
+}
+
+function render() {
+  renderSceneBadge();
+  renderFollowBanner();
+  renderCards();
+}
+
+var modalMode = '';
+function openModal(mode) {
+  modalMode = mode;
+  var inner = document.getElementById('modal-inner');
+  var html = '';
+
+  if (mode === 'scene') {
+    html += '<div class="modal-title"><i class="ti ti-clapperboard" aria-hidden="true"></i> 新規シーン開始</div>';
+    if (state.sceneName) {
+      html += '<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px;">現在: ' + state.sceneName + ' → 履歴に保存して切り替えます</p>';
+    }
+    html += '<input class="modal-input" id="scene-input" placeholder="シーン名（例: 図書館探索）" />';
+    html += '<div class="modal-row">';
+    html += '<button class="btn-modal-primary" onclick="doStartScene()"><i class="ti ti-player-play" aria-hidden="true"></i> 開始</button>';
+    html += '<button class="btn-modal-cancel" onclick="closeModal()">キャンセル</button>';
+    html += '</div>';
+
+  } else if (mode === 'settings') {
+    html += '<div class="modal-title"><i class="ti ti-users" aria-hidden="true"></i> PL管理</div>';
+    html += '<div id="pl-list">';
+    state.pls.forEach(function(pl) {
+      html += '<div class="pl-list-item" id="plitem-' + pl.id + '">';
+      html += '<span class="pl-list-name">' + pl.name + '</span>';
+      html += '<button class="btn-edit-name" onclick="startEditName(' + pl.id + ')"><i class="ti ti-pencil" aria-hidden="true"></i> 名前変更</button>';
+      html += '<button class="btn-del" onclick="deletePL(' + pl.id + ');openModal(\'settings\')" aria-label="削除"><i class="ti ti-x" aria-hidden="true"></i></button>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="modal-row" style="margin-top:12px;">';
+    html += '<input class="modal-input" id="add-pl-input" placeholder="PL名を入力" style="margin:0;" />';
+    html += '<button class="btn-modal-primary" onclick="doAddPL()" style="flex:0;padding:10px 16px;"><i class="ti ti-plus" aria-hidden="true"></i></button>';
+    html += '</div>';
+    html += '<div style="margin-top:16px;border-top:0.5px solid var(--color-border-tertiary);padding-top:12px;">';
+    html += '<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px;">放置アラート時間</p>';
+    html += '<div class="alert-num-row">';
+    [5,10,15,20,30].forEach(function(m) {
+      html += '<button class="alert-chip' + (state.alertMin===m?' selected':'') + '" onclick="setAlert(' + m + ')">' + m + '分</button>';
+    });
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="modal-row" style="margin-top:8px;">';
+    html += '<button class="btn-modal-cancel" onclick="closeModal()" style="flex:1;">閉じる</button>';
+    html += '</div>';
+
+  } else if (mode === 'history') {
+    html += '<div class="modal-title"><i class="ti ti-history" aria-hidden="true"></i> シーン履歴</div>';
+    if (!state.history.length) {
+      html += '<p style="font-size:14px;color:var(--color-text-secondary);">履歴はまだありません</p>';
+    } else {
+      var rev = state.history.slice().reverse();
+      rev.forEach(function(h) {
+        html += '<div class="history-item">';
+        html += '<div class="history-scene">' + h.name + '</div>';
+        html += '<div class="history-detail">';
+        h.counts.forEach(function(c) {
+          html += c.name + ' ' + c.count + '回　';
+        });
+        html += '</div>';
+        html += '<div class="history-time">' + fmtDateTime(h.start) + ' → ' + fmtDateTime(h.end) + '</div>';
+        html += '</div>';
+      });
+    }
+    html += '<div class="modal-row" style="margin-top:12px;">';
+    html += '<button class="btn-modal-cancel" onclick="closeModal()" style="flex:1;">閉じる</button>';
+    html += '</div>';
+
+  } else if (mode === 'reset') {
+    html += '<div class="modal-title"><i class="ti ti-trash" aria-hidden="true"></i> 全データリセット</div>';
+    html += '<p style="font-size:14px;color:var(--color-text-secondary);margin-bottom:16px;">本当に全データを削除しますか？<br>この操作は取り消せません。</p>';
+    html += '<div class="modal-row">';
+    html += '<button class="btn-modal-primary" style="background:var(--color-background-danger);color:var(--color-text-danger);" onclick="resetAll()"><i class="ti ti-trash" aria-hidden="true"></i> 削除する</button>';
+    html += '<button class="btn-modal-cancel" onclick="closeModal()">キャンセル</button>';
+    html += '</div>';
+  }
+
+  inner.innerHTML = html;
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+function doStartScene() {
+  var val = document.getElementById('scene-input').value;
+  startScene(val);
+  closeModal();
+}
+
+function doAddPL() {
+  var val = document.getElementById('add-pl-input').value;
+  addPL(val);
+  openModal('settings');
+}
+
+function setAlert(m) {
+  state.alertMin = m;
+  saveLS();
+  openModal('settings');
+}
+
+function startEditName(id) {
+  var el = document.getElementById('plitem-' + id);
+  if (!el) return;
+  var pl = state.pls.find(function(p){ return p.id === id; });
+  if (!pl) return;
+  el.innerHTML = '<div class="edit-name-inline">' +
+    '<input class="edit-name-input" id="edit-' + id + '" value="' + pl.name + '" />' +
+    '<button class="btn-edit-ok" onclick="doRename(' + id + ')">OK</button>' +
+    '<button class="btn-del" onclick="openModal(\'settings\')" aria-label="キャンセル"><i class="ti ti-x" aria-hidden="true"></i></button>' +
+    '</div>';
+  document.getElementById('edit-' + id).focus();
+}
+
+function doRename(id) {
+  var val = document.getElementById('edit-' + id);
+  if (val) renamePL(id, val.value);
+  openModal('settings');
+}
+
+loadLS();
+render();
+
+setInterval(function() {
+  render();
+}, 15000);
+</script>
