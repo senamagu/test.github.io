@@ -172,7 +172,7 @@ button.small:hover{background:rgba(255,255,255,.16);}
     <div class="panel-title">立ち絵・位置・サイズ</div>
     <label>サイズ（px）
       <div class="rangeRow">
-        <input type="range" id="charSize" min="80" max="1200" step="10" value="500">
+        <input type="range" id="charSize" min="80" max="6000" step="10" value="500">
         <span class="rangeVal" id="charSizeVal">500</span>
       </div>
     </label>
@@ -366,8 +366,8 @@ window.addEventListener("wheel", e => {
   // コントロールパネル上はスクロール優先
   if(e.target.closest(".controls")) return;
   e.preventDefault();
-  const delta = e.deltaY > 0 ? -20 : 20;
-  charSize = Math.max(80, Math.min(1200, charSize + delta));
+  const delta = e.deltaY > 0 ? -40 : 40;
+  charSize = Math.max(80, Math.min(6000, charSize + delta));
   applyCharTransform();
   saveSettings();
 },{passive:false});
