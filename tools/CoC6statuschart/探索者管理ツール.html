@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>探索者管理ツール</title>
+<style>
+body{margin:0;font-family:sans-serif;background:#1e1f22;color:#eee;display:flex}
+#sidebar{width:280px;background:#2b2d31;padding:15px;height:100vh;overflow:auto}
+#main{flex:1;padding:15px;overflow:auto}
+.card{background:#2b2d31;padding:12px;border-radius:8px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #444;padding:6px;text-align:center}
+input,select,button{margin:3px;padding:6px}
+.character{display:flex;justify-content:space-between;padding:4px}
+</style>
+</head>
+<body>
+<div id="sidebar">
+<h2>探索者管理</h2>
+<input type="file" id="files" multiple accept=".txt"><br>
+<button onclick="clearAll()">全削除</button>
+
+<div class="card">
+<h3>技能検索</h3>
+<input id="skillSearch" placeholder="目星">
+<button onclick="skillRanking()">検索</button>
+<div id="skillResult"></div>
+</div>
+
+<div class="card">
+<h3>登録キャラ</h3>
+<div id="charList"></div>
+</div>
+</div>
+
+<div id="main">
+<h2>能力値一覧</h2>
+<table>
+<thead><tr><th>名前</th><th>STR</th><th>CON</th><th>POW</th><th>DEX</th><th>APP</th><th>SIZ</th><th>INT</th><th>EDU</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<div class="card">
+<h3>ランキング</h3>
+<select id="rankStat">
+<option>STR</option><option>CON</option><option>POW</option><option>DEX</option>
+<option>APP</option><option>SIZ</option><option>INT</option><option>EDU</option>
+</select>
+<button onclick="showRanking()">表示</button>
+<div id="ranking"></div>
+</div>
+</div>
+
+<script>
+const stats=["STR","CON","POW","DEX","APP","SIZ","INT","EDU"];
+let chars=JSON.parse(localStorage.getItem("chars")||"[]");
+
+function save(){
+ localStorage.setItem("chars",JSON.stringify(chars));
+ render();
+}
+
+function parse(txt){
+ let name=(txt.match(/名前:\\s*(.+?)\\s*\\(/)||[])[1];
+ if(!name)return null;
+
+ let c={name,skills:{}};
+
+ for(let s of stats){
+   let m=txt.match(new RegExp(s+"\\s+(\\d+)"));
+   c[s]=m?Number(m[1]):0;
+ }
+
+ let lines=txt.split("\\n");
+ for(let line of lines){
+   let m=line.match(/^(.+?)\\s+(\\d+)\\s+\\d+/);
+   if(m && !stats.includes(m[1].trim())){
+      c.skills[m[1].trim()] = Number(m[2]);
+   }
+ }
+ return c;
+}
+
+document.getElementById("files").addEventListener("change",e=>{
+ [...e.target.files].forEach(f=>{
+   let r=new FileReader();
+   r.onload=x=>{
+      let c=parse(x.target.result);
+      if(c){ chars.push(c); save(); }
+   };
+   r.readAsText(f,"utf-8");
+ });
+});
+
+function render(){
+ let tb=document.getElementById("tbody");
+ tb.innerHTML="";
+ chars.forEach(c=>{
+  tb.innerHTML+=`<tr>
+  <td>${c.name}</td>
+  <td>${c.STR}</td><td>${c.CON}</td><td>${c.POW}</td><td>${c.DEX}</td>
+  <td>${c.APP}</td><td>${c.SIZ}</td><td>${c.INT}</td><td>${c.EDU}</td>
+  </tr>`;
+ });
+
+ let cl=document.getElementById("charList");
+ cl.innerHTML="";
+ chars.forEach((c,i)=>{
+   cl.innerHTML+=`<div class="character">${c.name}
+   <button onclick="delChar(${i})">🗑</button></div>`;
+ });
+}
+
+function delChar(i){
+ chars.splice(i,1);
+ save();
+}
+
+function clearAll(){
+ if(confirm("全削除しますか？")){
+   chars=[];
+   save();
+ }
+}
+
+function showRanking(){
+ let stat=document.getElementById("rankStat").value;
+ let arr=[...chars].sort((a,b)=>b[stat]-a[stat]);
+
+ let html="";
+ let rank=1;
+
+ for(let i=0;i<arr.length;i++){
+   if(i>0 && arr[i][stat]!==arr[i-1][stat]) rank=i+1;
+   html+=`${rank}位 ${arr[i].name} (${arr[i][stat]})<br>`;
+ }
+ document.getElementById("ranking").innerHTML=html;
+}
+
+function skillRanking(){
+ let word=document.getElementById("skillSearch").value.trim();
+ let result=[];
+
+ chars.forEach(c=>{
+   for(let skill in c.skills){
+      if(skill.includes(word)){
+         result.push({
+           name:c.name,
+           skill,
+           value:c.skills[skill]
+         });
+      }
+   }
+ });
+
+ result.sort((a,b)=>b.value-a.value);
+
+ let html="";
+ let rank=1;
+
+ result.forEach((r,i)=>{
+   if(i>0 && r.value!==result[i-1].value) rank=i+1;
+   html+=`${rank}位 ${r.name} | ${r.skill} | ${r.value}<br>`;
+ });
+
+ document.getElementById("skillResult").innerHTML=html||"該当なし";
+}
+
+render();
+</script>
+</body>
+</html>
