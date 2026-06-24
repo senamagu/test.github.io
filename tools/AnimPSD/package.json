@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://senamagu.github.io/tools/AnimPSD/",
+  "homepage": "https://senamagu.github.io/test.github.io/tools/AnimPSD/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
