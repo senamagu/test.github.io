@@ -1,0 +1,43 @@
+name: Deploy PSD Generator
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'tools/AnimPSD/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install and Build
+        working-directory: ./tools/AnimPSD
+        run: |
+          npm install
+          npm run build
+
+      - name: Prepare Files for GitHub Pages
+        run: |
+          mkdir -p _site/tools/AnimPSD
+          cp -r tools/AnimPSD/dist/* _site/tools/AnimPSD/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
