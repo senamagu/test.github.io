@@ -1,0 +1,11 @@
+{
+  "name": "psd-generator",
+  "homepage": "https://senamagu.github.io/tools/AnimPSD/", 
+  // ...
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  }
+}
