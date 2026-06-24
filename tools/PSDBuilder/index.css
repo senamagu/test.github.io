@@ -1,0 +1,25 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ここでUIのカラーを一括で手動調整できます */
+  --color-primary: #3b82f6;       /* メインボタン・アクティブ要素の色 (例: Blue 500) */
+  --color-primary-hover: #2563eb; /* ボタンのホバー色 */
+  --color-bg: #f9fafb;            /* アプリ全体の背景色 */
+  --color-surface: #ffffff;       /* パネルやカードの背景色 */
+  --color-text-main: #1f2937;     /* 主なテキスト色 */
+  --color-text-sub: #6b7280;      /* サブテキスト色 */
+  --color-border: #e5e7eb;        /* 境界線の色 */
+  --color-danger: #ef4444;        /* エラーや削除ボタンの色 */
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  /* iPad向けに文字選択などを無効化しネイティブアプリに近づける */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
