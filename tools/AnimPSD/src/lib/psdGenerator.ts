@@ -1,5 +1,6 @@
 // src/lib/psdGenerator.ts
-import { writePsd } from 'ag-psd';
+import 'ag-psd/initialize-canvas'; // 【追加】ブラウザでag-psdを動かすための必須設定
+import { writePsd, Psd, Layer } from 'ag-psd';
 
 export interface ImageItem {
   id: string;
@@ -36,11 +37,9 @@ const fileToCanvas = async (file: File): Promise<HTMLCanvasElement> => {
 };
 
 export const generatePsd = async (images: ImageItem[], settings: PsdSettings) => {
-  // ag-psdは配列の先頭が「上」のレイヤーとなるため、
-  // リストの並び順（上から下）に合わせて生成します。
-  const children = await Promise.all(images.map(async (img, index) => {
+  // TypeScriptのエラーを防ぐため「戻り値は Layer の配列である」と明記
+  const children: Layer[] = await Promise.all(images.map(async (img, index): Promise<Layer> => {
     const canvas = await fileToCanvas(img.file);
-    const seqNum = images.length - index; // 下から1,2,3とするか上からかは要調整
 
     // フォルダ名決定ロジック
     let folderName = '';
@@ -74,10 +73,18 @@ export const generatePsd = async (images: ImageItem[], settings: PsdSettings) =>
     };
   }));
 
-  const psd = {
+  // 【修正】ag-psdの型定義に合わせた正しい構造（DPIの設定）
+  const psd: Psd = {
     width: settings.width,
     height: settings.height,
-    resolution: settings.dpi,
+    imageResources: {
+      resolutionInfo: {
+        hRes: settings.dpi,
+        vRes: settings.dpi,
+        hResUnit: 'PPI',
+        vResUnit: 'PPI'
+      }
+    },
     children: children
   };
 
