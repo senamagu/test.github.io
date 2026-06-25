@@ -20,7 +20,7 @@
 
   <div class="max-w-6xl mx-auto space-y-6">
     <header class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-      <h1 class="text-2xl font-bold text-gray-700">PSD Generator v1.0</h1>
+      <h1 class="text-2xl font-bold text-gray-700">PSD Generator v1.1</h1>
       <button id="generateBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors text-lg">
         PSDを生成する
       </button>
@@ -28,13 +28,13 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
-      <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm space-y-6 h-fit">
+      <div class="lg:col-span-1 space-y-6 h-fit">
         
-        <section>
+        <div class="bg-white p-6 rounded-xl shadow-sm">
           <h2 class="text-lg font-bold border-b pb-2 mb-4">キャンバス設定</h2>
           <div class="mb-4">
             <label class="block text-sm text-gray-600 mb-1">テンプレート読込</label>
-            <select id="templateSelect" class="w-full border rounded p-2 bg-gray-50">
+            <select id="templateSelect" class="w-full border rounded p-2 bg-gray-50 text-sm">
               <option value="default">デフォルト (1920x1080)</option>
               <option value="video">動画用テンプレ (2500x1575)</option>
               <option value="custom" disabled>カスタム (保存されたテンプレ)</option>
@@ -64,11 +64,58 @@
             <input type="text" id="saveTemplateName" placeholder="テンプレ名" class="flex-1 border rounded p-2 text-sm">
             <button id="saveTemplateBtn" class="bg-gray-800 text-white px-4 py-2 rounded text-sm font-bold">保存</button>
           </div>
-        </section>
+        </div>
 
-        <section>
-          <h2 class="text-lg font-bold border-b pb-2 mb-4">命名設定</h2>
+        <div class="bg-white p-6 rounded-xl shadow-sm">
+          <h2 class="text-lg font-bold border-b pb-2 mb-4">画像・レイヤー設定</h2>
           
+          <div class="mb-5">
+            <label class="block text-sm font-bold text-gray-700 mb-1">空レイヤーの生成数 (各フォルダ内)</label>
+            <div class="flex items-center">
+              <input type="number" id="layerCount" value="2" min="0" max="50" class="w-20 border rounded p-2 text-right mr-2">
+              <span class="text-sm text-gray-600">枚</span>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="alignCenter" checked class="w-5 h-5 text-blue-600 rounded mr-2">
+              <span class="text-sm font-bold text-gray-700">画像をキャンバスの中央に配置</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">画像サイズの一括調整</label>
+            <div class="space-y-3 text-sm">
+              <label class="flex items-center cursor-pointer">
+                <input type="radio" name="resizeRule" value="none" checked class="mr-2"> 
+                <span class="text-gray-700">原寸大のまま (100%)</span>
+              </label>
+              
+              <div class="flex items-center">
+                <label class="flex items-center cursor-pointer min-w-[100px]">
+                  <input type="radio" name="resizeRule" value="scale" class="mr-2"> 
+                  <span class="text-gray-700">倍率で指定:</span>
+                </label>
+                <input type="number" id="resizeScale" value="100" min="1" max="300" class="w-16 border rounded p-1 mx-2 text-right"> 
+                <span class="text-gray-600">%</span>
+              </div>
+              
+              <div class="flex items-center flex-wrap gap-2">
+                <label class="flex items-center cursor-pointer min-w-[100px]">
+                  <input type="radio" name="resizeRule" value="px" class="mr-2"> 
+                  <span class="text-gray-700">pxで指定:</span>
+                </label>
+                <input type="number" id="resizePxW" placeholder="幅" class="w-16 border rounded p-1 text-right"> 
+                <span class="text-gray-500">x</span>
+                <input type="number" id="resizePxH" placeholder="高さ" class="w-16 border rounded p-1 text-right">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm">
+          <h2 class="text-lg font-bold border-b pb-2 mb-4">命名設定</h2>
           <div class="mb-4">
             <label class="block text-sm font-bold text-gray-700 mb-2">フォルダ命名</label>
             <div class="space-y-2 text-sm">
@@ -80,7 +127,6 @@
               <input type="text" id="folderCustomPrefix" placeholder="例: cut_" class="w-full border rounded p-2 mt-1 hidden text-sm">
             </div>
           </div>
-
           <div>
             <label class="block text-sm font-bold text-gray-700 mb-2">画像レイヤー命名</label>
             <div class="space-y-2 text-sm">
@@ -89,18 +135,7 @@
               <label class="flex items-center"><input type="radio" name="imageRule" value="sameAsFolder" class="mr-2"> フォルダ名と同じ</label>
             </div>
           </div>
-        </section>
-
-        <section>
-           <h2 class="text-lg font-bold border-b pb-2 mb-4 text-gray-400">内部構造 (将来拡張用)</h2>
-           <div class="text-xs text-gray-500 space-y-1">
-             <p>・親フォルダ (動的命名)</p>
-             <p class="pl-4">└ フォルダ (固定)</p>
-             <p class="pl-8">├ レイヤー①</p>
-             <p class="pl-8">└ レイヤー②</p>
-             <p class="pl-4">└ 画像レイヤー (動的命名)</p>
-           </div>
-        </section>
+        </div>
 
       </div>
 
@@ -151,18 +186,21 @@
     const aspectLock = document.getElementById('aspectLock');
     const templateSelect = document.getElementById('templateSelect');
     
+    // 新機能関連DOM
+    const layerCountInput = document.getElementById('layerCount');
+    const alignCenterCheckbox = document.getElementById('alignCenter');
+    const resizeScaleInput = document.getElementById('resizeScale');
+    const resizePxWInput = document.getElementById('resizePxW');
+    const resizePxHInput = document.getElementById('resizePxH');
+
     // --- 初期化処理 ---
     function init() {
-      // カスタムテンプレのロード
       updateTemplateDropdown();
-
-      // SortableJSの初期化 (iPad対応)
       new Sortable(imageList, {
         animation: 150,
-        delayOnTouchOnly: true, // スマホ等でのスクロール誤爆防止
+        delayOnTouchOnly: true,
         delay: 150,
         onEnd: (evt) => {
-          // 配列の順序も同期
           const movedItem = imagesData.splice(evt.oldIndex, 1)[0];
           imagesData.splice(evt.newIndex, 0, movedItem);
         }
@@ -170,8 +208,6 @@
     }
 
     // --- イベントリスナー設定 ---
-    
-    // 比率固定の計算
     aspectLock.addEventListener('change', (e) => {
       if(e.target.checked) currentRatio = Number(canvasW.value) / Number(canvasH.value);
     });
@@ -182,7 +218,6 @@
       if(aspectLock.checked) canvasW.value = Math.round(Number(e.target.value) * currentRatio);
     });
 
-    // テンプレ関連
     templateSelect.addEventListener('change', (e) => {
       const val = e.target.value;
       if (val === 'default') setCanvas(1920, 1080, 350);
@@ -203,7 +238,6 @@
       alert('テンプレートを保存したぞ！');
     });
 
-    // 命名設定のトグル
     document.getElementsByName('folderRule').forEach(radio => {
       radio.addEventListener('change', (e) => {
         const prefixInput = document.getElementById('folderCustomPrefix');
@@ -211,7 +245,11 @@
       });
     });
 
-    // ファイルドラッグ＆ドロップ操作
+    // 倍率/pxの入力枠をフォーカスした時に自動でラジオボタンを切り替える親切設計
+    resizeScaleInput.addEventListener('focus', () => document.querySelector('input[name="resizeRule"][value="scale"]').checked = true);
+    resizePxWInput.addEventListener('focus', () => document.querySelector('input[name="resizeRule"][value="px"]').checked = true);
+    resizePxHInput.addEventListener('focus', () => document.querySelector('input[name="resizeRule"][value="px"]').checked = true);
+
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
@@ -220,13 +258,9 @@
       handleFiles(e.dataTransfer.files);
     });
     fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-
-    // PSD生成ボタン
     generateBtn.addEventListener('click', generatePSD);
 
-
     // --- 関数群 ---
-
     function setCanvas(w, h, dpi) {
       canvasW.value = w;
       canvasH.value = h;
@@ -235,11 +269,9 @@
     }
 
     function updateTemplateDropdown() {
-      // 既存のカスタムを削除
       Array.from(templateSelect.options).forEach(opt => {
         if(opt.value.startsWith('custom_')) opt.remove();
       });
-      // 追加
       Object.keys(savedTemplates).forEach(key => {
         const opt = document.createElement('option');
         opt.value = 'custom_' + key;
@@ -250,11 +282,7 @@
 
     async function handleFiles(files) {
       for (const file of files) {
-        if (!file.type.match('image.*')) {
-          alert(`${file.name} は対応していない形式だ。弾いておくぞ。`);
-          continue;
-        }
-        
+        if (!file.type.match('image.*')) continue;
         try {
           const imgObj = await readImage(file);
           imagesData.push({
@@ -265,7 +293,7 @@
             height: imgObj.height
           });
         } catch (e) {
-          alert(`${file.name} の読み込みに失敗した。データが破損しているかもしれない。`);
+          console.error(e);
         }
       }
       renderList();
@@ -288,7 +316,6 @@
     function renderList() {
       imageList.innerHTML = '';
       imageCount.textContent = imagesData.length;
-      
       imagesData.forEach((data, index) => {
         const li = document.createElement('li');
         li.className = 'flex items-center gap-4 bg-gray-50 p-3 rounded border border-gray-200 cursor-move hover:bg-gray-100 transition-colors';
@@ -309,7 +336,6 @@
       });
     }
 
-    // グローバルスコープから呼べるようにする
     window.removeImage = function(index) {
       imagesData.splice(index, 1);
       renderList();
@@ -321,7 +347,6 @@
         return;
       }
 
-      // 生成中はボタンを無効化
       generateBtn.disabled = true;
       const originalText = generateBtn.textContent;
       generateBtn.textContent = '生成中...';
@@ -331,45 +356,74 @@
         const h = parseInt(canvasH.value);
         const dpi = parseInt(canvasDpi.value);
 
-        // 命名規則の取得
+        // 新機能の設定値を取得
+        const layerCount = parseInt(layerCountInput.value) || 0;
+        const isCenter = alignCenterCheckbox.checked;
+        const resizeRule = document.querySelector('input[name="resizeRule"]:checked').value;
+
         const folderRule = document.querySelector('input[name="folderRule"]:checked').value;
         const folderPrefix = document.getElementById('folderCustomPrefix').value;
         const imageRule = document.querySelector('input[name="imageRule"]:checked').value;
 
         const psdChildren = [];
-
-        // 並び順：表示が上のものを「一番上（前面）」のレイヤーにするため、配列の逆から処理する。
-        // ag-psdはchildren配列の先頭が背面のレイヤーとなる。
         const reversedData = [...imagesData].reverse();
 
         reversedData.forEach((data, reversedIndex) => {
-          // 元の並び順としてのインデックス（連番用）
           const displayIndex = imagesData.length - reversedIndex; 
           const fileNameWithoutExt = data.name.substring(0, data.name.lastIndexOf('.')) || data.name;
 
-          // フォルダ名決定
           let fName = '';
           if (folderRule === 'filename') fName = fileNameWithoutExt;
           else if (folderRule === 'sequential') fName = String(displayIndex);
           else fName = folderPrefix + displayIndex.toString().padStart(3, '0');
 
-          // 画像レイヤー名決定
           let iName = '';
           if (imageRule === 'filename') iName = fileNameWithoutExt;
           else if (imageRule === 'static') iName = '画像';
           else if (imageRule === 'sameAsFolder') iName = fName;
 
-          // 画像をキャンバスに描画 (センタリングなどの処理はせず左上に配置)
+          // ▼ 新機能：サイズの算出
+          let drawW = data.width;
+          let drawH = data.height;
+
+          if (resizeRule === 'scale') {
+            const scale = (parseInt(resizeScaleInput.value) || 100) / 100;
+            drawW = data.width * scale;
+            drawH = data.height * scale;
+          } else if (resizeRule === 'px') {
+            drawW = parseInt(resizePxWInput.value) || data.width;
+            drawH = parseInt(resizePxHInput.value) || data.height;
+          }
+
+          // ▼ 新機能：座標（中央揃え）の算出
+          let drawX = 0;
+          let drawY = 0;
+          if (isCenter) {
+            drawX = (w - drawW) / 2;
+            drawY = (h - drawH) / 2;
+          }
+
+          // 画像の描画
           const canvas = document.createElement('canvas');
           canvas.width = w;
           canvas.height = h;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(data.img, 0, 0);
+          ctx.drawImage(data.img, drawX, drawY, drawW, drawH);
 
-          // 仕様書通りの構造
+          // ▼ 新機能：空レイヤーの動的生成
+          // ag-psdは配列の先頭が「背面（下）」のレイヤーになる。
+          // レイヤー1が上で、レイヤー2が下になるように配置する。
+          const emptyLayers = [];
+          for (let i = layerCount; i >= 1; i--) {
+            emptyLayers.push({
+              name: `レイヤー${i}`,
+              canvas: document.createElement('canvas')
+            });
+          }
+
           const group = {
             name: fName,
-            opened: true, // フォルダを開いた状態にするか
+            opened: true,
             children: [
               {
                 name: iName,
@@ -378,10 +432,7 @@
               {
                 name: "フォルダ",
                 opened: false,
-                children: [
-                  { name: "レイヤー②", canvas: document.createElement('canvas') }, // ダミーキャンバスを入れないとクリスタ等で空レイヤーが認識されない場合がある
-                  { name: "レイヤー①", canvas: document.createElement('canvas') }
-                ]
+                children: emptyLayers
               }
             ]
           };
@@ -389,7 +440,6 @@
           psdChildren.push(group);
         });
 
-        // PSDオブジェクトの構築
         const psd = {
           width: w,
           height: h,
@@ -397,11 +447,9 @@
           children: psdChildren
         };
 
-        // ag-psdでバイナリ化
         const buffer = agPsd.writePsd(psd);
         const blob = new Blob([buffer], { type: 'application/octet-stream' });
         
-        // ダウンロード実行
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -413,17 +461,14 @@
 
       } catch (error) {
         console.error(error);
-        // エラーの内容を具体的に表示させる
-         alert('エラー発生: ' + error.message + '\nスタックトレース: ' + error.stack);
+        alert('エラー発生: ' + error.message);
       } finally {
         generateBtn.disabled = false;
         generateBtn.textContent = originalText;
       }
     }
 
-    // 起動
     init();
-
   </script>
 </body>
 </html>
