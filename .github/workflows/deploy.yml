@@ -21,19 +21,18 @@ jobs:
         with:
           node-version: 20
 
-      # ここで「tools/AnimPSD」に移動して作業します
+      # 【修正】ここを確実な階層移動にします
       - name: Install and Build
         run: |
           cd tools/AnimPSD
           npm install
           npm run build
 
-      # ビルド後のdistフォルダをGitHub Pagesが認識する場所へ移動
-      - name: Upload pages artifact
+      # 【修正】ビルドされたdistフォルダを直接指定します
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'tools/AnimPSD/dist'
 
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
