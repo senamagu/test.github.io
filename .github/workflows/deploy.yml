@@ -2,7 +2,7 @@ name: Deploy PSD Generator
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
@@ -10,31 +10,37 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-deploy:
-  environment:
-  name: github-pages
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 【最重要】ここでフォルダを移動してビルドする
-      - name: Install and Build
-        run: |
+      - run: |
           cd tools/AnimPSD
           npm install
           npm run build
 
-      # 【最重要】ビルド結果（dist）をアップロードする
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'tools/AnimPSD/dist'
+          path: tools/AnimPSD/dist
 
-      - name: Deploy to GitHub Pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
         uses: actions/deploy-pages@v4
