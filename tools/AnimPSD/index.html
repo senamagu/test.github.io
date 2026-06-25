@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PSDテンプレート生成ツール</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <script src="https://unpkg.com/ag-psd@14.4.1/dist/bundle.js"></script>
+
+  <style>
+    /* iPad・スマホでのタッチ操作最適化 */
+    .sortable-ghost { opacity: 0.4; }
+    .drag-active { border-color: #3b82f6 !important; background-color: #eff6ff !important; }
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans p-4 md:p-8">
+
+  <div class="max-w-6xl mx-auto space-y-6">
+    <header class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+      <h1 class="text-2xl font-bold text-gray-700">PSD Generator v1.0</h1>
+      <button id="generateBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors text-lg">
+        PSDを生成する
+      </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm space-y-6 h-fit">
+        
+        <section>
+          <h2 class="text-lg font-bold border-b pb-2 mb-4">キャンバス設定</h2>
+          <div class="mb-4">
+            <label class="block text-sm text-gray-600 mb-1">テンプレート読込</label>
+            <select id="templateSelect" class="w-full border rounded p-2 bg-gray-50">
+              <option value="default">デフォルト (1920x1080)</option>
+              <option value="video">動画用テンプレ (2500x1575)</option>
+              <option value="custom" disabled>カスタム (保存されたテンプレ)</option>
+            </select>
+          </div>
+          
+          <div class="flex items-center space-x-2 mb-4">
+            <input type="checkbox" id="aspectLock" class="w-5 h-5 text-blue-600 rounded">
+            <label for="aspectLock" class="text-sm font-bold">比率を固定する</label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">幅 (px)</label>
+              <input type="number" id="canvasW" value="1920" class="w-full border rounded p-2 text-right">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">高さ (px)</label>
+              <input type="number" id="canvasH" value="1080" class="w-full border rounded p-2 text-right">
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm text-gray-600 mb-1">DPI</label>
+              <input type="number" id="canvasDpi" value="350" class="w-full border rounded p-2 text-right">
+            </div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <input type="text" id="saveTemplateName" placeholder="テンプレ名" class="flex-1 border rounded p-2 text-sm">
+            <button id="saveTemplateBtn" class="bg-gray-800 text-white px-4 py-2 rounded text-sm font-bold">保存</button>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold border-b pb-2 mb-4">命名設定</h2>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-2">フォルダ命名</label>
+            <div class="space-y-2 text-sm">
+              <label class="flex items-center"><input type="radio" name="folderRule" value="filename" checked class="mr-2"> 元画像ファイル名</label>
+              <label class="flex items-center"><input type="radio" name="folderRule" value="sequential" class="mr-2"> 連番 (1, 2, 3...)</label>
+              <label class="flex items-center">
+                <input type="radio" name="folderRule" value="custom" class="mr-2"> 任意文字列＋連番
+              </label>
+              <input type="text" id="folderCustomPrefix" placeholder="例: cut_" class="w-full border rounded p-2 mt-1 hidden text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">画像レイヤー命名</label>
+            <div class="space-y-2 text-sm">
+              <label class="flex items-center"><input type="radio" name="imageRule" value="filename" checked class="mr-2"> 元画像ファイル名</label>
+              <label class="flex items-center"><input type="radio" name="imageRule" value="static" class="mr-2"> 「画像」</label>
+              <label class="flex items-center"><input type="radio" name="imageRule" value="sameAsFolder" class="mr-2"> フォルダ名と同じ</label>
+            </div>
+          </div>
+        </section>
+
+        <section>
+           <h2 class="text-lg font-bold border-b pb-2 mb-4 text-gray-400">内部構造 (将来拡張用)</h2>
+           <div class="text-xs text-gray-500 space-y-1">
+             <p>・親フォルダ (動的命名)</p>
+             <p class="pl-4">└ フォルダ (固定)</p>
+             <p class="pl-8">├ レイヤー①</p>
+             <p class="pl-8">└ レイヤー②</p>
+             <p class="pl-4">└ 画像レイヤー (動的命名)</p>
+           </div>
+        </section>
+
+      </div>
+
+      <div class="lg:col-span-2 space-y-4">
+        
+        <div id="dropZone" class="border-4 border-dashed border-gray-300 rounded-xl p-10 text-center bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+          <div class="text-gray-500 pointer-events-none">
+            <svg class="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <p class="text-lg font-bold mb-2">ここをタップして画像を選択</p>
+            <p class="text-sm">または、画像をドラッグ＆ドロップ (複数可)</p>
+            <p class="text-xs mt-2 text-gray-400">対応: PNG, JPG, WEBP</p>
+          </div>
+          <input type="file" id="fileInput" multiple accept="image/png, image/jpeg, image/webp" class="hidden">
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-4">
+          <div class="flex justify-between items-center border-b pb-2 mb-4">
+            <h3 class="font-bold">追加された画像 (<span id="imageCount">0</span>枚)</h3>
+            <span class="text-xs text-gray-500">ドラッグで並び替え可能 (上が前面になります)</span>
+          </div>
+          <ul id="imageList" class="space-y-2 min-h-[200px]">
+            </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 状態管理 ---
+    let imagesData = [];
+    let savedTemplates = JSON.parse(localStorage.getItem('psdTemplates')) || {};
+    let currentRatio = 1920 / 1080;
+
+    // --- DOM要素取得 ---
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const imageList = document.getElementById('imageList');
+    const imageCount = document.getElementById('imageCount');
+    const generateBtn = document.getElementById('generateBtn');
+    
+    // 設定関連DOM
+    const canvasW = document.getElementById('canvasW');
+    const canvasH = document.getElementById('canvasH');
+    const canvasDpi = document.getElementById('canvasDpi');
+    const aspectLock = document.getElementById('aspectLock');
+    const templateSelect = document.getElementById('templateSelect');
+    
+    // --- 初期化処理 ---
+    function init() {
+      // カスタムテンプレのロード
+      updateTemplateDropdown();
+
+      // SortableJSの初期化 (iPad対応)
+      new Sortable(imageList, {
+        animation: 150,
+        delayOnTouchOnly: true, // スマホ等でのスクロール誤爆防止
+        delay: 150,
+        onEnd: (evt) => {
+          // 配列の順序も同期
+          const movedItem = imagesData.splice(evt.oldIndex, 1)[0];
+          imagesData.splice(evt.newIndex, 0, movedItem);
+        }
+      });
+    }
+
+    // --- イベントリスナー設定 ---
+    
+    // 比率固定の計算
+    aspectLock.addEventListener('change', (e) => {
+      if(e.target.checked) currentRatio = Number(canvasW.value) / Number(canvasH.value);
+    });
+    canvasW.addEventListener('input', (e) => {
+      if(aspectLock.checked) canvasH.value = Math.round(Number(e.target.value) / currentRatio);
+    });
+    canvasH.addEventListener('input', (e) => {
+      if(aspectLock.checked) canvasW.value = Math.round(Number(e.target.value) * currentRatio);
+    });
+
+    // テンプレ関連
+    templateSelect.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'default') setCanvas(1920, 1080, 350);
+      else if (val === 'video') setCanvas(2500, 1575, 350);
+      else if (val.startsWith('custom_')) {
+        const t = savedTemplates[val.replace('custom_', '')];
+        if(t) setCanvas(t.w, t.h, t.dpi);
+      }
+    });
+
+    document.getElementById('saveTemplateBtn').addEventListener('click', () => {
+      const name = document.getElementById('saveTemplateName').value;
+      if (!name) return alert('テンプレート名を入力してくれ！');
+      savedTemplates[name] = { w: canvasW.value, h: canvasH.value, dpi: canvasDpi.value };
+      localStorage.setItem('psdTemplates', JSON.stringify(savedTemplates));
+      updateTemplateDropdown();
+      document.getElementById('saveTemplateName').value = '';
+      alert('テンプレートを保存したぞ！');
+    });
+
+    // 命名設定のトグル
+    document.getElementsByName('folderRule').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const prefixInput = document.getElementById('folderCustomPrefix');
+        e.target.value === 'custom' ? prefixInput.classList.remove('hidden') : prefixInput.classList.add('hidden');
+      });
+    });
+
+    // ファイルドラッグ＆ドロップ操作
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault(); dropZone.classList.remove('drag-active');
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+    // PSD生成ボタン
+    generateBtn.addEventListener('click', generatePSD);
+
+
+    // --- 関数群 ---
+
+    function setCanvas(w, h, dpi) {
+      canvasW.value = w;
+      canvasH.value = h;
+      canvasDpi.value = dpi;
+      if(aspectLock.checked) currentRatio = w / h;
+    }
+
+    function updateTemplateDropdown() {
+      // 既存のカスタムを削除
+      Array.from(templateSelect.options).forEach(opt => {
+        if(opt.value.startsWith('custom_')) opt.remove();
+      });
+      // 追加
+      Object.keys(savedTemplates).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = 'custom_' + key;
+        opt.textContent = `${key} (${savedTemplates[key].w}x${savedTemplates[key].h})`;
+        templateSelect.appendChild(opt);
+      });
+    }
+
+    async function handleFiles(files) {
+      for (const file of files) {
+        if (!file.type.match('image.*')) {
+          alert(`${file.name} は対応していない形式だ。弾いておくぞ。`);
+          continue;
+        }
+        
+        try {
+          const imgObj = await readImage(file);
+          imagesData.push({
+            file: file,
+            name: file.name,
+            img: imgObj.img,
+            width: imgObj.width,
+            height: imgObj.height
+          });
+        } catch (e) {
+          alert(`${file.name} の読み込みに失敗した。データが破損しているかもしれない。`);
+        }
+      }
+      renderList();
+    }
+
+    function readImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => resolve({ img: img, width: img.width, height: img.height });
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderList() {
+      imageList.innerHTML = '';
+      imageCount.textContent = imagesData.length;
+      
+      imagesData.forEach((data, index) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center gap-4 bg-gray-50 p-3 rounded border border-gray-200 cursor-move hover:bg-gray-100 transition-colors';
+        li.innerHTML = `
+          <div class="text-gray-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </div>
+          <img src="${data.img.src}" class="w-16 h-16 object-cover rounded shadow-sm">
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold truncate text-gray-700">${data.name}</p>
+            <p class="text-xs text-gray-500">${data.width} × ${data.height} px</p>
+          </div>
+          <button onclick="removeImage(${index})" class="text-red-500 hover:bg-red-50 p-2 rounded">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        `;
+        imageList.appendChild(li);
+      });
+    }
+
+    // グローバルスコープから呼べるようにする
+    window.removeImage = function(index) {
+      imagesData.splice(index, 1);
+      renderList();
+    }
+
+    async function generatePSD() {
+      if (imagesData.length === 0) {
+        alert('まずは画像を追加してくれ！');
+        return;
+      }
+
+      // 生成中はボタンを無効化
+      generateBtn.disabled = true;
+      const originalText = generateBtn.textContent;
+      generateBtn.textContent = '生成中...';
+
+      try {
+        const w = parseInt(canvasW.value);
+        const h = parseInt(canvasH.value);
+        const dpi = parseInt(canvasDpi.value);
+
+        // 命名規則の取得
+        const folderRule = document.querySelector('input[name="folderRule"]:checked').value;
+        const folderPrefix = document.getElementById('folderCustomPrefix').value;
+        const imageRule = document.querySelector('input[name="imageRule"]:checked').value;
+
+        const psdChildren = [];
+
+        // 並び順：表示が上のものを「一番上（前面）」のレイヤーにするため、配列の逆から処理する。
+        // ag-psdはchildren配列の先頭が背面のレイヤーとなる。
+        const reversedData = [...imagesData].reverse();
+
+        reversedData.forEach((data, reversedIndex) => {
+          // 元の並び順としてのインデックス（連番用）
+          const displayIndex = imagesData.length - reversedIndex; 
+          const fileNameWithoutExt = data.name.substring(0, data.name.lastIndexOf('.')) || data.name;
+
+          // フォルダ名決定
+          let fName = '';
+          if (folderRule === 'filename') fName = fileNameWithoutExt;
+          else if (folderRule === 'sequential') fName = String(displayIndex);
+          else fName = folderPrefix + displayIndex.toString().padStart(3, '0');
+
+          // 画像レイヤー名決定
+          let iName = '';
+          if (imageRule === 'filename') iName = fileNameWithoutExt;
+          else if (imageRule === 'static') iName = '画像';
+          else if (imageRule === 'sameAsFolder') iName = fName;
+
+          // 画像をキャンバスに描画 (センタリングなどの処理はせず左上に配置)
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(data.img, 0, 0);
+
+          // 仕様書通りの構造
+          const group = {
+            name: fName,
+            opened: true, // フォルダを開いた状態にするか
+            children: [
+              {
+                name: iName,
+                canvas: canvas
+              },
+              {
+                name: "フォルダ",
+                opened: false,
+                children: [
+                  { name: "レイヤー②", canvas: document.createElement('canvas') }, // ダミーキャンバスを入れないとクリスタ等で空レイヤーが認識されない場合がある
+                  { name: "レイヤー①", canvas: document.createElement('canvas') }
+                ]
+              }
+            ]
+          };
+          
+          psdChildren.push(group);
+        });
+
+        // PSDオブジェクトの構築
+        const psd = {
+          width: w,
+          height: h,
+          resolution: dpi,
+          children: psdChildren
+        };
+
+        // ag-psdでバイナリ化
+        const buffer = agPsd.writePsd(psd);
+        const blob = new Blob([buffer], { type: 'application/octet-stream' });
+        
+        // ダウンロード実行
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `template_${Date.now()}.psd`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+      } catch (error) {
+        console.error(error);
+        alert('すまん、PSD生成中にエラーが発生した。コンソールを確認してくれ。');
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = originalText;
+      }
+    }
+
+    // 起動
+    init();
+
+  </script>
+</body>
+</html>
