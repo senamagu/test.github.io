@@ -413,7 +413,8 @@
 
       } catch (error) {
         console.error(error);
-        alert('すまん、PSD生成中にエラーが発生した。コンソールを確認してくれ。');
+        // エラーの内容を具体的に表示させる
+         alert('エラー発生: ' + error.message + '\nスタックトレース: ' + error.stack);
       } finally {
         generateBtn.disabled = false;
         generateBtn.textContent = originalText;
