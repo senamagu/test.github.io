@@ -63,7 +63,7 @@
 
     /* Markdown preview styles */
     .preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 { margin-top: 0.5em; margin-bottom: 0.5em; }
-    .preview blockquote { border-left: 4px solid var(--border-color); margin: 0; padding-left: 1em; color: gray; }
+    .preview blockquote { border-left: 4px solid var(--border-color); margin: 0; padding-left: 1em; color: #777; }
 
     @media (max-width: 768px) {
       .main-area { flex-direction: column; }
@@ -82,9 +82,10 @@
       <button onclick="formatCmd('italic')" title="イタリック"><i>I</i></button>
       <button onclick="formatCmd('underline')" title="下線"><u>U</u></button>
       <button onclick="formatCmd('strikeThrough')" title="打ち消し"><s>S</s></button>
+      <button onclick="removeFormatCmd()" title="選択範囲のスタイルをリセット">🚫 リセット</button>
     </div>
 
-    <!-- 色指定 (カラーピッカー + ハッシュタグHEX入力) -->
+    <!-- 色指定 -->
     <div class="group">
       <label title="文字色">
         <input type="color" id="textColorPicker" onchange="syncColor(this.value, 'color')">
@@ -98,7 +99,7 @@
 
     <!-- サイズ・不透明度の自由入力 -->
     <div class="group">
-      <input type="text" id="fontSizeInput" list="fontSizeList" placeholder="サイズ(例:16px)" style="width: 110px;" onchange="applyStyle('font-size', this.value)">
+      <input type="text" id="fontSizeInput" list="fontSizeList" placeholder="サイズ(16px等)" style="width: 100px;" onchange="applyStyle('font-size', this.value)">
       <datalist id="fontSizeList">
         <option value="12px"></option>
         <option value="16px"></option>
@@ -106,7 +107,7 @@
         <option value="24px"></option>
       </datalist>
 
-      <input type="text" id="opacityInput" placeholder="不透明度(0~1)" style="width: 100px;" onchange="applyStyle('opacity', this.value)">
+      <input type="text" id="opacityInput" placeholder="不透明度(0~1)" style="width: 90px;" onchange="applyStyle('opacity', this.value)">
     </div>
 
     <div class="group">
@@ -180,7 +181,7 @@
   <!-- Bottom Output Area -->
   <div class="bottom-area">
     <div class="bottom-toolbar">
-      <span>HTML出力 (Markdown変換済)</span>
+      <span>HTML出力 (Markdown維持)</span>
       <span id="warnings"></span>
       <div>
         <button onclick="formatHTML()">✨ 整形</button>
@@ -205,6 +206,27 @@
     let historyStack = [];
     let historyIndex = -1;
     const MAX_HISTORY = 100;
+
+    // ▼ 選択範囲(Selection)のバックアップ機能 ▼
+    let savedRange = null;
+    document.addEventListener('selectionchange', () => {
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        // エディタ内の選択範囲ならバックアップを取る
+        if (editor.contains(range.commonAncestorContainer) || editor === range.commonAncestorContainer) {
+          savedRange = range.cloneRange();
+        }
+      }
+    });
+
+    function restoreSelection() {
+      const selection = window.getSelection();
+      if ((!selection.rangeCount || selection.isCollapsed) && savedRange) {
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+      }
+    }
 
     function saveHistory() {
       const currentHtml = editor.innerHTML;
@@ -234,9 +256,7 @@
 
     window.onload = () => {
       const saved = localStorage.getItem('privatter_designer_save');
-      if (saved) {
-        editor.innerHTML = saved;
-      }
+      if (saved) editor.innerHTML = saved;
       saveHistory();
       syncToHTML();
       if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
@@ -247,6 +267,7 @@
     editor.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
+        restoreSelection();
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
         const range = selection.getRangeAt(0);
@@ -269,27 +290,22 @@
     editor.addEventListener('keyup', updateInspectorDisplay);
 
     htmlEditor.addEventListener('input', () => {
-      editor.innerHTML = htmlEditor.value; // 手動でHTMLを編集した場合の反映
+      editor.innerHTML = htmlEditor.value;
       updatePreview(htmlEditor.value);
       validateContent(htmlEditor.value);
       saveHistory();
     });
 
-    // ▼ 今回の目玉：Markdownパース処理 ▼
+    // ▼ Markdownパース (プレビュー用のみ) ▼
     function parseMarkdown(htmlStr) {
       let res = htmlStr;
-      
-      // 太字 (**テキスト**)
       res = res.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-      // 打ち消し (~~テキスト~~)
       res = res.replace(/~~(.*?)~~/g, '<del>$1</del>');
 
-      // 行単位のMarkdown（見出し・引用）
       let lines = res.split('\n');
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
         
-        // 装飾用タグ越しに見出し記号があるケースを想定してパース
         const headingMatch = line.match(/^(<[^>]+>)*(#{1,6})\s+(.*?)(<\/[^>]+>)*$/);
         if (headingMatch) {
           const tagsStart = headingMatch[1] || '';
@@ -300,12 +316,14 @@
           continue;
         }
         
-        const quoteMatch = line.match(/^(<[^>]+>)*(>|&gt;)\s+(.*?)(<\/[^>]+>)*$/);
+        // 引用パース (> または &gt; または 全角＞ に対応)
+        const quoteMatch = line.match(/^(<[^>]+>)*(>|&gt;|＞)\s?(.*?)(<\/[^>]+>)*$/);
         if (quoteMatch) {
           const tagsStart = quoteMatch[1] || '';
           const content = quoteMatch[3];
           const tagsEnd = quoteMatch[4] || '';
-          lines[i] = `${tagsStart}<blockquote>${content}</blockquote>${tagsEnd}`;
+          // プレビュー用にインラインスタイルを当てる
+          lines[i] = `${tagsStart}<blockquote style="border-left: 4px solid var(--border-color); margin: 0; padding-left: 1em; color: #777;">${content}</blockquote>${tagsEnd}`;
         }
       }
       return lines.join('\n');
@@ -314,51 +332,99 @@
     function syncToHTML() {
       let html = editor.innerHTML;
       
-      // MarkdownをHTMLタグに変換
-      let processedHTML = parseMarkdown(html);
+      // HTML出力はMarkdownを維持したまま
+      htmlEditor.value = html;
 
-      htmlEditor.value = processedHTML;
-      updatePreview(processedHTML);
-      validateContent(processedHTML);
+      // プレビューにはMarkdownをパースしたHTMLを適用
+      let previewHTML = parseMarkdown(html);
+      preview.innerHTML = previewHTML;
+
+      validateContent(html);
     }
 
-    function updatePreview(html) {
-      preview.innerHTML = html;
-    }
-
-    // フォーマット & スタイル適用
     function formatCmd(cmd) {
+      restoreSelection();
       document.execCommand(cmd, false, null);
       cleanEmptySpans();
       syncToHTML();
       saveHistory();
+      editor.focus();
     }
 
+    // ▼ スタイル適用（重複防止 ＆ 最新優先） ▼
     function applyStyle(property, value) {
       if(!value) return;
+      restoreSelection();
+      
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
-      
-      const range = selection.getRangeAt(0);
-      let parent = range.commonAncestorContainer;
-      if (parent.nodeType === 3) parent = parent.parentNode;
 
-      if (parent.tagName === 'SPAN' && parent.textContent === range.toString()) {
-        parent.style[property] = value;
-      } else {
-        const span = document.createElement('span');
-        span.style[property] = value;
-        span.appendChild(range.extractContents());
-        range.insertNode(span);
-      }
+      const range = selection.getRangeAt(0);
+      const content = range.extractContents();
+      
+      // 抜き出した要素から同じプロパティを消去 (タグ重複・競合防止)
+      const tempDiv = document.createElement('div');
+      tempDiv.appendChild(content);
+      const allElements = tempDiv.querySelectorAll('*');
+      allElements.forEach(el => {
+        if (el.style) el.style[property] = '';
+      });
+
+      // 新しいSpanで囲んで最後に適用
+      const span = document.createElement('span');
+      span.style[property] = value;
+      
+      const frag = document.createDocumentFragment();
+      while(tempDiv.firstChild) frag.appendChild(tempDiv.firstChild);
+      span.appendChild(frag);
+      
+      range.insertNode(span);
+
+      // 適用した文字を選択状態に戻す（連続して変更できるように）
+      const newRange = document.createRange();
+      newRange.selectNodeContents(span);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+      
+      editor.focus();
       cleanEmptySpans();
       syncToHTML();
       saveHistory();
     }
 
-    // 色のハッシュタグ(HEX)入力をカラーピッカーと同期させる
+    // ▼ スタイルリセット機能 ▼
+    function removeFormatCmd() {
+      restoreSelection();
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      // ブラウザ標準のフォーマット解除
+      document.execCommand('removeFormat', false, null);
+
+      // インラインCSSを手動で完全に剥がす
+      const range = selection.getRangeAt(0);
+      const content = range.extractContents();
+      
+      const tempDiv = document.createElement('div');
+      tempDiv.appendChild(content);
+      
+      const allElements = tempDiv.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.removeAttribute('style');
+      });
+
+      const frag = document.createDocumentFragment();
+      while(tempDiv.firstChild) frag.appendChild(tempDiv.firstChild);
+      range.insertNode(frag);
+
+      editor.focus();
+      cleanEmptySpans();
+      syncToHTML();
+      saveHistory();
+    }
+
     function syncColor(val, type) {
-      if (val && val[0] !== '#') val = '#' + val; // #忘れを補完
+      if (val && val[0] !== '#') val = '#' + val; 
       const isValidHex = /^#[0-9A-F]{6}$/i.test(val);
       
       if (type === 'color') {
@@ -373,6 +439,7 @@
 
     function insertBlock(type) {
       if (!type) return;
+      restoreSelection();
       let html = '';
       if (type === 'details') html = '<details><summary>詳細</summary><p>テキスト</p></details>';
       else if (type === 'ruby') html = '<ruby>漢字<rt>かんじ</rt></ruby>';
@@ -388,6 +455,7 @@
 
     function insertMarkdown(type) {
       if (!type) return;
+      restoreSelection();
       let text = '';
       switch(type) {
         case 'bold': text = '**太字**'; break;
@@ -419,7 +487,6 @@
           }
         }
       }
-      
       const uniqueErrors = [...new Set(errors)];
       warningsEl.textContent = uniqueErrors.length > 0 ? "⚠️ 警告: " + uniqueErrors.join(', ') : "✅ 問題なし";
     }
@@ -445,8 +512,8 @@
       let html = htmlEditor.value;
       html = html.replace(/></g, '>\n<');
       htmlEditor.value = html;
-      editor.innerHTML = html; // エディタ側にも逆反映
-      updatePreview(html);
+      editor.innerHTML = html; 
+      syncToHTML();
       saveHistory();
     }
 
@@ -482,6 +549,7 @@
 
     function updateInspectorDisplay() {
       if (inspector.style.display !== 'block') return;
+      restoreSelection();
       const selection = window.getSelection();
       if (!selection.rangeCount) return;
       
