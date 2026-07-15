@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privatter+ Designer</title>
+<style>
+  :root {
+    --bg-main: #f5f5f5;
+    --bg-panel: #ffffff;
+    --border-color: #ddd;
+    --text-main: #333;
+    --text-muted: #666;
+    --primary: #4a90e2;
+    --primary-hover: #357abd;
+    --danger: #e74c3c;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --bg-main: #1e1e1e;
+    --bg-panel: #2d2d2d;
+    --border-color: #444;
+    --text-main: #e0e0e0;
+    --text-muted: #aaa;
+    --primary: #5c9ce6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-family);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  h1 { font-size: 1.2rem; font-weight: 600; }
+
+  .header-controls button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: 5px;
+  }
+
+  .header-controls button:hover { background: var(--bg-main); }
+
+  #toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  #toolbar button, #toolbar select, #toolbar input[type="color"] {
+    padding: 6px 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-panel);
+    color: var(--text-main);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  #toolbar button:hover { background: var(--bg-main); }
+
+  #workspace {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+  }
+
+  .panel-header {
+    padding: 8px 10px;
+    background: var(--bg-main);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #editor-container { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+  #preview-container { flex: 1; min-width: 200px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
+  #inspector-container { width: 250px; border-left: 1px solid var(--border-color); font-size: 0.9rem; }
+
+  .resizer {
+    width: 5px;
+    background: var(--border-color);
+    cursor: col-resize;
+    z-index: 10;
+  }
+  .resizer:hover { background: var(--primary); }
+
+  #visual-editor, #html-editor, #preview-area {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    outline: none;
+  }
+
+  #html-editor {
+    display: none;
+    font-family: monospace;
+    white-space: pre-wrap;
+    background: var(--bg-main);
+    border: none;
+    resize: none;
+    color: var(--text-main);
+  }
+
+  /* Preview Specific styling closely matching Privatter+ */
+  #preview-area {
+    background: var(--bg-panel);
+    line-height: 1.6;
+    word-break: break-word;
+  }
+
+  #output-container {
+    height: 150px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-panel);
+    display: flex;
+    flex-direction: column;
+  }
+
+  #html-output {
+    flex: 1;
+    width: 100%;
+    border: none;
+    padding: 10px;
+    font-family: monospace;
+    background: var(--bg-main);
+    color: var(--text-main);
+    resize: none;
+  }
+
+  .warnings {
+    padding: 5px 10px;
+    background: #fff3cd;
+    color: #856404;
+    font-size: 0.85rem;
+    display: none;
+  }
+  [data-theme="dark"] .warnings { background: #5c4b18; color: #ffeb99; }
+
+  /* Inspector Styles */
+  .inspector-group { padding: 10px; border-bottom: 1px solid var(--border-color); }
+  .inspector-group label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.8rem;}
+  .inspector-group input, .inspector-group select { width: 100%; padding: 4px; }
+
+  @media (max-width: 768px) {
+    #workspace { flex-direction: column; }
+    .resizer { height: 5px; width: 100%; cursor: row-resize; }
+    #preview-container, #inspector-container { border-left: none; border-top: 1px solid var(--border-color); }
+    #inspector-container { width: 100%; height: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Privatter+ Designer</h1>
+  <div class="header-controls">
+    <button id="theme-toggle">🌓 テーマ切替</button>
+    <button id="btn-format">✨ HTML整形</button>
+    <button id="btn-clear">🗑️ クリア</button>
+  </div>
+</header>
+
+<div id="toolbar">
+  <button onclick="execCmd('bold')"><b>B</b></button>
+  <button onclick="execCmd('italic')"><i>I</i></button>
+  <button onclick="execCmd('underline')"><u>U</u></button>
+  <button onclick="execCmd('strikeThrough')"><del>S</del></button>
+  <input type="color" id="color-picker" title="文字色" onchange="execCmd('foreColor', this.value)">
+  <input type="color" id="bg-color-picker" title="背景色" onchange="execCmd('hiliteColor', this.value)">
+  <select onchange="execCmd('fontSize', this.value)">
+    <option value="">サイズ</option>
+    <option value="1">極小</option>
+    <option value="3">標準</option>
+    <option value="5">大</option>
+    <option value="7">特大</option>
+  </select>
+  <button onclick="execCmd('justifyLeft')">左寄</button>
+  <button onclick="execCmd('justifyCenter')">中央</button>
+  <button onclick="execCmd('justifyRight')">右寄</button>
+  <button onclick="insertTag('div')">div</button>
+  <button onclick="insertTag('span')">span</button>
+  <button onclick="insertTag('ruby')">ruby</button>
+  <button onclick="insertTag('hr')">hr</button>
+</div>
+
+<div id="workspace">
+  <div id="editor-container" class="panel">
+    <div class="panel-header">
+      <span>エディタ</span>
+      <select id="editor-mode">
+        <option value="visual">ビジュアル</option>
+        <option value="html">HTML</option>
+      </select>
+    </div>
+    <div id="visual-editor" contenteditable="true">ここにテキストを入力してください...</div>
+    <textarea id="html-editor"></textarea>
+  </div>
+
+  <div class="resizer" id="resizer"></div>
+
+  <div id="preview-container" class="panel">
+    <div class="panel-header">プレビュー</div>
+    <div id="preview-area"></div>
+  </div>
+
+  <div id="inspector-container" class="panel">
+    <div class="panel-header">インスペクター</div>
+    <div class="inspector-group">
+      <label>選択中の要素</label>
+      <div id="inspector-tag-name">-</div>
+    </div>
+    <div class="inspector-group">
+      <label>文字色 (color)</label>
+      <input type="text" id="insp-color" placeholder="例: #ff0000">
+    </div>
+    <div class="inspector-group">
+      <label>背景色 (background-color)</label>
+      <input type="text" id="insp-bg" placeholder="例: #000000">
+    </div>
+    <div class="inspector-group">
+      <label>フォントサイズ</label>
+      <input type="text" id="insp-size" placeholder="例: 1.2em">
+    </div>
+    <div class="inspector-group">
+      <label>不透明度 (opacity)</label>
+      <input type="number" id="insp-opacity" step="0.1" min="0" max="1">
+    </div>
+  </div>
+</div>
+
+<div id="output-container">
+  <div class="panel-header">
+    <span>HTML出力</span>
+    <button id="btn-copy">📋 コピー</button>
+  </div>
+  <div id="warnings" class="warnings"></div>
+  <textarea id="html-output" readonly></textarea>
+</div>
+
+<script>
+  // --- Constants & Config ---
+  const ALLOWED_TAGS = ['DIV','SPAN','P','DETAILS','SUMMARY','RUBY','RT','RP','RB','UL','LI','OL','B','I','STRONG','EM','U','DEL','HR', '#text'];
+  const ALLOWED_CSS = ['align-items','background','background-color','background-image','background-position','background-repeat','background-size','border','border-bottom','border-left','border-radius','border-right','border-top','bottom','color','display','flex-shrink','font-family','font-size','font-style','font-weight','height','letter-spacing','line-height','margin','margin-bottom','margin-left','margin-right','margin-top','max-width','min-width','opacity','overflow','overflow-x','overflow-y','padding','padding-bottom','padding-left','padding-right','padding-top','position','right','text-align','text-justify','width','word-break','word-wrap','z-index'];
+
+  // --- DOM Elements ---
+  const visualEditor = document.getElementById('visual-editor');
+  const htmlEditor = document.getElementById('html-editor');
+  const previewArea = document.getElementById('preview-area');
+  const htmlOutput = document.getElementById('html-output');
+  const editorMode = document.getElementById('editor-mode');
+  const warningsDiv = document.getElementById('warnings');
+  const themeToggle = document.getElementById('theme-toggle');
+
+  // --- Initialization ---
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedHtml = localStorage.getItem('privatter_html') || '<p>ここにテキストを入力してください...</p>';
+    visualEditor.innerHTML = savedHtml;
+    updateAll(savedHtml);
+    
+    // Theme load
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.setAttribute('data-theme', 'dark');
+    }
+  });
+
+  // --- Core Update Logic ---
+  function updateAll(htmlContent) {
+    // Basic validation & formatting
+    const validationResult = validateHTML(htmlContent);
+    
+    if (validationResult.warnings.length > 0) {
+      warningsDiv.style.display = 'block';
+      warningsDiv.innerHTML = `<strong>⚠️ 警告:</strong> ${validationResult.warnings.join(', ')}`;
+    } else {
+      warningsDiv.style.display = 'none';
+    }
+
+    // Sync views
+    if (editorMode.value === 'visual') {
+      htmlEditor.value = htmlContent;
+    } else {
+      visualEditor.innerHTML = htmlContent;
+    }
+    previewArea.innerHTML = htmlContent;
+    htmlOutput.value = htmlContent;
+    
+    // Auto save
+    localStorage.setItem('privatter_html', htmlContent);
+  }
+
+  // --- Event Listeners ---
+  visualEditor.addEventListener('input', () => updateAll(visualEditor.innerHTML));
+  htmlEditor.addEventListener('input', () => updateAll(htmlEditor.value));
+
+  editorMode.addEventListener('change', (e) => {
+    if (e.target.value === 'visual') {
+      visualEditor.style.display = 'block';
+      htmlEditor.style.display = 'none';
+      visualEditor.innerHTML = htmlEditor.value;
+    } else {
+      visualEditor.style.display = 'none';
+      htmlEditor.style.display = 'block';
+      htmlEditor.value = visualEditor.innerHTML;
+    }
+  });
+
+  // --- Formatting Commands ---
+  function execCmd(command, value = null) {
+    if (editorMode.value !== 'visual') return;
+    document.execCommand(command, false, value);
+    visualEditor.focus();
+    updateAll(visualEditor.innerHTML);
+  }
+
+  function insertTag(tagName) {
+    if (editorMode.value !== 'visual') return;
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    
+    const range = selection.getRangeAt(0);
+    const selectedText = range.extractContents();
+    
+    const elem = document.createElement(tagName);
+    if(selectedText.childNodes.length === 0) {
+      elem.textContent = '新規' + tagName;
+    } else {
+      elem.appendChild(selectedText);
+    }
+    
+    range.insertNode(elem);
+    updateAll(visualEditor.innerHTML);
+  }
+
+  // --- Validation Engine ---
+  function validateHTML(htmlString) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const warnings = new Set();
+
+    function walkNode(node) {
+      if (node.nodeType === 1) { // Element Node
+        // Check Tag
+        if (!ALLOWED_TAGS.includes(node.nodeName)) {
+          warnings.add(`使用不可タグ: &lt;${node.nodeName.toLowerCase()}&gt;`);
+        }
+        // Check CSS
+        if (node.style.length > 0) {
+          for (let i = 0; i < node.style.length; i++) {
+            const prop = node.style[i];
+            if (!ALLOWED_CSS.includes(prop)) {
+              warnings.add(`使用不可CSS: ${prop}`);
+            }
+          }
+        }
+      }
+      for (const child of node.childNodes) walkNode(child);
+    }
+    walkNode(doc.body);
+    return { warnings: Array.from(warnings) };
+  }
+
+  // --- Inspector Logic ---
+  visualEditor.addEventListener('click', (e) => {
+    const target = e.target;
+    document.getElementById('inspector-tag-name').textContent = `<${target.nodeName.toLowerCase()}>`;
+    
+    const styles = window.getComputedStyle(target);
+    document.getElementById('insp-color').value = styles.color;
+    document.getElementById('insp-bg').value = styles.backgroundColor;
+    document.getElementById('insp-size').value = styles.fontSize;
+    document.getElementById('insp-opacity').value = styles.opacity;
+    
+    // Note: To make inspector fully two-way editable, we would bind input events 
+    // on these fields to apply styles back to `target`.
+  });
+
+  // --- Splitter Logic ---
+  const resizer = document.getElementById('resizer');
+  const editorContainer = document.getElementById('editor-container');
+  const previewContainer = document.getElementById('preview-container');
+  let isDragging = false;
+
+  resizer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    document.body.style.cursor = 'col-resize';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+    const newFlexBasis = ((e.clientX - workspaceRect.left) / workspaceRect.width) * 100;
+    if (newFlexBasis > 10 && newFlexBasis < 90) {
+      editorContainer.style.flex = `0 0 ${newFlexBasis}%`;
+      previewContainer.style.flex = `1 1 auto`;
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    document.body.style.cursor = 'default';
+  });
+
+  // --- Header Controls ---
+  themeToggle.addEventListener('click', () => {
+    const body = document.body;
+    const isDark = body.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      body.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    } else {
+      body.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+
+  document.getElementById('btn-copy').addEventListener('click', () => {
+    htmlOutput.select();
+    document.execCommand('copy');
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✅ コピー完了';
+    setTimeout(() => btn.textContent = '📋 コピー', 2000);
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    if(confirm('エディタの内容を全てクリアしますか？')) {
+      visualEditor.innerHTML = '';
+      htmlEditor.value = '';
+      updateAll('');
+    }
+  });
+
+  document.getElementById('btn-format').addEventListener('click', () => {
+    // 簡易的なHTMLフォーマッター (実用時はPrettier等の導入を推奨)
+    let formatted = htmlOutput.value.replace(/></g, '>\n<');
+    htmlEditor.value = formatted;
+    updateAll(formatted);
+  });
+
+</script>
+</body>
+</html>
