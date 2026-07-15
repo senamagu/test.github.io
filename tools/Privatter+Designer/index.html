@@ -33,7 +33,9 @@
     .toolbar { display: flex; flex-wrap: wrap; gap: 5px; padding: 8px; background: var(--toolbar-bg); border-bottom: 1px solid var(--border-color); align-items: center; }
     .toolbar button, .toolbar select, .toolbar input { padding: 4px 8px; font-size: 14px; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; cursor: pointer; }
     .toolbar button:hover { background: var(--btn-hover); }
-    .toolbar .group { display: flex; gap: 2px; padding-right: 10px; border-right: 1px solid var(--border-color); }
+    .toolbar .group { display: flex; gap: 5px; padding-right: 10px; border-right: 1px solid var(--border-color); align-items: center; }
+    .toolbar label { display: flex; align-items: center; gap: 2px; font-size: 12px; }
+    .toolbar input[type="color"] { padding: 0; width: 30px; height: 26px; }
     
     /* Layout */
     .main-area { display: flex; flex: 1; overflow: hidden; flex-direction: row; }
@@ -51,14 +53,17 @@
     .html-editor { flex: 1; width: 100%; resize: none; padding: 10px; background: var(--bg-color); color: var(--text-color); border: none; outline: none; font-family: monospace; white-space: pre-wrap; }
     .bottom-toolbar { padding: 5px 10px; background: var(--toolbar-bg); display: flex; gap: 10px; justify-content: space-between; align-items: center; }
     
-    /* Inspector (Floating on Right) */
+    /* Inspector */
     .inspector { position: absolute; top: 30px; right: 10px; width: 220px; background: var(--toolbar-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: none; z-index: 10; font-size: 13px; }
     .inspector label { display: block; margin-top: 5px; }
     .inspector input[type="text"], .inspector input[type="number"] { width: 100%; padding: 3px; background: var(--btn-bg); color: var(--text-color); border: 1px solid var(--border-color); }
     .inspector-close { position: absolute; top: 5px; right: 5px; cursor: pointer; font-weight: bold; }
 
-    /* Warnings */
     #warnings { color: var(--warn-color); font-size: 12px; margin-left: 10px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Markdown preview styles */
+    .preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 { margin-top: 0.5em; margin-bottom: 0.5em; }
+    .preview blockquote { border-left: 4px solid var(--border-color); margin: 0; padding-left: 1em; color: gray; }
 
     @media (max-width: 768px) {
       .main-area { flex-direction: column; }
@@ -78,22 +83,38 @@
       <button onclick="formatCmd('underline')" title="下線"><u>U</u></button>
       <button onclick="formatCmd('strikeThrough')" title="打ち消し"><s>S</s></button>
     </div>
+
+    <!-- 色指定 (カラーピッカー + ハッシュタグHEX入力) -->
     <div class="group">
-      <input type="color" id="textColor" title="文字色" onchange="applyStyle('color', this.value)">
-      <input type="color" id="bgColor" title="背景色" value="#ffffff" onchange="applyStyle('background-color', this.value)">
-      <select onchange="applyStyle('font-size', this.value)">
-        <option value="">サイズ</option>
-        <option value="12px">12px</option>
-        <option value="16px">16px</option>
-        <option value="20px">20px</option>
-        <option value="24px">24px</option>
-      </select>
+      <label title="文字色">
+        <input type="color" id="textColorPicker" onchange="syncColor(this.value, 'color')">
+        <input type="text" id="textColorHex" placeholder="#ff0000" style="width: 75px;" onchange="syncColor(this.value, 'color')">
+      </label>
+      <label title="背景色">
+        <input type="color" id="bgColorPicker" value="#ffffff" onchange="syncColor(this.value, 'background-color')">
+        <input type="text" id="bgColorHex" placeholder="#ffffff" style="width: 75px;" onchange="syncColor(this.value, 'background-color')">
+      </label>
     </div>
+
+    <!-- サイズ・不透明度の自由入力 -->
     <div class="group">
-      <button onclick="formatCmd('justifyLeft')">左</button>
-      <button onclick="formatCmd('justifyCenter')">中央</button>
-      <button onclick="formatCmd('justifyRight')">右</button>
+      <input type="text" id="fontSizeInput" list="fontSizeList" placeholder="サイズ(例:16px)" style="width: 110px;" onchange="applyStyle('font-size', this.value)">
+      <datalist id="fontSizeList">
+        <option value="12px"></option>
+        <option value="16px"></option>
+        <option value="20px"></option>
+        <option value="24px"></option>
+      </datalist>
+
+      <input type="text" id="opacityInput" placeholder="不透明度(0~1)" style="width: 100px;" onchange="applyStyle('opacity', this.value)">
     </div>
+
+    <div class="group">
+      <button onclick="formatCmd('justifyLeft')" title="左寄せ">左</button>
+      <button onclick="formatCmd('justifyCenter')" title="中央">中</button>
+      <button onclick="formatCmd('justifyRight')" title="右寄せ">右</button>
+    </div>
+
     <div class="group">
       <select id="blockSelect" onchange="insertBlock(this.value); this.value='';">
         <option value="">ブロック挿入</option>
@@ -106,8 +127,6 @@
         <option value="ul">ul/li</option>
         <option value="ol">ol/li</option>
       </select>
-    </div>
-    <div class="group">
       <select id="mdSelect" onchange="insertMarkdown(this.value); this.value='';">
         <option value="">Markdown</option>
         <option value="bold">**太字**</option>
@@ -118,13 +137,15 @@
         <option value="h3">### H3</option>
       </select>
     </div>
+
     <div class="group">
       <button onclick="undo()">↩ Undo</button>
       <button onclick="redo()">↪ Redo</button>
     </div>
+    
     <div>
-      <button onclick="toggleDarkMode()">🌗 切替</button>
-      <button onclick="toggleInspector()">🔍 インスペクター</button>
+      <button onclick="toggleDarkMode()">🌗</button>
+      <button onclick="toggleInspector()">🔍 インスペクタ</button>
     </div>
   </div>
 
@@ -149,7 +170,7 @@
         <label>色: <input type="text" id="insp-color" onchange="updateInsp('color')"></label>
         <label>背景: <input type="text" id="insp-bg" onchange="updateInsp('background-color')"></label>
         <label>サイズ: <input type="text" id="insp-size" onchange="updateInsp('font-size')"></label>
-        <label>不透明度: <input type="number" step="0.1" min="0" max="1" id="insp-opacity" onchange="updateInsp('opacity')"></label>
+        <label>不透明度: <input type="text" id="insp-opacity" onchange="updateInsp('opacity')"></label>
         <label>文字間隔: <input type="text" id="insp-letter" onchange="updateInsp('letter-spacing')"></label>
         <label>行間: <input type="text" id="insp-line" onchange="updateInsp('line-height')"></label>
       </div>
@@ -159,7 +180,7 @@
   <!-- Bottom Output Area -->
   <div class="bottom-area">
     <div class="bottom-toolbar">
-      <span>HTMLソース</span>
+      <span>HTML出力 (Markdown変換済)</span>
       <span id="warnings"></span>
       <div>
         <button onclick="formatHTML()">✨ 整形</button>
@@ -171,7 +192,6 @@
   </div>
 
   <script>
-    // Elements
     const editor = document.getElementById('editor');
     const preview = document.getElementById('preview');
     const htmlEditor = document.getElementById('htmlEditor');
@@ -179,11 +199,9 @@
     const inspector = document.getElementById('inspector');
     let currentInspectElement = null;
 
-    // Allowed settings
-    const ALLOWED_TAGS = ['DIV','SPAN','P','DETAILS','SUMMARY','RUBY','RT','RP','RB','UL','LI','OL','B','I','STRONG','EM','U','DEL','HR','BR'];
+    const ALLOWED_TAGS = ['DIV','SPAN','P','DETAILS','SUMMARY','RUBY','RT','RP','RB','UL','LI','OL','B','I','STRONG','EM','U','DEL','HR','BR','H1','H2','H3','H4','H5','H6','BLOCKQUOTE'];
     const ALLOWED_CSS = ['align-items','background','background-color','background-image','background-position','background-repeat','background-size','border','border-bottom','border-left','border-radius','border-right','border-top','bottom','color','display','flex-shrink','font-family','font-size','font-style','font-weight','height','letter-spacing','line-height','margin','margin-bottom','margin-left','margin-right','margin-top','max-width','min-width','opacity','overflow','overflow-x','overflow-y','padding','padding-bottom','padding-left','padding-right','padding-top','position','right','text-align','text-justify','width','word-break','word-wrap','z-index'];
 
-    // History (Undo/Redo)
     let historyStack = [];
     let historyIndex = -1;
     const MAX_HISTORY = 100;
@@ -214,7 +232,6 @@
       }
     }
 
-    // Initialize
     window.onload = () => {
       const saved = localStorage.getItem('privatter_designer_save');
       if (saved) {
@@ -222,18 +239,11 @@
       }
       saveHistory();
       syncToHTML();
-      
-      // Load Theme
       if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
     };
 
-    // Editor Event Listeners
-    editor.addEventListener('input', () => {
-      syncToHTML();
-      saveHistory();
-    });
+    editor.addEventListener('input', () => { syncToHTML(); saveHistory(); });
 
-    // 改行時に <br> や <div> を生成せず \n を挿入する処理
     editor.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -259,27 +269,64 @@
     editor.addEventListener('keyup', updateInspectorDisplay);
 
     htmlEditor.addEventListener('input', () => {
-      editor.innerHTML = htmlEditor.value;
+      editor.innerHTML = htmlEditor.value; // 手動でHTMLを編集した場合の反映
       updatePreview(htmlEditor.value);
       validateContent(htmlEditor.value);
       saveHistory();
     });
 
-    // Sync functions
+    // ▼ 今回の目玉：Markdownパース処理 ▼
+    function parseMarkdown(htmlStr) {
+      let res = htmlStr;
+      
+      // 太字 (**テキスト**)
+      res = res.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      // 打ち消し (~~テキスト~~)
+      res = res.replace(/~~(.*?)~~/g, '<del>$1</del>');
+
+      // 行単位のMarkdown（見出し・引用）
+      let lines = res.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        
+        // 装飾用タグ越しに見出し記号があるケースを想定してパース
+        const headingMatch = line.match(/^(<[^>]+>)*(#{1,6})\s+(.*?)(<\/[^>]+>)*$/);
+        if (headingMatch) {
+          const tagsStart = headingMatch[1] || '';
+          const level = headingMatch[2].length;
+          const content = headingMatch[3];
+          const tagsEnd = headingMatch[4] || '';
+          lines[i] = `${tagsStart}<h${level}>${content}</h${level}>${tagsEnd}`;
+          continue;
+        }
+        
+        const quoteMatch = line.match(/^(<[^>]+>)*(>|&gt;)\s+(.*?)(<\/[^>]+>)*$/);
+        if (quoteMatch) {
+          const tagsStart = quoteMatch[1] || '';
+          const content = quoteMatch[3];
+          const tagsEnd = quoteMatch[4] || '';
+          lines[i] = `${tagsStart}<blockquote>${content}</blockquote>${tagsEnd}`;
+        }
+      }
+      return lines.join('\n');
+    }
+
     function syncToHTML() {
-      // contenteditable特有の不要な生成物を極力排除
       let html = editor.innerHTML;
-      htmlEditor.value = html;
-      updatePreview(html);
-      validateContent(html);
+      
+      // MarkdownをHTMLタグに変換
+      let processedHTML = parseMarkdown(html);
+
+      htmlEditor.value = processedHTML;
+      updatePreview(processedHTML);
+      validateContent(processedHTML);
     }
 
     function updatePreview(html) {
-      // \n を維持するため pre-wrap にしているが、HTMLとしての改行も効かせる
       preview.innerHTML = html;
     }
 
-    // Formatting Commands
+    // フォーマット & スタイル適用
     function formatCmd(cmd) {
       document.execCommand(cmd, false, null);
       cleanEmptySpans();
@@ -287,14 +334,12 @@
       saveHistory();
     }
 
-    // Apply inline style (wrap with span if needed)
     function applyStyle(property, value) {
+      if(!value) return;
       const selection = window.getSelection();
-      if (!selection.rangeCount) return;
+      if (!selection.rangeCount || selection.isCollapsed) return;
       
       const range = selection.getRangeAt(0);
-      if (range.collapsed) return; // 何も選択されていない場合はスキップ
-      
       let parent = range.commonAncestorContainer;
       if (parent.nodeType === 3) parent = parent.parentNode;
 
@@ -311,7 +356,21 @@
       saveHistory();
     }
 
-    // Insert Blocks
+    // 色のハッシュタグ(HEX)入力をカラーピッカーと同期させる
+    function syncColor(val, type) {
+      if (val && val[0] !== '#') val = '#' + val; // #忘れを補完
+      const isValidHex = /^#[0-9A-F]{6}$/i.test(val);
+      
+      if (type === 'color') {
+        if (isValidHex) document.getElementById('textColorPicker').value = val;
+        document.getElementById('textColorHex').value = val;
+      } else {
+        if (isValidHex) document.getElementById('bgColorPicker').value = val;
+        document.getElementById('bgColorHex').value = val;
+      }
+      applyStyle(type, val);
+    }
+
     function insertBlock(type) {
       if (!type) return;
       let html = '';
@@ -327,7 +386,6 @@
       saveHistory();
     }
 
-    // Insert Markdown
     function insertMarkdown(type) {
       if (!type) return;
       let text = '';
@@ -344,7 +402,6 @@
       saveHistory();
     }
 
-    // Validate Tags & CSS
     function validateContent(htmlStr) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlStr, 'text/html');
@@ -367,15 +424,12 @@
       warningsEl.textContent = uniqueErrors.length > 0 ? "⚠️ 警告: " + uniqueErrors.join(', ') : "✅ 問題なし";
     }
 
-    // Clean up empty/useless spans
     function cleanEmptySpans() {
       const spans = editor.querySelectorAll('span');
       spans.forEach(span => {
         if (!span.getAttribute('style') && !span.className) {
           const frag = document.createDocumentFragment();
-          while (span.firstChild) {
-            frag.appendChild(span.firstChild);
-          }
+          while (span.firstChild) frag.appendChild(span.firstChild);
           span.parentNode.replaceChild(frag, span);
         }
       });
@@ -383,18 +437,15 @@
 
     function cleanUpHTML() {
       cleanEmptySpans();
-      // ブラウザが勝手に入れる <div><br></div> などを \n に変換する処理を追加可能だが、
-      // ここでは空タグの除去をメインにする。
       syncToHTML();
       saveHistory();
     }
 
     function formatHTML() {
-      // 簡易的なHTML整形（インデント付与等）
       let html = htmlEditor.value;
       html = html.replace(/></g, '>\n<');
       htmlEditor.value = html;
-      editor.innerHTML = html;
+      editor.innerHTML = html; // エディタ側にも逆反映
       updatePreview(html);
       saveHistory();
     }
@@ -411,7 +462,6 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     }
 
-    // Resizer Logic (PC Only)
     const resizer = document.getElementById('resizer');
     const leftPanel = document.getElementById('leftPanel');
     let isResizing = false;
@@ -426,7 +476,6 @@
     });
     document.addEventListener('mouseup', () => { isResizing = false; });
 
-    // Inspector Logic
     function toggleInspector() {
       inspector.style.display = inspector.style.display === 'block' ? 'none' : 'block';
     }
@@ -442,7 +491,6 @@
       if (node && node !== editor) {
         currentInspectElement = node;
         document.getElementById('inspector-tag').textContent = `タグ: <${node.tagName.toLowerCase()}>`;
-        const style = window.getComputedStyle(node);
         document.getElementById('insp-color').value = node.style.color || '';
         document.getElementById('insp-bg').value = node.style.backgroundColor || '';
         document.getElementById('insp-size').value = node.style.fontSize || '';
