@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>簡易敵モブコマメーカー</title>
+<style>
+:root {
+  --bg: #171717;
+  --panel: #242424;
+  --panel2: #2d2d2d;
+  --border: #444;
+  --text: #f2f2f2;
+  --sub: #aaa;
+  --accent: #69a9ff;
+  --danger: #ff7777;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main {
+  width: min(1100px, calc(100% - 32px));
+  margin: 40px auto;
+}
+
+h1 {
+  margin-bottom: 8px;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+}
+
+.description {
+  color: var(--sub);
+  margin-bottom: 30px;
+}
+
+section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+label {
+  font-size: 0.85rem;
+  color: var(--sub);
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  background: #171717;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  border-radius: 7px;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+button {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 9px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.15);
+}
+
+button.primary {
+  background: var(--accent);
+  color: #111;
+  border-color: var(--accent);
+  font-weight: bold;
+}
+
+button.danger {
+  color: var(--danger);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.ability-row,
+.skill-row {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.skill-row {
+  grid-template-columns: 1fr 100px auto;
+}
+
+.formula {
+  color: var(--sub);
+  font-size: 0.8rem;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel2);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.toggle {
+  appearance: none;
+  width: 48px;
+  height: 26px;
+  background: #555;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.toggle::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: white;
+  transition: .2s;
+}
+
+.toggle:checked {
+  background: var(--accent);
+}
+
+.toggle:checked::before {
+  transform: translateX(22px);
+}
+
+.weapon-item {
+  display: grid;
+  grid-template-columns: 1fr 120px 150px auto;
+  gap: 8px;
+  align-items: end;
+  background: var(--panel2);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.weapon-item .field {
+  min-width: 0;
+}
+
+.output {
+  width: 100%;
+  min-height: 360px;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.note {
+  font-size: 0.8rem;
+  color: var(--sub);
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .weapon-item {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .weapon-item button {
+    grid-column: span 2;
+  }
+}
+</style>
+</head>
+
+<body>
+<main>
+  <h1>簡易敵モブコマメーカー</h1>
+  <div class="description">
+    能力値や武器を設定すると、CCFOLIAに貼り付けられるJSONを生成するぞ。
+  </div>
+
+  <section>
+    <h2>基本情報</h2>
+
+    <div class="field">
+      <label>キャラクター名</label>
+      <input type="text" id="name" placeholder="敵モブ">
+    </div>
+
+    <br>
+
+    <div class="field">
+      <label>メモ</label>
+      <textarea id="memo" placeholder="キャラクターの説明など"></textarea>
+    </div>
+  </section>
+
+  <section>
+    <h2>能力値</h2>
+
+    <div class="button-row">
+      <button class="primary" id="rollAllAbilities">能力値を一括ダイス</button>
+    </div>
+
+    <div id="abilities"></div>
+  </section>
+
+  <section>
+    <h2>技能値・派生値</h2>
+
+    <div class="button-row">
+      <button id="calcDerived">派生値を計算</button>
+      <button id="rollAllSkills">技能値を一括ダイス</button>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label>DB（手入力可能）</label>
+        <input type="text" id="db">
+      </div>
+
+      <div class="field">
+        <label>HP</label>
+        <input type="number" id="hp">
+      </div>
+
+      <div class="field">
+        <label>SAN</label>
+        <input type="number" id="san">
+      </div>
+
+      <div class="field">
+        <label>MP</label>
+        <input type="number" id="mp">
+      </div>
+    </div>
+
+    <br>
+
+    <div id="skills"></div>
+  </section>
+
+  <section>
+    <h2>武器</h2>
+
+    <div class="toggle-row">
+      <span>ナイフを所持する</span>
+      <input type="checkbox" class="toggle" id="knife">
+    </div>
+
+    <div class="toggle-row">
+      <span>拳銃を所持する</span>
+      <input type="checkbox" class="toggle" id="gun">
+    </div>
+
+    <div class="button-row">
+      <button id="randomWeapons">拳銃・ナイフをランダム決定</button>
+    </div>
+
+    <h3>その他の武器</h3>
+    <div id="extraWeapons"></div>
+
+    <button id="addWeapon">＋ 武器を追加</button>
+  </section>
+
+  <section>
+    <h2>駒の状態</h2>
+
+    <div class="toggle-row">
+      <span>ステータスを非公開にする</span>
+      <input type="checkbox" class="toggle" id="secret">
+    </div>
+
+    <div class="toggle-row">
+      <span>発言時キャラクターを表示しない</span>
+      <input type="checkbox" class="toggle" id="invisible">
+    </div>
+
+    <div class="toggle-row">
+      <span>盤面キャラクター一覧に表示しない</span>
+      <input type="checkbox" class="toggle" id="hideStatus">
+    </div>
+  </section>
+
+  <section>
+    <h2>出力</h2>
+
+    <div class="button-row">
+      <button class="primary" id="generate">JSONを生成</button>
+      <button id="copy">クリップボードにコピー</button>
+    </div>
+
+    <textarea id="output" class="output" readonly></textarea>
+
+    <div class="note">
+      「クリップボードにコピー」後、そのままCCFOLIAに貼り付けて使用。
+    </div>
+  </section>
+</main>
+
+<script>
+const ABILITIES = [
+  { key: "STR", formula: "3d6" },
+  { key: "CON", formula: "3d6" },
+  { key: "POW", formula: "3d6" },
+  { key: "DEX", formula: "3d6" },
+  { key: "APP", formula: "3d6" },
+  { key: "SIZ", formula: "2d6+6" },
+  { key: "INT", formula: "2d6+6" },
+  { key: "EDU", formula: "3d6+3" }
+];
+
+const SKILLS = [
+  {
+    key: "fist",
+    label: "こぶし",
+    formula: () => {
+      const dex = getNumber("DEX");
+      return random(1, Math.max(1, dex * 2)) + 50;
+    }
+  },
+  {
+    key: "kick",
+    label: "キック",
+    formula: () => {
+      const dex = getNumber("DEX");
+      return random(1, 20) + random(1, Math.max(1, dex * 2)) + 25;
+    }
+  },
+  {
+    key: "gunSkill",
+    label: "拳銃",
+    formula: () => {
+      const dex = getNumber("DEX");
+      const edu = getNumber("EDU");
+      return random(1, 20)
+        + random(1, Math.max(1, edu + dex))
+        + 20;
+    }
+  }
+];
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function rollDice(count, sides, bonus = 0) {
+  let total = bonus;
+  for (let i = 0; i < count; i++) {
+    total += random(1, sides);
+  }
+  return total;
+}
+
+function rollAbility(key) {
+  switch (key) {
+    case "STR":
+    case "CON":
+    case "POW":
+    case "DEX":
+    case "APP":
+      return rollDice(3, 6);
+
+    case "SIZ":
+    case "INT":
+      return rollDice(2, 6, 6);
+
+    case "EDU":
+      return rollDice(3, 6, 3);
+  }
+}
+
+function getNumber(key) {
+  const element = document.getElementById(key);
+  return Number(element?.value) || 0;
+}
+
+function getDB(str, siz) {
+  const total = str + siz;
+
+  if (total <= 12) return "-1D6";
+  if (total <= 16) return "-1D4";
+  if (total <= 24) return "0";
+  if (total <= 32) return "+1D4";
+  if (total <= 40) return "+1D6";
+  if (total <= 56) return "+2D6";
+  if (total <= 72) return "+3D6";
+  if (total <= 88) return "+4D6";
+  if (total <= 104) return "+5D6";
+  if (total <= 120) return "+6D6";
+  if (total <= 136) return "+7D6";
+
+  return "+7D6";
+}
+
+function renderAbilities() {
+  const container = document.getElementById("abilities");
+
+  ABILITIES.forEach(({ key, formula }) => {
+    const row = document.createElement("div");
+    row.className = "ability-row";
+
+    row.innerHTML = `
+      <strong>${key}</strong>
+      <input type="number" id="${key}" min="0">
+      <button data-ability="${key}">🎲 ${formula}</button>
+    `;
+
+    container.appendChild(row);
+  });
+
+  document.querySelectorAll("[data-ability]").forEach(button => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.ability;
+      document.getElementById(key).value = rollAbility(key);
+      calculateDerived();
+    });
+  });
+}
+
+function renderSkills() {
+  const container = document.getElementById("skills");
+
+  SKILLS.forEach(({ key, label }) => {
+    const row = document.createElement("div");
+    row.className = "skill-row";
+
+    row.innerHTML = `
+      <div>
+        <strong>${label}</strong>
+        <div class="formula" id="${key}Formula"></div>
+      </div>
+
+      <input type="number" id="${key}" min="0">
+
+      <button data-skill="${key}">🎲 振り直し</button>
+    `;
+
+    container.appendChild(row);
+  });
+
+  document.querySelectorAll("[data-skill]").forEach(button => {
+    button.addEventListener("click", () => {
+      rollSkill(button.dataset.skill);
+    });
+  });
+
+  updateSkillFormulas();
+}
+
+function updateSkillFormulas() {
+  const dex = getNumber("DEX");
+  const edu = getNumber("EDU");
+
+  document.getElementById("fistFormula").textContent =
+    `1d(${dex}×2)+50`;
+
+  document.getElementById("kickFormula").textContent =
+    `1d20+1d(${dex}×2)+25`;
+
+  document.getElementById("gunSkillFormula").textContent =
+    `1d20+1d(${edu}+${dex})+20`;
+}
+
+function rollSkill(key) {
+  const skill = SKILLS.find(skill => skill.key === key);
+  document.getElementById(key).value = skill.formula();
+}
+
+function rollAllSkills() {
+  SKILLS.forEach(skill => rollSkill(skill.key));
+}
+
+function calculateDerived() {
+  const str = getNumber("STR");
+  const con = getNumber("CON");
+  const pow = getNumber("POW");
+  const siz = getNumber("SIZ");
+
+  document.getElementById("db").value = getDB(str, siz);
+  document.getElementById("hp").value = Math.floor((con + siz) / 2);
+  document.getElementById("san").value = pow * 5;
+  document.getElementById("mp").value = pow;
+
+  updateSkillFormulas();
+}
+
+function addExtraWeapon() {
+  const container = document.getElementById("extraWeapons");
+
+  const weapon = document.createElement("div");
+  weapon.className = "weapon-item";
+
+  weapon.innerHTML = `
+    <div class="field">
+      <label>武器名</label>
+      <input type="text" class="weapon-name" placeholder="例：ショットガン">
+    </div>
+
+    <div class="field">
+      <label>技能値</label>
+      <input type="number" class="weapon-skill" placeholder="70">
+    </div>
+
+    <div class="field">
+      <label>DBを加算</label>
+      <select class="weapon-db">
+        <option value="yes">あり</option>
+        <option value="no">なし</option>
+      </select>
+    </div>
+
+    <button class="danger remove-weapon">削除</button>
+  `;
+
+  weapon.querySelector(".remove-weapon").addEventListener("click", () => {
+    weapon.remove();
+  });
+
+  container.appendChild(weapon);
+}
+
+function getExtraWeapons() {
+  return [...document.querySelectorAll(".weapon-item")]
+    .map(item => ({
+      name: item.querySelector(".weapon-name").value.trim(),
+      skill: item.querySelector(".weapon-skill").value,
+      hasDB: item.querySelector(".weapon-db").value === "yes"
+    }))
+    .filter(weapon => weapon.name);
+}
+
+function buildCommands(data) {
+  const {
+    str, con, dex, db,
+    fist, kick, gunSkill,
+    knife, gun,
+    extraWeapons
+  } = data;
+
+  const attackChoices = ["こぶし"];
+
+  if (knife) attackChoices.push("ナイフ");
+  attackChoices.push("キック");
+  if (gun) attackChoices.push("拳銃");
+
+  extraWeapons.forEach(weapon => attackChoices.push(weapon.name));
+
+  const lines = [];
+
+  lines.push("✧攻撃✧");
+  lines.push(`choice ${attackChoices.join(" ")}`);
+
+  lines.push(`CCB<=${fist}　〈こぶし(パンチ)〉`);
+  lines.push(`1d3${db} 〈こぶし：ダメージ〉`);
+
+  if (knife) {
+    lines.push(`1d4${db} 〈ナイフ：ダメージ〉`);
+  }
+
+  lines.push(`CCB<=${kick}　〈キック〉`);
+  lines.push(`1d6${db} 〈キック：ダメージ〉`);
+
+  if (gun) {
+    lines.push(`CCB<=${gunSkill}　〈拳銃〉`);
+    lines.push("1d10 〈拳銃：ダメージ〉");
+    lines.push("▽発砲");
+    lines.push(":弾数-1");
+    lines.push("▽リロード");
+    lines.push(":弾数=6");
+  }
+
+  extraWeapons.forEach(weapon => {
+    const damage = weapon.hasDB
+      ? `1d3${db}`
+      : "1d3";
+
+    lines.push(`CCB<=${weapon.skill || 0}　〈${weapon.name}〉`);
+    lines.push(`${damage} 〈${weapon.name}：ダメージ〉`);
+  });
+
+  lines.push("・");
+  lines.push("✧ダメージ✧");
+  lines.push(`CCB<=${dex * 2}　〈回避〉`);
+  lines.push(":HP-");
+  lines.push(`CCB<=${con * 5}　〈気絶ロール〉`);
+  lines.push("・");
+  lines.push("✧テンプレ✧");
+  lines.push("CCB<=0 〈〉");
+  lines.push("1d3");
+
+  return lines.join("\n");
+}
+
+function generateJSON() {
+  const str = getNumber("STR");
+  const con = getNumber("CON");
+  const pow = getNumber("POW");
+  const dex = getNumber("DEX");
+  const app = getNumber("APP");
+  const siz = getNumber("SIZ");
+  const int = getNumber("INT");
+  const edu = getNumber("EDU");
+
+  const hp = Number(document.getElementById("hp").value) || 0;
+  const san = Number(document.getElementById("san").value) || 0;
+  const mp = Number(document.getElementById("mp").value) || 0;
+
+  const db = document.getElementById("db").value.trim() || "0";
+
+  const knife = document.getElementById("knife").checked;
+  const gun = document.getElementById("gun").checked;
+
+  const extraWeapons = getExtraWeapons();
+
+  const data = {
+    str,
+    con,
+    dex,
+    db,
+    fist: Number(document.getElementById("fist").value) || 0,
+    kick: Number(document.getElementById("kick").value) || 0,
+    gunSkill: Number(document.getElementById("gunSkill").value) || 0,
+    knife,
+    gun,
+    extraWeapons
+  };
+
+  const status = [
+    {
+      label: "HP",
+      value: hp,
+      max: hp
+    },
+    {
+      label: "SAN",
+      value: san,
+      max: san
+    },
+    {
+      label: "MP",
+      value: mp,
+      max: mp
+    }
+  ];
+
+  if (gun) {
+    status.push({
+      label: "弾数",
+      value: 6,
+      max: 6
+    });
+  }
+
+  const params = [
+    { label: "STR", value: String(str) },
+    { label: "CON", value: String(con) },
+    { label: "POW", value: String(pow) },
+    { label: "DEX", value: String(dex) },
+    { label: "APP", value: String(app) },
+    { label: "SIZ", value: String(siz) },
+    { label: "INT", value: String(int) },
+    { label: "EDU", value: String(edu) },
+    { label: "DB", value: db }
+  ];
+
+  const character = {
+    kind: "character",
+    data: {
+      name: document.getElementById("name").value || "敵モブ",
+      memo: document.getElementById("memo").value,
+      initiative: dex,
+
+      status,
+      params,
+
+      secret: document.getElementById("secret").checked,
+      invisible: document.getElementById("invisible").checked,
+      hideStatus: document.getElementById("hideStatus").checked,
+
+      commands: buildCommands(data)
+    }
+  };
+
+  document.getElementById("output").value =
+    JSON.stringify(character, null, 2);
+
+  return character;
+}
+
+async function copyOutput() {
+  const output = document.getElementById("output");
+
+  if (!output.value) {
+    generateJSON();
+  }
+
+  try {
+    await navigator.clipboard.writeText(output.value);
+    alert("CCFOLIA用データをコピーしたぞ");
+  } catch (error) {
+    output.select();
+    document.execCommand("copy");
+    alert("CCFOLIA用データをコピーしたぞ");
+  }
+}
+
+document.getElementById("rollAllAbilities").addEventListener("click", () => {
+  ABILITIES.forEach(({ key }) => {
+    document.getElementById(key).value = rollAbility(key);
+  });
+
+  calculateDerived();
+});
+
+document.getElementById("rollAllSkills").addEventListener("click", () => {
+  rollAllSkills();
+});
+
+document.getElementById("calcDerived").addEventListener("click", () => {
+  calculateDerived();
+});
+
+document.getElementById("randomWeapons").addEventListener("click", () => {
+  document.getElementById("knife").checked = Math.random() < 0.5;
+  document.getElementById("gun").checked = Math.random() < 0.5;
+});
+
+document.getElementById("addWeapon").addEventListener("click", () => {
+  addExtraWeapon();
+});
+
+document.getElementById("generate").addEventListener("click", () => {
+  generateJSON();
+});
+
+document.getElementById("copy").addEventListener("click", () => {
+  copyOutput();
+});
+
+renderAbilities();
+renderSkills();
+
+ABILITIES.forEach(({ key }) => {
+  document.getElementById(key).addEventListener("input", () => {
+    updateSkillFormulas();
+  });
+});
+
+calculateDerived();
+</script>
+</body>
+</html>
