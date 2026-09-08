@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Noto+Serif+JP:wght@200;300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+<title>Text Scatter Maker</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #ececec;
+  font-family: sans-serif;
+  color: #222;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  min-height: 100vh;
+}
+
+.controls {
+  background: white;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0 0 20px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+textarea,
+select,
+input[type="number"],
+input[type="color"] {
+  width: 100%;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+  padding: 10px;
+}
+
+select,
+input[type="number"] {
+  padding: 8px;
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.range-row input {
+  width: 100%;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+.value {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
+button {
+  width: 100%;
+  border: none;
+  padding: 12px;
+  margin-top: 12px;
+  cursor: pointer;
+  background: #222;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+button:hover {
+  opacity: .8;
+}
+
+.secondary {
+  background: #777;
+}
+
+.preview-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  overflow: auto;
+}
+
+.canvas-wrap {
+  position: relative;
+  background:
+    linear-gradient(45deg, #ddd 25%, transparent 25%),
+    linear-gradient(-45deg, #ddd 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ddd 75%),
+    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+}
+
+#canvas {
+  display: block;
+  background: transparent;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+
+.check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.check label {
+  margin: 0;
+  font-weight: normal;
+}
+
+@media (max-width: 800px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .preview-area {
+    padding: 15px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="controls">
+
+<h1>Text Scatter Maker</h1>
+
+<label>散らす文字</label>
+<textarea id="text">Darling, I have been waiting for you all night.</textarea>
+
+<label>フォント</label>
+<select id="font">
+  <optgroup label="筆記体">
+    <option value="'Great Vibes', cursive">Great Vibes</option>
+    <option value="'Dancing Script', cursive">Dancing Script</option>
+    <option value="'Allura', cursive">Allura</option>
+  </optgroup>
+
+  <optgroup label="明朝・セリフ">
+    <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
+    <option value="'Playfair Display', serif">Playfair Display</option>
+    <option value="'Noto Serif JP', serif">Noto Serif JP</option>
+  </optgroup>
+
+  <optgroup label="その他">
+    <option value="serif">Serif</option>
+    <option value="sans-serif">Sans Serif</option>
+    <option value="monospace">Monospace</option>
+  </optgroup>
+</select>
+
+<hr>
+
+<label>キャンバスサイズ</label>
+
+<div class="range-row">
+  <div>
+    <input type="number" id="canvasWidth" value="1200">
+    <div class="value">横幅</div>
+  </div>
+
+  <div>
+    <input type="number" id="canvasHeight" value="800">
+    <div class="value">縦幅</div>
+  </div>
+</div>
+
+<label>最小文字サイズ</label>
+<input type="range" id="minSize" min="10" max="300" value="25">
+<div class="value" id="minSizeValue"></div>
+
+<label>最大文字サイズ</label>
+<input type="range" id="maxSize" min="10" max="500" value="120">
+<div class="value" id="maxSizeValue"></div>
+
+<label>回転の強さ</label>
+<input type="range" id="rotation" min="0" max="180" value="35">
+<div class="value" id="rotationValue"></div>
+
+<label>最小透明度</label>
+<input type="range" id="minOpacity" min="0" max="100" value="60">
+<div class="value" id="minOpacityValue"></div>
+
+<label>最大透明度</label>
+<input type="range" id="maxOpacity" min="0" max="100" value="100">
+<div class="value" id="maxOpacityValue"></div>
+
+<label>文字色</label>
+<input type="color" id="color" value="#111111">
+
+<div class="check">
+  <input type="checkbox" id="keepSpaces" checked>
+  <label for="keepSpaces">スペースも間隔として反映</label>
+</div>
+
+<div class="check">
+  <input type="checkbox" id="randomCase">
+  <label for="randomCase">大文字・小文字をランダム化</label>
+</div>
+
+<hr>
+
+<button id="generate">ランダム生成</button>
+<button class="secondary" id="download">PNG保存</button>
+
+</div>
+
+<div class="preview-area">
+  <div class="canvas-wrap">
+    <canvas id="canvas" width="1200" height="800"></canvas>
+  </div>
+</div>
+
+</div>
+
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const el = {
+  text: document.getElementById("text"),
+  font: document.getElementById("font"),
+  canvasWidth: document.getElementById("canvasWidth"),
+  canvasHeight: document.getElementById("canvasHeight"),
+  minSize: document.getElementById("minSize"),
+  maxSize: document.getElementById("maxSize"),
+  rotation: document.getElementById("rotation"),
+  minOpacity: document.getElementById("minOpacity"),
+  maxOpacity: document.getElementById("maxOpacity"),
+  color: document.getElementById("color"),
+  keepSpaces: document.getElementById("keepSpaces"),
+  randomCase: document.getElementById("randomCase"),
+  generate: document.getElementById("generate"),
+  download: document.getElementById("download")
+};
+
+const values = {
+  minSize: document.getElementById("minSizeValue"),
+  maxSize: document.getElementById("maxSizeValue"),
+  rotation: document.getElementById("rotationValue"),
+  minOpacity: document.getElementById("minOpacityValue"),
+  maxOpacity: document.getElementById("maxOpacityValue")
+};
+
+function updateValues() {
+  values.minSize.textContent = el.minSize.value + " px";
+  values.maxSize.textContent = el.maxSize.value + " px";
+  values.rotation.textContent = "±" + el.rotation.value + "°";
+  values.minOpacity.textContent = el.minOpacity.value + "%";
+  values.maxOpacity.textContent = el.maxOpacity.value + "%";
+}
+
+Object.values(el).forEach(item => {
+  if (
+    item.tagName === "INPUT" ||
+    item.tagName === "SELECT" ||
+    item.tagName === "TEXTAREA"
+  ) {
+    item.addEventListener("input", updateValues);
+  }
+});
+
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function hexToRgb(hex) {
+
+  hex = hex.replace("#", "");
+
+  const bigint = parseInt(hex, 16);
+
+  return {
+    r: (bigint >> 16) & 255,
+    g: (bigint >> 8) & 255,
+    b: bigint & 255
+  };
+}
+
+function randomizeCase(char) {
+
+  if (!el.randomCase.checked) return char;
+
+  if (!/[a-zA-Z]/.test(char)) return char;
+
+  return Math.random() > 0.5
+    ? char.toUpperCase()
+    : char.toLowerCase();
+}
+
+
+function generate() {
+
+  const width = Number(el.canvasWidth.value);
+  const height = Number(el.canvasHeight.value);
+
+  canvas.width = width;
+  canvas.height = height;
+
+  const text = el.text.value;
+
+  const minSize = Number(el.minSize.value);
+  const maxSize = Number(el.maxSize.value);
+
+  const minOpacity = Number(el.minOpacity.value) / 100;
+  const maxOpacity = Number(el.maxOpacity.value) / 100;
+
+  const rotation = Number(el.rotation.value);
+
+  const font = el.font.value;
+
+  const rgb = hexToRgb(el.color.value);
+
+  ctx.clearRect(0, 0, width, height);
+
+  for (let char of text) {
+
+    if (char === " ") {
+
+      if (el.keepSpaces.checked) {
+        continue;
+      } else {
+        continue;
+      }
+
+    }
+
+    char = randomizeCase(char);
+
+    const size = random(minSize, maxSize);
+
+    const x = random(0, width);
+    const y = random(0, height);
+
+    const angle = random(-rotation, rotation);
+
+    const opacity = random(minOpacity, maxOpacity);
+
+    ctx.save();
+
+    ctx.translate(x, y);
+
+    ctx.rotate(angle * Math.PI / 180);
+
+    ctx.font = `${size}px ${font}`;
+
+    ctx.fillStyle =
+      `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(char, 0, 0);
+
+    ctx.restore();
+
+  }
+
+}
+
+el.generate.addEventListener("click", generate);
+
+el.download.addEventListener("click", () => {
+
+  const link = document.createElement("a");
+
+  link.download = "text-scatter.png";
+
+  link.href = canvas.toDataURL("image/png");
+
+  link.click();
+
+});
+
+updateValues();
+
+document.fonts.ready.then(() => {
+  generate();
+});
+
+</script>
+
+</body>
+</html>
