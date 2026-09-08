@@ -212,8 +212,55 @@ function generate(){
   }
 }
 $('generate').addEventListener('click',generate);
-$('download').addEventListener('click',()=>{
-  const a=document.createElement('a');a.download='text-scatter.png';a.href=canvas.toDataURL('image/png');a.click();
+$('download').addEventListener('click', async ()=>{
+  const btn = $('download');
+  btn.disabled = true;
+  btn.textContent = 'PNG作成中…';
+
+  try {
+    // toBlobの方がSafariでも安定しやすく、巨大キャンバスでも扱いやすい
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob(b => b ? resolve(b) : reject(new Error('PNGの作成に失敗しました')), 'image/png');
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'text-scatter.png';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+
+    // Safariでクリック処理が終わる前に消えないよう少し待つ
+    setTimeout(() => {
+      a.remove();
+      URL.revokeObjectURL(url);
+    }, 1500);
+
+    btn.textContent = '保存しました';
+    setTimeout(() => btn.textContent = 'PNG保存', 1200);
+
+  } catch (err) {
+    console.error(err);
+
+    // ダウンロード属性が効かない環境向けに新しいタブでPNGを開く
+    try {
+      const dataUrl = canvas.toDataURL('image/png');
+      const win = window.open();
+      if (win) {
+        win.document.write('<title>text-scatter.png</title>');
+        win.document.write('<img src="' + dataUrl + '" style="max-width:100%;height:auto">');
+      } else {
+        throw new Error('ポップアップがブロックされています');
+      }
+    } catch (fallbackErr) {
+      alert('PNGを書き出せませんでした。Safariのポップアップブロックを解除して、もう一度試してください。');
+    }
+
+    btn.textContent = 'PNG保存';
+  }
+
+  btn.disabled = false;
 });
 document.fonts.ready.then(generate);
 </script>
