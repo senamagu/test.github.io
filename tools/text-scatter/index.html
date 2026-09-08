@@ -2,178 +2,33 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Noto+Serif+JP:wght@200;300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Text Scatter Maker</title>
-
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: #ececec;
-  font-family: sans-serif;
-  color: #222;
-}
-
-.app {
-  display: grid;
-  grid-template-columns: 330px 1fr;
-  min-height: 100vh;
-}
-
-.controls {
-  background: white;
-  padding: 20px;
-  border-right: 1px solid #ccc;
-  overflow-y: auto;
-}
-
-h1 {
-  font-size: 20px;
-  margin: 0 0 20px;
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: bold;
-  margin-top: 16px;
-  margin-bottom: 6px;
-}
-
-textarea,
-select,
-input[type="number"],
-input[type="color"] {
-  width: 100%;
-}
-
-textarea {
-  height: 100px;
-  resize: vertical;
-  padding: 10px;
-}
-
-select,
-input[type="number"] {
-  padding: 8px;
-}
-
-.range-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.range-row input {
-  width: 100%;
-}
-
-input[type="range"] {
-  width: 100%;
-}
-
-.value {
-  font-size: 12px;
-  color: #666;
-  text-align: right;
-}
-
-button {
-  width: 100%;
-  border: none;
-  padding: 12px;
-  margin-top: 12px;
-  cursor: pointer;
-  background: #222;
-  color: white;
-  font-weight: bold;
-  border-radius: 6px;
-}
-
-button:hover {
-  opacity: .8;
-}
-
-.secondary {
-  background: #777;
-}
-
-.preview-area {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  overflow: auto;
-}
-
-.canvas-wrap {
-  position: relative;
-  background:
-    linear-gradient(45deg, #ddd 25%, transparent 25%),
-    linear-gradient(-45deg, #ddd 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #ddd 75%),
-    linear-gradient(-45deg, transparent 75%, #ddd 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-
-  box-shadow: 0 10px 30px rgba(0,0,0,.15);
-}
-
-#canvas {
-  display: block;
-  background: transparent;
-}
-
-hr {
-  border: none;
-  border-top: 1px solid #ddd;
-  margin: 20px 0;
-}
-
-.check {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 13px;
-  margin-top: 10px;
-}
-
-.check label {
-  margin: 0;
-  font-weight: normal;
-}
-
-@media (max-width: 800px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-
-  .controls {
-    border-right: none;
-    border-bottom: 1px solid #ccc;
-  }
-
-  .preview-area {
-    padding: 15px;
-  }
-}
+*{box-sizing:border-box}body{margin:0;background:#e9e9e9;color:#222;font-family:system-ui,sans-serif}
+.app{display:grid;grid-template-columns:340px 1fr;min-height:100vh}
+.controls{background:#fff;padding:18px;overflow:auto;border-right:1px solid #ccc}
+h1{font-size:20px;margin:0 0 16px}label{display:block;font-size:13px;font-weight:700;margin:13px 0 5px}
+textarea,select,input[type=number]{width:100%;padding:8px;border:1px solid #bbb;border-radius:5px;background:#fff}
+textarea{height:90px;resize:vertical}
+input[type=range]{width:100%}.val{font-size:12px;text-align:right;color:#666}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{width:100%;border:0;border-radius:6px;padding:11px;margin-top:9px;background:#222;color:#fff;font-weight:700;cursor:pointer}
+button.secondary{background:#777}
+button:disabled{opacity:.5;cursor:wait}
+hr{border:0;border-top:1px solid #ddd;margin:18px 0}
+.check{display:flex;align-items:center;gap:7px;font-size:13px;margin:9px 0}.check label{margin:0;font-weight:400}
+.file{font-size:12px}
+.font-info{font-size:11px;color:#666;margin-top:5px;word-break:break-all}
+.preview{display:flex;align-items:center;justify-content:center;padding:25px;overflow:auto}
+.wrap{background-color:#fff;background-image:linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;box-shadow:0 10px 30px #0002}
+canvas{display:block}
+@media(max-width:800px){.app{grid-template-columns:1fr}.controls{border-right:0;border-bottom:1px solid #ccc}.preview{padding:10px}}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
-<div class="controls">
-
+<aside class="controls">
 <h1>Text Scatter Maker</h1>
 
 <label>散らす文字</label>
@@ -181,257 +36,186 @@ hr {
 
 <label>フォント</label>
 <select id="font">
-  <optgroup label="筆記体">
-    <option value="'Great Vibes', cursive">Great Vibes</option>
-    <option value="'Dancing Script', cursive">Dancing Script</option>
-    <option value="'Allura', cursive">Allura</option>
-  </optgroup>
-
-  <optgroup label="明朝・セリフ">
-    <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
-    <option value="'Playfair Display', serif">Playfair Display</option>
-    <option value="'Noto Serif JP', serif">Noto Serif JP</option>
-  </optgroup>
-
-  <optgroup label="その他">
-    <option value="serif">Serif</option>
-    <option value="sans-serif">Sans Serif</option>
-    <option value="monospace">Monospace</option>
-  </optgroup>
+<optgroup label="筆記体">
+<option value="'Great Vibes',cursive">Great Vibes</option>
+<option value="'Dancing Script',cursive">Dancing Script</option>
+<option value="'Allura',cursive">Allura</option>
+</optgroup>
+<optgroup label="明朝・セリフ">
+<option value="'Cormorant Garamond',serif">Cormorant Garamond</option>
+<option value="'Playfair Display',serif">Playfair Display</option>
+<option value="'Noto Serif JP',serif">Noto Serif JP</option>
+</optgroup>
+<optgroup label="標準">
+<option value="serif">Serif</option>
+<option value="sans-serif">Sans Serif</option>
+<option value="monospace">Monospace</option>
+</optgroup>
 </select>
+
+<label>フォントファイルを読み込む</label>
+<input class="file" id="fontFile" type="file" accept=".ttf,.otf,.woff,.woff2">
+<div class="font-info" id="fontInfo">TTF / OTF / WOFF / WOFF2</div>
 
 <hr>
 
-<label>キャンバスサイズ</label>
-
-<div class="range-row">
-  <div>
-    <input type="number" id="canvasWidth" value="1200">
-    <div class="value">横幅</div>
-  </div>
-
-  <div>
-    <input type="number" id="canvasHeight" value="800">
-    <div class="value">縦幅</div>
-  </div>
+<label>キャンバス</label>
+<div class="row">
+<input type="number" id="cw" value="1200" min="100">
+<input type="number" id="ch" value="800" min="100">
 </div>
 
-<label>最小文字サイズ</label>
-<input type="range" id="minSize" min="10" max="300" value="25">
-<div class="value" id="minSizeValue"></div>
+<label>文字サイズ</label>
+<div class="row">
+<div><input type="range" id="minSize" min="8" max="400" value="25"><div class="val" id="vmin"></div></div>
+<div><input type="range" id="maxSize" min="8" max="600" value="120"><div class="val" id="vmax"></div></div>
+</div>
 
-<label>最大文字サイズ</label>
-<input type="range" id="maxSize" min="10" max="500" value="120">
-<div class="value" id="maxSizeValue"></div>
+<label>回転</label>
+<input type="range" id="rotation" min="0" max="180" value="35"><div class="val" id="vrot"></div>
 
-<label>回転の強さ</label>
-<input type="range" id="rotation" min="0" max="180" value="35">
-<div class="value" id="rotationValue"></div>
+<label>文字間の最小距離</label>
+<input type="range" id="gap" min="-30" max="100" value="8"><div class="val" id="vgap"></div>
 
-<label>最小透明度</label>
-<input type="range" id="minOpacity" min="0" max="100" value="60">
-<div class="value" id="minOpacityValue"></div>
+<label>重なり許容量</label>
+<input type="range" id="overlap" min="0" max="100" value="0"><div class="val" id="voverlap"></div>
 
-<label>最大透明度</label>
-<input type="range" id="maxOpacity" min="0" max="100" value="100">
-<div class="value" id="maxOpacityValue"></div>
+<label>配置試行回数</label>
+<input type="range" id="tries" min="10" max="1000" step="10" value="200"><div class="val" id="vtries"></div>
+
+<label>透明度</label>
+<div class="row">
+<div><input type="range" id="minOpacity" min="0" max="100" value="60"><div class="val" id="vopmin"></div></div>
+<div><input type="range" id="maxOpacity" min="0" max="100" value="100"><div class="val" id="vopmax"></div></div>
+</div>
 
 <label>文字色</label>
 <input type="color" id="color" value="#111111">
 
-<div class="check">
-  <input type="checkbox" id="keepSpaces" checked>
-  <label for="keepSpaces">スペースも間隔として反映</label>
-</div>
-
-<div class="check">
-  <input type="checkbox" id="randomCase">
-  <label for="randomCase">大文字・小文字をランダム化</label>
-</div>
-
 <hr>
+
+<div class="check"><input type="checkbox" id="randomSize" checked><label for="randomSize">文字サイズをランダム化</label></div>
+<div class="check"><input type="checkbox" id="randomOpacity" checked><label for="randomOpacity">透明度をランダム化</label></div>
+<div class="check"><input type="checkbox" id="randomRotation" checked><label for="randomRotation">角度をランダム化</label></div>
+<div class="check"><input type="checkbox" id="randomCase"><label for="randomCase">大文字・小文字をランダム化</label></div>
+<div class="check"><input type="checkbox" id="edge" checked><label for="edge">文字がキャンバス外にはみ出さない</label></div>
 
 <button id="generate">ランダム生成</button>
 <button class="secondary" id="download">PNG保存</button>
+</aside>
 
+<main class="preview"><div class="wrap"><canvas id="canvas" width="1200" height="800"></canvas></div></main>
 </div>
-
-<div class="preview-area">
-  <div class="canvas-wrap">
-    <canvas id="canvas" width="1200" height="800"></canvas>
-  </div>
-</div>
-
-</div>
-
 
 <script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+let customFontFamily=null;
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-const el = {
-  text: document.getElementById("text"),
-  font: document.getElementById("font"),
-  canvasWidth: document.getElementById("canvasWidth"),
-  canvasHeight: document.getElementById("canvasHeight"),
-  minSize: document.getElementById("minSize"),
-  maxSize: document.getElementById("maxSize"),
-  rotation: document.getElementById("rotation"),
-  minOpacity: document.getElementById("minOpacity"),
-  maxOpacity: document.getElementById("maxOpacity"),
-  color: document.getElementById("color"),
-  keepSpaces: document.getElementById("keepSpaces"),
-  randomCase: document.getElementById("randomCase"),
-  generate: document.getElementById("generate"),
-  download: document.getElementById("download")
-};
-
-const values = {
-  minSize: document.getElementById("minSizeValue"),
-  maxSize: document.getElementById("maxSizeValue"),
-  rotation: document.getElementById("rotationValue"),
-  minOpacity: document.getElementById("minOpacityValue"),
-  maxOpacity: document.getElementById("maxOpacityValue")
-};
-
-function updateValues() {
-  values.minSize.textContent = el.minSize.value + " px";
-  values.maxSize.textContent = el.maxSize.value + " px";
-  values.rotation.textContent = "±" + el.rotation.value + "°";
-  values.minOpacity.textContent = el.minOpacity.value + "%";
-  values.maxOpacity.textContent = el.maxOpacity.value + "%";
+const $=id=>document.getElementById(id);
+const controls=['minSize','maxSize','rotation','gap','overlap','tries','minOpacity','maxOpacity'];
+const labels={minSize:'vmin',maxSize:'vmax',rotation:'vrot',gap:'vgap',overlap:'voverlap',tries:'vtries',minOpacity:'vopmin',maxOpacity:'vopmax'};
+function updateVals(){
+  $(labels.minSize).textContent=$('minSize').value+' px';
+  $(labels.maxSize).textContent=$('maxSize').value+' px';
+  $(labels.rotation).textContent='±'+$('rotation').value+'°';
+  $(labels.gap).textContent=$('gap').value+' px';
+  $(labels.overlap).textContent=$('overlap').value+'%';
+  $(labels.tries).textContent=$('tries').value+' 回';
+  $(labels.minOpacity).textContent=$('minOpacity').value+'%';
+  $(labels.maxOpacity).textContent=$('maxOpacity').value+'%';
 }
+controls.forEach(id=>$(id).addEventListener('input',updateVals));updateVals();
 
-Object.values(el).forEach(item => {
-  if (
-    item.tagName === "INPUT" ||
-    item.tagName === "SELECT" ||
-    item.tagName === "TEXTAREA"
-  ) {
-    item.addEventListener("input", updateValues);
-  }
+$('fontFile').addEventListener('change',async e=>{
+  const file=e.target.files[0]; if(!file)return;
+  try{
+    const family='UserUploadedFont';
+    const face=new FontFace(family,await file.arrayBuffer());
+    await face.load(); document.fonts.add(face);
+    customFontFamily=family;
+    $('fontInfo').textContent='読み込み済み: '+file.name;
+    $('font').disabled=true;
+    generate();
+  }catch(err){$('fontInfo').textContent='読み込み失敗: '+err.message}
 });
 
-function random(min, max) {
-  return Math.random() * (max - min) + min;
+function rnd(a,b){return Math.random()*(b-a)+a}
+function rgb(hex){let n=parseInt(hex.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255]}
+function rotatedBounds(w,h,a){
+  const c=Math.abs(Math.cos(a)),s=Math.abs(Math.sin(a));
+  return {w:w*c+h*s,h:w*s+h*c};
 }
-
-function hexToRgb(hex) {
-
-  hex = hex.replace("#", "");
-
-  const bigint = parseInt(hex, 16);
-
-  return {
-    r: (bigint >> 16) & 255,
-    g: (bigint >> 8) & 255,
-    b: bigint & 255
-  };
+function bbox(item,gap){
+  const b=rotatedBounds(item.w,item.h,item.angle);
+  return {x:item.x-b.w/2-gap,y:item.y-b.h/2-gap,w:b.w+gap*2,h:b.h+gap*2};
 }
-
-function randomizeCase(char) {
-
-  if (!el.randomCase.checked) return char;
-
-  if (!/[a-zA-Z]/.test(char)) return char;
-
-  return Math.random() > 0.5
-    ? char.toUpperCase()
-    : char.toLowerCase();
+function intersects(a,b,allowed){
+  const ax=a.x+allowed, ay=a.y+allowed, aw=a.w-allowed*2, ah=a.h-allowed*2;
+  const bx=b.x+allowed, by=b.y+allowed, bw=b.w-allowed*2, bh=b.h-allowed*2;
+  return ax<bx+bw && ax+aw>bx && ay<by+bh && ay+ah>by;
 }
+function generate(){
+  const W=Math.max(100,+$('cw').value),H=Math.max(100,+$('ch').value);
+  canvas.width=W;canvas.height=H;ctx.clearRect(0,0,W,H);
+  const text=$('text').value, font=customFontFamily?`'${customFontFamily}'`:$('font').value;
+  const minS=Math.min(+$('minSize').value,+$('maxSize').value);
+  const maxS=Math.max(+$('minSize').value,+$('maxSize').value);
+  const rot=+$('rotation').value*Math.PI/180;
+  const minO=Math.min(+$('minOpacity').value,+$('maxOpacity').value)/100;
+  const maxO=Math.max(+$('minOpacity').value,+$('maxOpacity').value)/100;
+  const gap=+$('gap').value;
+  const overlapPct=+$('overlap').value/100;
+  const tries=+$('tries').value;
+  const items=[];
 
+  for(let raw of [...text]){
+    if(/\s/.test(raw))continue;
+    let ch=raw;
+    if($('randomCase').checked && /[a-zA-Z]/.test(ch)) ch=Math.random()>.5?ch.toUpperCase():ch.toLowerCase();
 
-function generate() {
+    let size=$('randomSize').checked?rnd(minS,maxS):maxS;
+    let angle=$('randomRotation').checked?rnd(-rot,rot):0;
+    ctx.font=`${size}px ${font}`;
+    const m=ctx.measureText(ch);
+    const w=Math.max(1,m.width),h=Math.max(1,(m.actualBoundingBoxAscent||size*.8)+(m.actualBoundingBoxDescent||size*.2));
+    const item={ch,size,angle,w,h,x:0,y:0,alpha:$('randomOpacity').checked?rnd(minO,maxO):maxO};
 
-  const width = Number(el.canvasWidth.value);
-  const height = Number(el.canvasHeight.value);
-
-  canvas.width = width;
-  canvas.height = height;
-
-  const text = el.text.value;
-
-  const minSize = Number(el.minSize.value);
-  const maxSize = Number(el.maxSize.value);
-
-  const minOpacity = Number(el.minOpacity.value) / 100;
-  const maxOpacity = Number(el.maxOpacity.value) / 100;
-
-  const rotation = Number(el.rotation.value);
-
-  const font = el.font.value;
-
-  const rgb = hexToRgb(el.color.value);
-
-  ctx.clearRect(0, 0, width, height);
-
-  for (let char of text) {
-
-    if (char === " ") {
-
-      if (el.keepSpaces.checked) {
-        continue;
-      } else {
-        continue;
+    const rb=rotatedBounds(w,h,angle);
+    let placed=false;
+    for(let t=0;t<tries;t++){
+      const margin=$('edge').checked?Math.max(rb.w,rb.h)/2:0;
+      item.x=rnd(margin,W-margin);
+      item.y=rnd(margin,H-margin);
+      const box=bbox(item,gap);
+      let bad=false;
+      for(const old of items){
+        const oldBox=bbox(old,gap);
+        if(intersects(box,oldBox,overlapPct*Math.min(box.w,box.h)/2)){bad=true;break}
       }
-
+      if(!bad){placed=true;break}
     }
-
-    char = randomizeCase(char);
-
-    const size = random(minSize, maxSize);
-
-    const x = random(0, width);
-    const y = random(0, height);
-
-    const angle = random(-rotation, rotation);
-
-    const opacity = random(minOpacity, maxOpacity);
-
-    ctx.save();
-
-    ctx.translate(x, y);
-
-    ctx.rotate(angle * Math.PI / 180);
-
-    ctx.font = `${size}px ${font}`;
-
-    ctx.fillStyle =
-      `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
-
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    ctx.fillText(char, 0, 0);
-
-    ctx.restore();
-
+    if(!placed){
+      // 最後まで置けない場合は、許容範囲内で配置
+      const margin=$('edge').checked?Math.max(rb.w,rb.h)/2:0;
+      item.x=rnd(margin,W-margin);item.y=rnd(margin,H-margin);
+    }
+    items.push(item);
   }
 
+  const [r,g,b]=rgb($('color').value);
+  for(const it of items){
+    ctx.save();ctx.translate(it.x,it.y);ctx.rotate(it.angle);
+    ctx.font=`${it.size}px ${font}`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=`rgba(${r},${g},${b},${it.alpha})`;
+    ctx.fillText(it.ch,0,0);ctx.restore();
+  }
 }
-
-el.generate.addEventListener("click", generate);
-
-el.download.addEventListener("click", () => {
-
-  const link = document.createElement("a");
-
-  link.download = "text-scatter.png";
-
-  link.href = canvas.toDataURL("image/png");
-
-  link.click();
-
+$('generate').addEventListener('click',generate);
+$('download').addEventListener('click',()=>{
+  const a=document.createElement('a');a.download='text-scatter.png';a.href=canvas.toDataURL('image/png');a.click();
 });
-
-updateValues();
-
-document.fonts.ready.then(() => {
-  generate();
-});
-
+document.fonts.ready.then(generate);
 </script>
-
 </body>
 </html>
