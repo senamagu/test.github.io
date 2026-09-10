@@ -101,6 +101,13 @@ h1,h2,h3{margin:0}
     <button id="mergeTabs">全タブ結合</button>
   </div>
   <div class="section-label">タブ</div>
+  <div class="panel">
+    <div class="small" style="margin-bottom:7px">チェックしたタブをまとめて操作できます。</div>
+    <div class="row">
+      <button id="mergeSelected">選択して結合</button>
+      <button id="deleteSelected" class="danger">選択して削除</button>
+    </div>
+  </div>
   <div id="tabList" class="list"></div>
   <div class="section-label">ブロック追加</div>
   <div class="panel">
@@ -177,7 +184,11 @@ function fontSize(s){return ({h1:"2.1em",h2:"1.7em",h3:"1.35em",normal:"1em",sma
 
 function renderTabs(){
   $("#tabs").innerHTML=state.tabs.map(t=>`<button class="tab ${t.id===state.activeTab?"active":""}" data-tab="${t.id}">${esc(t.name)}</button>`).join("");
-  $("#tabList").innerHTML=state.tabs.map(t=>`<div class="list-item"><span>${esc(t.name)}</span><button data-tab="${t.id}">開く</button></div>`).join("");
+  $("#tabList").innerHTML=state.tabs.map(t=>`<div class="list-item">
+    <input type="checkbox" class="tab-check" data-tab-check="${t.id}" style="width:auto">
+    <span>${esc(t.name)}</span>
+    <button data-tab="${t.id}">開く</button>
+  </div>`).join("");
   $$("#tabs [data-tab],#tabList [data-tab]").forEach(b=>b.onclick=()=>{state.activeTab=b.dataset.tab;state.selected=null;render()});
 }
 function renderChars(){
@@ -403,7 +414,30 @@ function exportBlock(b){
 }
 $("#fileInput").onchange=e=>importFiles(e.target.files);
 $("#addTab").onclick=()=>{newTab("新しいログ");render()};
-$("#mergeTabs").onclick=()=>{if(state.tabs.length<2)return;const t=getTab();const all=state.tabs.flatMap(x=>x.blocks.map(b=>({...b,createdAt:Number(b.createdAt)||0,srcTab:x.name}))).sort((a,b)=>a.createdAt-b.createdAt);t.blocks=all;t.name="全ログ";state.tabs=[t];render()};
+function checkedTabIds(){
+  return $$("#tabList .tab-check:checked").map(x=>x.dataset.tabCheck);
+}
+function mergeTabIds(ids){
+  if(ids.length<2){alert("2つ以上のタブを選択してください。");return}
+  const selected=state.tabs.filter(t=>ids.includes(t.id));
+  const first=selected[0];
+  const all=selected.flatMap(x=>x.blocks.map(b=>({...b,createdAt:Number(b.createdAt)||0,srcTab:x.name}))).sort((a,b)=>a.createdAt-b.createdAt);
+  first.blocks=all;
+  first.name=selected.map(x=>x.name).join(" + ");
+  state.tabs=[...state.tabs.filter(t=>!ids.includes(t.id)||t.id===first.id)];
+  state.activeTab=first.id;state.selected=null;render();
+}
+$("#mergeTabs").onclick=()=>{if(state.tabs.length<2)return;mergeTabIds(state.tabs.map(t=>t.id))};
+$("#mergeSelected").onclick=()=>mergeTabIds(checkedTabIds());
+$("#deleteSelected").onclick=()=>{
+  const ids=checkedTabIds();
+  if(!ids.length){alert("削除するタブを選択してください。");return}
+  if(!confirm(`選択した ${ids.length} 個のタブを削除しますか？`))return;
+  state.tabs=state.tabs.filter(t=>!ids.includes(t.id));
+  if(!state.tabs.length)newTab("ログ");
+  if(!state.tabs.some(t=>t.id===state.activeTab))state.activeTab=state.tabs[0].id;
+  state.selected=null;render();
+};
 $$("[data-add]").forEach(b=>b.onclick=()=>addBlock(b.dataset.add));
 $("#addChar").onclick=()=>{const n=prompt("キャラクター名");if(!n)return;charFor(n,"#333333");render();charEditor(state.characters[n].id)};
 $("#settingsBtn").onclick=openSettings;$("#exportBtn").onclick=exportHTML;$("#inspectorBtn").onclick=()=>$("#inspector").classList.toggle("open");
