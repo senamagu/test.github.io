@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ココフォリアログ整形</title>
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap");
 :root{
   --ui-bg:#202124;--ui-panel:#292a2d;--ui-panel2:#323338;--ui-line:#4b4d52;
   --ui-text:#f1f3f4;--ui-sub:#aeb3bb;--accent:#8ab4f8;
-  --page-bg:#eeeeee;--page-text:#333333;--bubble:#ffffff;
+  --page-bg:#eeeeee;--page-text:#333333;--bubble:#ffffff;--separator:#333333;
 }
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}
+html,body{margin:0;min-height:100%;font-family:"Zen Kaku Gothic New",sans-serif}
 body{background:var(--ui-bg);color:var(--ui-text)}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer;border:1px solid var(--ui-line);background:var(--ui-panel2);color:var(--ui-text);padding:8px 10px}
@@ -34,7 +35,7 @@ h1,h2,h3{margin:0}
 .tab{white-space:nowrap}
 .tab.active{background:#4b6d9e;border-color:#7195ca}
 .preview-wrap{flex:1;min-height:0;overflow:auto;padding:28px;background:#151619;-webkit-overflow-scrolling:touch}
-.page{max-width:900px;margin:0 auto;background:var(--page-bg);color:var(--page-text);padding:42px 48px 70px;min-height:100%;font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}
+.page{max-width:900px;margin:0 auto;background:var(--page-bg);color:var(--page-text);padding:42px 48px 70px;min-height:100%;font-family:"Zen Kaku Gothic New",sans-serif}
 .preview-title{text-align:center;font-size:38px;font-weight:800;padding:4px 0 18px;border-bottom:4px solid currentColor;margin-bottom:34px}
 .preview-header-img{display:block;max-width:100%;max-height:420px;object-fit:contain;margin:0 auto 28px}
 .block{position:relative;margin:18px 0}
@@ -47,7 +48,7 @@ h1,h2,h3{margin:0}
 .avatar{width:56px;height:56px;min-width:56px;object-fit:cover;background:#aaa;display:block}
 .speech-content{min-width:0;flex:1}
 .speaker{font-weight:800;font-size:18px;line-height:1.25;margin:0 0 5px}
-.bubble{position:relative;display:block;padding:12px 18px;background:var(--bubble);color:var(--page-text);line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble{position:relative;display:block;padding:12px 18px;min-height:1.65em;background:var(--bubble);color:var(--page-text);line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
 .bubble.left-tail:before,.bubble.right-tail:before{content:"";position:absolute;top:16px;border:10px solid transparent}
 .bubble.left-tail:before{left:-18px;border-right-color:var(--bubble)}
 .bubble.right-tail:before{right:-18px;border-left-color:var(--bubble)}
@@ -104,7 +105,7 @@ h1,h2,h3{margin:0}
   <h2>ココフォリアログ整形</h2>
   <div class="section-label">読み込み</div>
   <div class="panel">
-    <input id="fileInput" type="file" multiple accept=".html,.htm,.json,.png,.jpg,.jpeg,.webp,.gif,.apng,.mp4,.mov,.wav,.mp3,.ogg">
+    <input id="fileInput" type="file" multiple accept=".html,.htm,.json,.png,.jpg,.jpeg,.webp,.gif,.apng,.mp4,.mov,.wav,.mp3,.ogg,audio/*,video/*,image/*">
     <div class="small" style="margin-top:7px">HTML(新/旧)・JSON・画像/動画/音声を読み込めます。画像等は挿入素材として登録します。</div>
   </div>
   <div class="row">
@@ -168,8 +169,8 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&
 const clone=o=>JSON.parse(JSON.stringify(o));
 const defaultSettings={
   title:"タイトル",titleColor:"#333333",headerImage:null,
-  pageBg:"#eeeeee",rootBg:"#777777",logBg:"#eeeeee",baseText:"#333333",baseBubble:"#ffffff",
-  font:'"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif',
+  pageBg:"#eeeeee",rootBg:"#777777",logBg:"#eeeeee",baseText:"#333333",baseBubble:"#ffffff",separatorColor:"#333333",
+  font:'"Zen Kaku Gothic New",sans-serif',
   colors:{system:"#666666",success:"#00a9b3",critical:"#00a9b3",failure:"#c74720",fumble:"#c74720"}
 };
 let state={settings:defaultSettings,characters:{},tabs:[],activeTab:null,selected:null,media:{}};
@@ -178,6 +179,16 @@ function newTab(name="ログ"){
   const t={id:uid(),name,blocks:[]}; state.tabs.push(t); state.activeTab=t.id; return t;
 }
 function getTab(){return state.tabs.find(t=>t.id===state.activeTab)||state.tabs[0]}
+function isAllTab(){return state.activeTab==="__ALL__"}
+function getDisplayBlocks(){
+  if(!isAllTab()){const t=getTab();return t?(t.blocks.map(b=>({block:b,tabId:t.id}))):[]}
+  return state.tabs.flatMap(t=>t.blocks.map(b=>({block:b,tabId:t.id})))
+    .sort((a,b)=>(Number(a.block.createdAt)||0)-(Number(b.block.createdAt)||0));
+}
+function findBlock(id){
+  for(const t of state.tabs){const b=t.blocks.find(x=>x.id===id);if(b)return {block:b,tab:t,index:t.blocks.indexOf(b)}}
+  return null;
+}
 function charFor(name,color,icon){
   const key=String(name||"").trim();
   if(!key||key==="system"||key==="　") return null;
@@ -189,18 +200,33 @@ function makeBlock(type,data={}){
   return Object.assign({id:uid(),type,createdAt:Date.now(),text:"",name:"",nameColor:"#333333",textColor:state.settings.baseText,bubbleColor:state.settings.baseBubble,direction:"left",shape:"normal",size:"normal",showName:true,align:"left",boxColor:"#aaaaaa",title:"",image:null,media:null,mediaKind:"image",imageSide:"right",srcTab:null},data);
 }
 function save(){try{localStorage.setItem("cocofolia_formatter_v1",JSON.stringify(state))}catch(e){console.warn(e)}}
-function load(){try{const x=localStorage.getItem("cocofolia_formatter_v1");if(x){state=JSON.parse(x);if(!state.tabs.length)newTab();return true}}catch(e){}newTab();return false}
+function load(){
+  try{
+    const x=localStorage.getItem("cocofolia_formatter_v1");
+    if(x){
+      state=JSON.parse(x);
+      state.settings=Object.assign(clone(defaultSettings),state.settings||{});
+      state.settings.colors=Object.assign(clone(defaultSettings.colors),state.settings.colors||{});
+      if(!state.tabs.length)newTab();
+      return true
+    }
+  }catch(e){}
+  newTab();return false
+}
 function sizeClass(s){return ({h1:"h1",h2:"h2",h3:"h3",normal:"normal",small:"small"})[s]||"normal"}
 function fontSize(s){return ({h1:"2.1em",h2:"1.7em",h3:"1.35em",normal:"1em",small:".78em"})[s]||"1em"}
 
 function renderTabs(){
-  $("#tabs").innerHTML=state.tabs.map(t=>`<button class="tab ${t.id===state.activeTab?"active":""}" data-tab="${t.id}">${esc(t.name)}</button>`).join("");
+  const allActive=isAllTab();
+  $("#tabs").innerHTML=`<button class="tab ${allActive?"active":""}" data-tab="__ALL__">ALL</button>`+
+    state.tabs.map(t=>`<button class="tab ${t.id===state.activeTab?"active":""}" data-tab="${t.id}">${esc(t.name)}</button>`).join("");
   $("#tabList").innerHTML=state.tabs.map(t=>`<div class="list-item">
     <input type="checkbox" class="tab-check" data-tab-check="${t.id}" style="width:auto">
-    <span>${esc(t.name)}</span>
-    <button data-tab="${t.id}">開く</button>
+    <span>${esc(t.name)}</span><button data-tab="${t.id}">開く</button>
   </div>`).join("");
-  $$("#tabs [data-tab],#tabList [data-tab]").forEach(b=>b.onclick=()=>{state.activeTab=b.dataset.tab;state.selected=null;render()});
+  $$("#tabs [data-tab],#tabList [data-tab]").forEach(b=>b.onclick=()=>{
+    state.activeTab=b.dataset.tab;state.selected=null;render()
+  });
 }
 function renderChars(){
   $("#charList").innerHTML=Object.values(state.characters).map(c=>`<div class="list-item"><span style="color:${esc(c.nameColor)}">${esc(c.name)}</span><button data-char="${esc(c.id)}">設定</button></div>`).join("")||'<div class="small">読み込むとキャラクターがここに並びます。</div>';
@@ -217,49 +243,65 @@ function blockTools(b){
  return `<div class="block-tools"><button data-act="up">↑</button><button data-act="down">↓</button><button data-act="insert">＋</button><button data-act="del" class="danger">削除</button></div>`;
 }
 function renderPage(){
- const p=$("#page"); if(!getTab()){p.innerHTML="";return}
- const s=state.settings;
- p.style.background=s.logBg;p.style.color=s.baseText;p.style.fontFamily=s.font;
- let html=`<div class="preview-title" style="color:${esc(s.titleColor)}">${esc(s.title)}</div>`;
- if(s.headerImage) html+=`<img class="preview-header-img" src="${esc(s.headerImage)}">`;
- html+=getTab().blocks.map((b,i)=>{
-   const sel=state.selected===b.id;
-   let content="";
-   if(b.type==="bubble"){
-     const c=state.characters[b.name]||{};
-     const icon=b.icon||c.icon;
-     content=`<div class="speech-row ${b.direction==="right"?"right":""}">
-       ${icon?`<img class="avatar" src="${esc(icon)}">`:`<div class="avatar"></div>`}
-       <div class="speech-content">${b.showName?`<div class="speaker" style="color:${esc(b.nameColor||c.nameColor||s.baseText)}">${esc(b.name)}</div>`:""}
-       <div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="background:${esc(b.bubbleColor||s.baseBubble)};color:${esc(b.textColor||c.textColor||s.baseText)};font-size:${fontSize(b.size)}">${esc(b.text)}</div></div></div>`;
-   }else if(b.type==="narration"){
-     content=`<div class="narration ${b.align}" style="color:${esc(b.textColor||s.baseText)};font-size:${fontSize(b.size)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
-   }else if(b.type==="textbox"){
-     content=`<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(b.boxColor)};color:${esc(b.textColor)}">
-       <div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>
-       ${b.image?`<img src="${esc(b.image)}">`:""}</div>`;
-   }else if(b.type==="bgm"){
-     content=`<div class="bgm"><span style="color:${esc(b.textColor)};background:${esc(b.bgColor)};padding:4px 8px">${esc(b.text||"BGM")}</span><audio controls src="${esc(b.media||"")}"></audio></div>`;
-   }else if(b.type==="media"){
-     if(b.mediaKind==="audio") content=`<div class="media"><audio controls src="${esc(b.media||"")}"></audio></div>`;
-     else if(b.mediaKind==="video") content=`<div class="media"><video controls src="${esc(b.media||"")}"></video></div>`;
-     else content=`<div class="media"><img src="${esc(b.media||"")}"></div>`;
-   }else if(b.type==="separator") content=`<div class="separator" style="color:${esc(b.color||s.baseText)}"></div>`;
-   return `<div class="block ${sel?"selected":""}" data-block="${b.id}">${blockTools(b)}${content}</div>`;
- }).join("");
- p.innerHTML=html||'<div class="empty">ログがありません。左側から読み込むか、ブロックを追加してください。</div>';
- $$("#page .block").forEach(el=>{
-   el.onclick=e=>{if(e.target.closest(".block-tools"))return;state.selected=el.dataset.block;renderInspector();renderPage()};
-   $$("#page .block-tools button",el).forEach(btn=>btn.onclick=e=>{e.stopPropagation();blockAction(el.dataset.block,btn.dataset.act)});
- });
+  const p=$("#page");
+  if(!state.tabs.length){p.innerHTML="";return}
+  const s=state.settings;
+  p.style.background=s.logBg;p.style.color=s.baseText;p.style.fontFamily=s.font;
+  let html=`<div class="preview-title" style="color:${esc(s.titleColor)}">${esc(s.title)}</div>`;
+  if(s.headerImage) html+=`<img class="preview-header-img" src="${esc(s.headerImage)}">`;
+  const items=getDisplayBlocks();
+  html+=items.map(({block:b,tabId},i)=>{
+    const sel=state.selected===b.id;
+    let content="";
+    if(b.type==="bubble"){
+      const c=state.characters[b.name]||{},icon=b.icon||c.icon;
+      content=`<div class="speech-row ${b.direction==="right"?"right":""}">
+        ${icon?`<img class="avatar" src="${esc(icon)}">`:`<div class="avatar"></div>`}
+        <div class="speech-content">${b.showName?`<div class="speaker" style="color:${esc(b.nameColor||c.nameColor||s.baseText)}">${esc(b.name)}</div>`:""}
+        <div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="background:${esc(b.bubbleColor||s.baseBubble)};color:${esc(b.textColor||c.textColor||s.baseText)};font-size:${fontSize(b.size)}">${esc(b.text)}</div></div></div>`;
+    }else if(b.type==="narration"){
+      content=`<div class="narration ${b.align}" style="color:${esc(b.textColor||s.baseText)};font-size:${fontSize(b.size)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
+    }else if(b.type==="textbox"){
+      content=`<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(b.boxColor)};color:${esc(b.textColor)}">
+        <div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>
+        ${b.image?`<img src="${esc(b.image)}">`:""}</div>`;
+    }else if(b.type==="bgm"){
+      content=`<div class="bgm" style="background:${esc(b.bgColor||"#333333")};color:${esc(b.textColor||"#eeeeee")}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(b.media||"")}"></audio></div>`;
+    }else if(b.type==="media"){
+      if(b.mediaKind==="audio") content=`<div class="media"><audio controls src="${esc(b.media||"")}"></audio></div>`;
+      else if(b.mediaKind==="video") content=`<div class="media"><video controls src="${esc(b.media||"")}"></video></div>`;
+      else content=`<div class="media"><img src="${esc(b.media||"")}"></div>`;
+    }else if(b.type==="separator") content=`<div class="separator" style="background:${esc(b.color||s.separatorColor||s.baseText)};color:${esc(b.color||s.separatorColor||s.baseText)}"></div>`;
+    return `<div class="block ${sel?"selected":""}" data-block="${b.id}" data-tab="${tabId}">${blockTools(b)}${content}</div>`;
+  }).join("");
+  p.innerHTML=html||'<div class="empty">ログがありません。左側から読み込むか、ブロックを追加してください。</div>';
+  $$("#page .block").forEach(el=>{
+    el.onclick=e=>{if(e.target.closest(".block-tools"))return;state.selected=el.dataset.block;renderInspector();renderPage()};
+    $$("#page .block-tools button",el).forEach(btn=>btn.onclick=e=>{e.stopPropagation();blockAction(el.dataset.block,btn.dataset.act)});
+  });
 }
 function blockAction(id,act){
- const t=getTab(),i=t.blocks.findIndex(b=>b.id===id);if(i<0)return;
- if(act==="up"&&i>0)[t.blocks[i-1],t.blocks[i]]=[t.blocks[i],t.blocks[i-1]];
- if(act==="down"&&i<t.blocks.length-1)[t.blocks[i+1],t.blocks[i]]=[t.blocks[i],t.blocks[i+1]];
- if(act==="del"){t.blocks.splice(i,1);state.selected=null}
- if(act==="insert"){const n=makeBlock("narration",{text:"新しい地の文"});t.blocks.splice(i+1,0,n);state.selected=n.id}
- render();
+  const found=findBlock(id);if(!found)return;
+  const {block:b,tab:t,index:i}=found;
+  if(act==="up"&&i>0){[t.blocks[i-1],t.blocks[i]]=[t.blocks[i],t.blocks[i-1]];state.activeTab=t.id}
+  if(act==="down"&&i<t.blocks.length-1){[t.blocks[i+1],t.blocks[i]]=[t.blocks[i],t.blocks[i+1]];state.activeTab=t.id}
+  if(act==="del"){
+    t.blocks.splice(i,1);state.selected=null;state.activeTab=t.id;
+  }
+  if(act==="insert"){
+    const types=[["1","吹き出し"],["2","地の文"],["3","テキストボックス"],["4","BGM"],["5","画像"],["6","動画"],["7","区切り線"]];
+    const choice=prompt("下に挿入する種類を選択：\n"+types.map(x=>x.join("：")).join("\n"),"2");
+    const map={1:"bubble",2:"narration",3:"textbox",4:"bgm",5:"media",6:"media",7:"separator"};
+    const type=map[choice];if(!type)return;
+    const n=makeBlock(type);
+    if(type==="bubble"){n.name=Object.keys(state.characters)[0]||"新キャラクター";charFor(n.name,"#333333")}
+    if(type==="narration")n.text="";
+    if(type==="textbox")n.text="";
+    if(type==="bgm")n.text="BGM";
+    if(type==="media")n.mediaKind=choice==="6"?"video":"image";
+    t.blocks.splice(i+1,0,n);state.selected=n.id;state.activeTab=t.id;
+  }
+  render();
 }
 function inputField(label,id,value,type="text"){
  return `<label>${label}</label><input id="${id}" type="${type}" value="${esc(value)}">`;
@@ -274,7 +316,7 @@ function bindCommonBlock(b){
  $$("#inspectorBody input[id$=Text]").forEach(el=>el.oninput=()=>{const key=el.id.replace("Text","").replace("f_","");b[key]=el.value;const c=$("#f_"+key);if(c)c.value=el.value;renderPage();save()});
 }
 function renderInspector(){
- const body=$("#inspectorBody"),b=getTab()?.blocks.find(x=>x.id===state.selected);
+ const body=$("#inspectorBody"),found=findBlock(state.selected),b=found?.block;
  if(!b){body.innerHTML=`<div class="panel"><b>全体設定</b><p class="small">要素をクリックすると個別編集できます。</p></div>`;return}
  let h=`<div class="panel"><div class="small">種類</div><b>${esc(b.type)}</b></div>`;
  if(b.type==="bubble"){
@@ -299,7 +341,7 @@ function renderInspector(){
    <label>画像</label><input id="mediaPicker" type="file" accept="image/*">`;
  }else if(b.type==="bgm"){
    h+=inputField("表示名","f_text",b.text)+colorField("背景色","f_bgColor",b.bgColor||"#333333")+colorField("文字・再生バー色","f_textColor",b.textColor||"#eeeeee")+
-   `<label>音声ファイル</label><input id="mediaPicker" type="file" accept="audio/*">`;
+   `<label>音声ファイル</label><input id="mediaPicker" type="file" accept=".mp3,.ogg,.wav,audio/*">`;
  }else if(b.type==="media"){
    h+=`<label>種類</label><select id="f_mediaKind"><option value="image">画像</option><option value="video">動画</option><option value="audio">音声</option></select><label>ファイル</label><input id="mediaPicker" type="file" accept="image/*,video/*,audio/*">`;
  }else if(b.type==="separator"){
@@ -334,11 +376,11 @@ async function fileData(f){return await new Promise((res,rej)=>{const r=new File
 function openSettings(){
  $("#inspector").classList.add("open");const s=state.settings;
  $("#inspectorBody").innerHTML=`${inputField("タイトル","s_title",s.title)}${colorField("タイトル色","s_titleColor",s.titleColor)}
- ${colorField("HTML/ページ背景","s_pageBg",s.pageBg)}${colorField("ログ領域背景","s_logBg",s.logBg)}${colorField("基本文字色","s_baseText",s.baseText)}${colorField("基本吹き出し色","s_baseBubble",s.baseBubble)}
+ ${colorField("HTML/ページ背景","s_pageBg",s.pageBg)}${colorField("ログ領域背景","s_logBg",s.logBg)}${colorField("区切り線色","s_separatorColor",s.separatorColor||"#333333")}${colorField("基本文字色","s_baseText",s.baseText)}${colorField("基本吹き出し色","s_baseBubble",s.baseBubble)}
  <label>フォント</label><input id="s_font" value="${esc(s.font)}">
  <div class="panel"><b>ダイス結果色</b>${colorField("system","s_system",s.colors.system)}${colorField("成功","s_success",s.colors.success)}${colorField("クリティカル/スペシャル","s_critical",s.colors.critical)}${colorField("失敗","s_failure",s.colors.failure)}${colorField("ファンブル","s_fumble",s.colors.fumble)}</div>
  <label>ヘッダー画像</label><input id="s_file" type="file" accept="image/*">`;
- const map={title:"title",titleColor:"titleColor",pageBg:"pageBg",logBg:"logBg",baseText:"baseText",baseBubble:"baseBubble",font:"font"};
+ const map={title:"title",titleColor:"titleColor",pageBg:"pageBg",logBg:"logBg",baseText:"baseText",baseBubble:"baseBubble",separatorColor:"separatorColor",font:"font"};
  Object.entries(map).forEach(([id,k])=>{const e=$("#s_"+id);if(e)e.oninput=()=>{s[k]=e.value;renderPage();save()}});
  ["system","success","critical","failure","fumble"].forEach(k=>{$("#s_"+k).oninput=e=>{s.colors[k]=e.target.value;renderPage();save()};$("#s_"+k+"Text").oninput=e=>{s.colors[k]=e.target.value;$("#s_"+k).value=e.target.value;renderPage();save()}});
  $("#s_file").onchange=async e=>{if(e.target.files[0]){s.headerImage=await fileData(e.target.files[0]);renderPage();save()}};
@@ -405,23 +447,29 @@ async function importFiles(files){
  render();
 }
 function exportHTML(){
- const s=state.settings;
- const tabs=state.tabs.map(t=>`<button class="tab" data-tab="${esc(t.id)}">${esc(t.name)}</button>`).join("");
- const blocks=state.tabs.map(t=>`<section class="logtab" id="tab_${esc(t.id)}"><h2>${esc(t.name)}</h2>${t.blocks.map(b=>exportBlock(b)).join("")}</section>`).join("");
- const doc=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(s.title)}</title><style>
-*{box-sizing:border-box}body{margin:0;background:${s.rootBg};color:${s.baseText};font-family:${s.font}}.wrap{max-width:960px;margin:auto;background:${s.logBg};min-height:100vh;padding:40px 48px 70px}.title{text-align:center;font-size:38px;font-weight:800;padding-bottom:18px;border-bottom:4px solid ${s.titleColor};color:${s.titleColor};margin-bottom:30px}.header{display:block;max-width:100%;max-height:420px;margin:0 auto 28px}.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:25px}.tab{border:0;padding:8px 12px;background:#ddd;color:#333}.tab.active{background:#555;color:#fff}.logtab{display:none}.logtab.active{display:block}.speech{display:flex;gap:14px;margin:18px 0;align-items:flex-start}.speech.right{flex-direction:row-reverse}.avatar{width:56px;height:56px;object-fit:cover;background:#aaa;flex:none}.speaker{font-weight:800;font-size:18px;margin-bottom:5px}.content{min-width:0;flex:1}.bubble{padding:12px 18px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;position:relative}.normal{border-radius:20px}.thought{border-radius:28px}.radio{border-radius:0}.loud{clip-path:polygon(0 9%,4% 0,8% 8%,12% 0,16% 8%,20% 0,24% 8%,28% 0,32% 8%,36% 0,40% 8%,44% 0,48% 8%,52% 0,56% 8%,60% 0,64% 8%,68% 0,72% 8%,76% 0,80% 8%,84% 0,88% 8%,92% 0,96% 8%,100% 0,98% 12%,100% 20%,98% 28%,100% 36%,98% 44%,100% 52%,98% 60%,100% 68%,98% 76%,100% 84%,98% 92%,100% 100%,96% 92%,92% 100%,88% 92%,84% 100%,80% 92%,76% 100%,72% 92%,68% 100%,64% 92%,60% 100%,56% 92%,52% 100%,48% 92%,44% 100%,40% 92%,36% 100%,32% 92%,28% 100%,24% 92%,20% 100%,16% 92%,12% 100%,8% 92%,4% 100%,2% 92%,0 84%,2% 76%,0 68%,2% 60%,0 52%,2% 44%,0 36%,2% 28%,0 20%,2% 12%);padding:18px 22px}.narration{white-space:pre-wrap;line-height:1.7;margin:18px 0}.textbox{padding:18px;background:#aaa;color:#fff;display:flex;gap:18px;align-items:center;margin:18px 0}.textbox.reverse{flex-direction:row-reverse}.textbox-main{flex:1}.textbox-title{font-size:24px;font-weight:900;margin-bottom:8px}.textbox-text{white-space:pre-wrap;line-height:1.65}.textbox img{width:38%;max-height:260px;object-fit:contain}.media img,.media video{display:block;max-width:100%;max-height:600px;margin:auto}.media audio{width:100%}.bgm{display:flex;gap:12px;align-items:center;background:#333;padding:10px 14px;margin:18px 0}.bgm audio{flex:1}.sep{height:4px;margin:28px 0;background:${s.baseText}}
-</style></head><body><main class="wrap"><div class="title">${esc(s.title)}</div>${s.headerImage?`<img class="header" src="${esc(s.headerImage)}">`:""}<div class="tabs">${tabs}</div>${blocks}</main><script>
-const ts=[...document.querySelectorAll(".tab")], ls=[...document.querySelectorAll(".logtab")];function show(id){ts.forEach(x=>x.classList.toggle("active",x.dataset.tab===id));ls.forEach(x=>x.classList.toggle("active",x.id==="tab_"+id))}ts.forEach(x=>x.onclick=()=>show(x.dataset.tab));if(ts[0])show(ts[0].dataset.tab);
-<\/script></body></html>`;
- const blob=new Blob([doc],{type:"text/html;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(s.title||"cocofolia-log")+".html";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+  const s=state.settings;
+  const tabs=`<button class="tab active" data-tab="__ALL__">ALL</button>`+
+    state.tabs.map(t=>`<button class="tab" data-tab="${esc(t.id)}">${esc(t.name)}</button>`).join("");
+  const allBlocks=state.tabs.flatMap(t=>t.blocks.map(b=>({...b,_tabId:t.id})))
+    .sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
+  const blocks=`<section class="logtab" id="tab___ALL__">${allBlocks.map(b=>exportBlock(b)).join("")}</section>`+
+    state.tabs.map(t=>`<section class="logtab" id="tab_${esc(t.id)}">${t.blocks.map(b=>exportBlock(b)).join("")}</section>`).join("");
+  const fontFace='@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap");';
+  const doc=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(s.title)}</title><style>
+  ${fontFace}
+  *{box-sizing:border-box}body{margin:0;background:${s.rootBg};color:${s.baseText};font-family:${s.font||'"Zen Kaku Gothic New",sans-serif'}}.wrap{max-width:960px;margin:auto;background:${s.logBg};min-height:100vh;padding:40px 48px 70px}.title{text-align:center;font-size:38px;font-weight:800;padding-bottom:18px;border-bottom:4px solid ${s.titleColor};color:${s.titleColor};margin-bottom:30px}.header{display:block;max-width:100%;max-height:420px;margin:0 auto 28px}.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:25px}.tab{border:0;padding:8px 12px;background:#ddd;color:#333}.tab.active{background:#555;color:#fff}.logtab{display:none}.logtab.active{display:block}.speech{display:flex;gap:14px;margin:18px 0;align-items:flex-start}.speech.right{flex-direction:row-reverse}.avatar{width:56px;height:56px;object-fit:cover;background:#aaa;flex:none}.speaker{font-weight:800;font-size:18px;margin-bottom:5px}.content{min-width:0;flex:1}.bubble{padding:12px 18px;min-height:1.65em;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;position:relative}.normal{border-radius:20px}.thought{border-radius:28px}.radio{border-radius:0}.loud{clip-path:polygon(0 9%,4% 0,8% 8%,12% 0,16% 8%,20% 0,24% 8%,28% 0,32% 8%,36% 0,40% 8%,44% 0,48% 8%,52% 0,56% 8%,60% 0,64% 8%,68% 0,72% 8%,76% 0,80% 8%,84% 0,88% 8%,92% 0,96% 8%,100% 0,98% 12%,100% 20%,98% 28%,100% 36%,98% 44%,100% 52%,98% 60%,100% 68%,98% 76%,100% 84%,98% 92%,100% 100%,96% 92%,92% 100%,88% 92%,84% 100%,80% 92%,76% 100%,72% 92%,68% 100%,64% 92%,60% 100%,56% 92%,52% 100%,48% 92%,44% 100%,40% 92%,36% 100%,32% 92%,28% 100%,24% 92%,20% 100%,16% 92%,12% 100%,8% 92%,4% 100%,2% 92%,0 84%,2% 76%,0 68%,2% 60%,0 52%,2% 44%,0 36%,2% 28%,0 20%,2% 12%);padding:18px 22px}.narration{white-space:pre-wrap;line-height:1.7;margin:18px 0}.textbox{padding:18px;background:#aaa;color:#fff;display:flex;gap:18px;align-items:center;margin:18px 0}.textbox.reverse{flex-direction:row-reverse}.textbox-main{flex:1}.textbox-title{font-size:24px;font-weight:900;margin-bottom:8px}.textbox-text{white-space:pre-wrap;line-height:1.65}.textbox img{width:38%;max-height:260px;object-fit:contain}.media img,.media video{display:block;max-width:100%;max-height:600px;margin:auto}.media audio{width:100%}.bgm{display:flex;gap:12px;align-items:center;padding:10px 14px;margin:18px 0}.bgm audio{flex:1}.sep{height:4px;margin:28px 0;background:${s.separatorColor||s.baseText}}
+  </style></head><body><main class="wrap"><div class="title">${esc(s.title)}</div>${s.headerImage?`<img class="header" src="${esc(s.headerImage)}">`:""}<div class="tabs">${tabs}</div>${blocks}</main><script>
+  const ts=[...document.querySelectorAll(".tab")],ls=[...document.querySelectorAll(".logtab")];function show(id){ts.forEach(x=>x.classList.toggle("active",x.dataset.tab===id));ls.forEach(x=>x.classList.toggle("active",x.id==="tab_"+id))}ts.forEach(x=>x.onclick=()=>show(x.dataset.tab));show("__ALL__");
+  <\/script></body></html>`;
+  const blob=new Blob([doc],{type:"text/html;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(s.title||"cocofolia-log")+".html";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
 }
 function exportBlock(b){
  if(b.type==="bubble"){const c=state.characters[b.name]||{},icon=b.icon||c.icon;return `<div class="speech ${b.direction==="right"?"right":""}">${icon?`<img class="avatar" src="${esc(icon)}">`:`<div class="avatar"></div>`}<div class="content">${b.showName?`<div class="speaker" style="color:${esc(b.nameColor)}">${esc(b.name)}</div>`:""}<div class="bubble ${esc(b.shape)}" style="background:${esc(b.bubbleColor)};color:${esc(b.textColor)};font-size:${fontSize(b.size)}">${esc(b.text)}</div></div></div>`}
  if(b.type==="narration")return `<div class="narration" style="color:${esc(b.textColor)};font-size:${fontSize(b.size)};text-align:${esc(b.align)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
  if(b.type==="textbox")return `<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(b.boxColor)};color:${esc(b.textColor)}"><div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>${b.image?`<img src="${esc(b.image)}">`:""}</div>`;
- if(b.type==="bgm")return `<div class="bgm"><span style="color:${esc(b.textColor)}">${esc(b.text||"BGM")}</span><audio controls src="${esc(b.media||"")}"></audio></div>`;
+ if(b.type==="bgm")return `<div class="bgm" style="background:${esc(b.bgColor||"#333333")};color:${esc(b.textColor||"#eeeeee")}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(b.media||"")}"></audio></div>`;
  if(b.type==="media"){return b.mediaKind==="video"?`<div class="media"><video controls src="${esc(b.media)}"></video></div>`:b.mediaKind==="audio"?`<div class="media"><audio controls src="${esc(b.media)}"></audio></div>`:`<div class="media"><img src="${esc(b.media)}"></div>`}
- return `<div class="sep"></div>`;
+ return `<div class="sep" style="background:${esc(b.color||s.separatorColor||s.baseText)}"></div>`;
 }
 $("#fileInput").onchange=e=>importFiles(e.target.files);
 $("#addTab").onclick=()=>{newTab("新しいログ");render()};
