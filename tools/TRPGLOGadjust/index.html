@@ -36,8 +36,7 @@ h1,h2,h3{margin:0}
 .tab.active{background:#4b6d9e;border-color:#7195ca}
 .preview-wrap{flex:1;min-height:0;overflow:auto;padding:28px;background:#151619;-webkit-overflow-scrolling:touch}
 .page{max-width:900px;margin:0 auto;background:var(--page-bg);color:var(--page-text);padding:42px 48px 70px;min-height:100%;font-family:"Zen Kaku Gothic New",sans-serif}
-.preview-title{text-align:center;font-size:38px;font-weight:800;padding:4px 0 18px;border-bottom:4px solid currentColor;margin-bottom:34px}
-.preview-header-img{display:block;max-width:100%;max-height:420px;object-fit:contain;margin:0 auto 28px}
+.preview-title{text-align:center;font-size:38px;font-weight:800;padding:4px 0 18px;border-bottom:4px solid currentColor;margin-bottom:34px}.preview-header-img{display:block;max-width:100%;max-height:420px;object-fit:contain;margin:16px auto 18px}
 .block{position:relative;margin:18px 0}
 .block.selected{outline:2px solid var(--accent);outline-offset:5px}
 .block-tools{display:none;position:absolute;right:0;top:-30px;z-index:4;gap:3px}
@@ -53,12 +52,11 @@ h1,h2,h3{margin:0}
 .bubble.left-tail:before{left:-18px;border-right-color:var(--bubble)}
 .bubble.right-tail:before{right:-18px;border-left-color:var(--bubble)}
 .bubble.normal{border-radius:20px}
-.bubble.thought{border-radius:28px}
-.bubble.radio{border-radius:0}
-.bubble.loud{
-  clip-path:polygon(0 9%,4% 0,8% 8%,12% 0,16% 8%,20% 0,24% 8%,28% 0,32% 8%,36% 0,40% 8%,44% 0,48% 8%,52% 0,56% 8%,60% 0,64% 8%,68% 0,72% 8%,76% 0,80% 8%,84% 0,88% 8%,92% 0,96% 8%,100% 0,98% 12%,100% 20%,98% 28%,100% 36%,98% 44%,100% 52%,98% 60%,100% 68%,98% 76%,100% 84%,98% 92%,100% 100%,96% 92%,92% 100%,88% 92%,84% 100%,80% 92%,76% 100%,72% 92%,68% 100%,64% 92%,60% 100%,56% 92%,52% 100%,48% 92%,44% 100%,40% 92%,36% 100%,32% 92%,28% 100%,24% 92%,20% 100%,16% 92%,12% 100%,8% 92%,4% 100%,2% 92%,0 84%,2% 76%,0 68%,2% 60%,0 52%,2% 44%,0 36%,2% 28%,0 20%,2% 12%);
-  padding:18px 22px;
-}
+.bubble.thought{border-radius:28px}.bubble.thought.left-tail:before,.bubble.thought.right-tail:before{width:12px;height:12px;border:0;border-radius:50%;top:23px}.bubble.thought.left-tail:before{left:-20px;background:var(--bubble)}.bubble.thought.right-tail:before{right:-20px;background:var(--bubble)}
+.bubble.radio{border-radius:0}.bubble.radio.left-tail:before,.bubble.radio.right-tail:before{border:0;width:12px;height:12px;top:16px;background:var(--bubble)}.bubble.radio.left-tail:before{left:-12px}.bubble.radio.right-tail:before{right:-12px}
+.bubble.loud{padding:18px 22px;clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 35%,97% 52%,100% 69%,97% 86%,100% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 52%,3% 34%,0 18%)}
+.bubble.loud.left-tail{clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 35%,97% 52%,100% 69%,97% 86%,100% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 60%,-18px 50%,0 40%,3% 34%,0 18%)}
+.bubble.loud.right-tail{clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 40%,calc(100% + 18px) 50%,100% 60%,97% 69%,100% 86%,97% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 52%,3% 34%,0 18%)}
 .bubble.right-tail{margin-right:18px}
 .bubble.left-tail{margin-left:18px}
 .narration{white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
@@ -67,8 +65,8 @@ h1,h2,h3{margin:0}
 .textbox.reverse{flex-direction:row-reverse}
 .textbox-main{flex:1;min-width:0}.textbox-title{font-weight:900;font-size:24px;margin-bottom:8px}.textbox-text{white-space:pre-wrap;line-height:1.65}
 .textbox img{width:38%;max-width:300px;max-height:260px;object-fit:contain}
-.bgm{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#333;color:#eee}
-.bgm audio{flex:1;min-width:0}
+.bgm{display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 14px;background:#333;color:#eee}.bgm span{flex:none}.bgm audio{flex:0 1 70%;max-width:560px}
+.bgm audio{min-width:180px}
 .media img,.media video{display:block;max-width:100%;max-height:600px;margin:auto}
 .media audio{width:100%}
 .separator{height:4px;background:currentColor;margin:28px 0}
@@ -137,7 +135,7 @@ h1,h2,h3{margin:0}
     </div>
   </div>
   <div class="section-label">キャラクター</div>
-  <div id="charList" class="list"></div>
+  <div class="panel"><div class="row"><button id="mergeCharsSelected">選択して結合</button><button id="deleteCharsSelected" class="danger">選択して削除</button></div></div><div id="charList" class="list"></div>
   <button id="addChar" style="width:100%;margin-top:6px">＋ キャラクター追加</button>
   <div class="section-label">保存</div>
   <div class="row"><button id="backupExport">バックアップ書出</button><button id="backupImport">バックアップ読込</button></div>
@@ -149,7 +147,7 @@ h1,h2,h3{margin:0}
   <div class="topbar">
     <h1 id="activeName">プレビュー</h1><div class="grow"></div>
     <button id="settingsBtn">全体設定</button>
-    <button id="exportBtn" class="primary">HTML書出</button>
+    <button id="exportBtn" class="primary">HTML/ZIP書出</button>
     <button id="inspectorBtn">編集</button>
   </div>
   <div id="tabs" class="tabs"></div>
@@ -168,7 +166,7 @@ const uid=()=>crypto.randomUUID?.()||Date.now().toString(36)+Math.random().toStr
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 const defaultSettings={
-  title:"タイトル",titleColor:"#333333",headerImage:null,
+  title:"タイトル",titleColor:"#333333",titleLineColor:"#333333",headerImage:null,
   pageBg:"#eeeeee",rootBg:"#777777",logBg:"#eeeeee",baseText:"#333333",baseBubble:"#ffffff",separatorColor:"#333333",
   font:'"Zen Kaku Gothic New",sans-serif',
   colors:{system:"#666666",success:"#00a9b3",critical:"#00a9b3",failure:"#c74720",fumble:"#c74720"}
@@ -192,12 +190,12 @@ function findBlock(id){
 function charFor(name,color,icon){
   const key=String(name||"").trim();
   if(!key||key==="system"||key==="　") return null;
-  if(!state.characters[key]) state.characters[key]={id:uid(),name:key,nameColor:color||"#333333",textColor:state.settings.baseText,icon:icon||null,narration:false,expressions:[]};
+  if(!state.characters[key]) state.characters[key]={id:uid(),name:key,nameColor:color||"#333333",textColor:state.settings.baseText,icon:icon||null,iconBg:"#aaaaaa",narration:false,expressions:[]};
   else if(icon&&!state.characters[key].icon) state.characters[key].icon=icon;
   return state.characters[key];
 }
 function makeBlock(type,data={}){
-  return Object.assign({id:uid(),type,createdAt:Date.now(),text:"",name:"",nameColor:"#333333",textColor:state.settings.baseText,bubbleColor:state.settings.baseBubble,direction:"left",shape:"normal",size:"normal",showName:true,align:"left",boxColor:"#aaaaaa",title:"",image:null,media:null,mediaKind:"image",imageSide:"right",srcTab:null},data);
+  return Object.assign({id:uid(),type,createdAt:Date.now(),text:"",name:"",nameColor:"#333333",textColor:state.settings.baseText,bubbleColor:state.settings.baseBubble,direction:"left",shape:"normal",size:"normal",fontWeight:"400",showName:true,align:"left",boxColor:"#aaaaaa",title:"",image:null,media:null,mediaKind:"image",imageSide:"right",srcTab:null},data);
 }
 function save(){try{localStorage.setItem("cocofolia_formatter_v1",JSON.stringify(state))}catch(e){console.warn(e)}}
 function load(){
@@ -207,6 +205,8 @@ function load(){
       state=JSON.parse(x);
       state.settings=Object.assign(clone(defaultSettings),state.settings||{});
       state.settings.colors=Object.assign(clone(defaultSettings.colors),state.settings.colors||{});
+      state.characters=state.characters||{};Object.values(state.characters).forEach(c=>{c.expressions=c.expressions||[];c.iconBg=c.iconBg||"#aaaaaa"});
+      state.tabs=state.tabs||[];state.tabs.forEach(t=>t.blocks.forEach(b=>{b.fontWeight=b.fontWeight||"400"}));
       if(!state.tabs.length)newTab();
       return true
     }
@@ -215,6 +215,20 @@ function load(){
 }
 function sizeClass(s){return ({h1:"h1",h2:"h2",h3:"h3",normal:"normal",small:"small"})[s]||"normal"}
 function fontSize(s){return ({h1:"2.1em",h2:"1.7em",h3:"1.35em",normal:"1em",small:".78em"})[s]||"1em"}
+function effectiveBlock(b,key,fallback){
+  const defs={nameColor:"#333333",textColor:defaultSettings.baseText,bubbleColor:defaultSettings.baseBubble,boxColor:"#aaaaaa"};
+  return b[key]===defs[key] ? (fallback??b[key]) : b[key];
+}
+function effectiveChar(c,key,fallback){
+  const v=c?.[key];
+  return (v==="#333333" || v==null) ? (fallback??v) : v;
+}
+function charForBlock(b){
+  const c=state.characters[b.name]||{};
+  const expr=c.expressions?.find(x=>x.id===b.expressionId);
+  return {c,icon:expr?.data||b.icon||c.icon};
+}
+function safeFileName(name){return String(name||"asset").replace(/[^\w.\-ぁ-んァ-ヶ一-龯]/g,"_").slice(0,120)||"asset"}
 
 function renderTabs(){
   const allActive=isAllTab();
@@ -229,9 +243,13 @@ function renderTabs(){
   });
 }
 function renderChars(){
-  $("#charList").innerHTML=Object.values(state.characters).map(c=>`<div class="list-item"><span style="color:${esc(c.nameColor)}">${esc(c.name)}</span><button data-char="${esc(c.id)}">設定</button></div>`).join("")||'<div class="small">読み込むとキャラクターがここに並びます。</div>';
+  $("#charList").innerHTML=Object.values(state.characters).map(c=>`<div class="list-item"><input type="checkbox" class="char-check" data-char-check="${esc(c.id)}" style="width:auto"><span style="color:${esc(c.nameColor)}">${esc(c.name)}</span><button data-char="${esc(c.id)}">設定</button></div>`).join("")||'<div class="small">読み込むとキャラクターがここに並びます。</div>';
   $$("#charList [data-char]").forEach(b=>b.onclick=()=>charEditor(b.dataset.char));
 }
+function checkedCharIds(){return $$("#charList .char-check:checked").map(x=>x.dataset.charCheck)}
+function mergeSelectedCharacters(){const ids=checkedCharIds();if(ids.length!==2){alert("結合するキャラクターを2人選択してください。");return}mergeCharacterPair(ids[0],ids[1])}
+function mergeCharacterPair(aid,bid){const src=Object.values(state.characters).find(x=>x.id===aid),dst=Object.values(state.characters).find(x=>x.id===bid);if(!src||!dst)return;if(!confirm(`「${src.name}」を「${dst.name}」に結合しますか？`))return;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name}));dst.expressions=[...(dst.expressions||[]),...(src.expressions||[])];delete state.characters[src.name];render();charEditor(dst.id)}
+function deleteSelectedCharacters(){const ids=checkedCharIds();if(!ids.length){alert("削除するキャラクターを選択してください。");return}if(!confirm(`選択した ${ids.length} 人のキャラクターを削除しますか？\n既存ブロックのキャラクター名は残ります。`))return;ids.forEach(id=>{const c=Object.values(state.characters).find(x=>x.id===id);if(c)delete state.characters[c.name]});state.selected=null;render()}
 function render(){
   renderTabs();renderChars();
   const t=getTab();$("#activeName").textContent=t?t.name:"プレビュー";
@@ -247,22 +265,24 @@ function renderPage(){
   if(!state.tabs.length){p.innerHTML="";return}
   const s=state.settings;
   p.style.background=s.logBg;p.style.color=s.baseText;p.style.fontFamily=s.font;
-  let html=`<div class="preview-title" style="color:${esc(s.titleColor)}">${esc(s.title)}</div>`;
-  if(s.headerImage) html+=`<img class="preview-header-img" src="${esc(s.headerImage)}">`;
+  let html=`<div class="preview-title" style="color:${esc(s.titleColor)};border-bottom-color:${esc(s.titleLineColor||s.titleColor)}">${esc(s.title)}${s.headerImage?`<img class="preview-header-img" src="${esc(s.headerImage)}">`:""}</div>`;
   const items=getDisplayBlocks();
   html+=items.map(({block:b,tabId},i)=>{
     const sel=state.selected===b.id;
     let content="";
     if(b.type==="bubble"){
-      const c=state.characters[b.name]||{},icon=b.icon||c.icon;
+      const {c,icon}=charForBlock(b);
+      const nameColor=effectiveBlock(b,"nameColor",effectiveChar(c,"nameColor",s.baseText));
+      const textColor=effectiveBlock(b,"textColor",effectiveChar(c,"textColor",s.baseText));
+      const bubbleColor=effectiveBlock(b,"bubbleColor",s.baseBubble);
       content=`<div class="speech-row ${b.direction==="right"?"right":""}">
-        ${icon?`<img class="avatar" src="${esc(icon)}">`:`<div class="avatar"></div>`}
-        <div class="speech-content">${b.showName?`<div class="speaker" style="color:${esc(b.nameColor||c.nameColor||s.baseText)}">${esc(b.name)}</div>`:""}
-        <div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="background:${esc(b.bubbleColor||s.baseBubble)};color:${esc(b.textColor||c.textColor||s.baseText)};font-size:${fontSize(b.size)}">${esc(b.text)}</div></div></div>`;
+        ${icon?`<img class="avatar" style="background:${esc(c.iconBg||"#aaaaaa")}" src="${esc(icon)}">`:`<div class="avatar" style="background:${esc(c.iconBg||"#aaaaaa")}"></div>`}
+        <div class="speech-content">${b.showName?`<div class="speaker" style="color:${esc(nameColor)}">${esc(b.name)}</div>`:""}
+        <div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="--bubble:${esc(bubbleColor)};background:${esc(bubbleColor)};color:${esc(textColor)};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${esc(b.text)}</div></div></div>`;
     }else if(b.type==="narration"){
-      content=`<div class="narration ${b.align}" style="color:${esc(b.textColor||s.baseText)};font-size:${fontSize(b.size)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
+      content=`<div class="narration ${b.align}" style="color:${esc(effectiveBlock(b,"textColor",s.baseText))};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
     }else if(b.type==="textbox"){
-      content=`<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(b.boxColor)};color:${esc(b.textColor)}">
+      content=`<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(effectiveBlock(b,"boxColor","#aaaaaa"))};color:${esc(effectiveBlock(b,"textColor",s.baseText))}">
         <div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>
         ${b.image?`<img src="${esc(b.image)}">`:""}</div>`;
     }else if(b.type==="bgm"){
@@ -275,10 +295,13 @@ function renderPage(){
     return `<div class="block ${sel?"selected":""}" data-block="${b.id}" data-tab="${tabId}">${blockTools(b)}${content}</div>`;
   }).join("");
   p.innerHTML=html||'<div class="empty">ログがありません。左側から読み込むか、ブロックを追加してください。</div>';
-  $$("#page .block").forEach(el=>{
-    el.onclick=e=>{if(e.target.closest(".block-tools"))return;state.selected=el.dataset.block;renderInspector();renderPage()};
-    $$("#page .block-tools button",el).forEach(btn=>btn.onclick=e=>{e.stopPropagation();blockAction(el.dataset.block,btn.dataset.act)});
-  });
+  // クリック対象は必ず最も内側の .block を拾う。再描画時の参照ずれを防止。
+  $("#page").onclick=e=>{
+    const btn=e.target.closest(".block-tools button");
+    if(btn){const el=btn.closest(".block");if(el){e.preventDefault();e.stopPropagation();blockAction(el.dataset.block,btn.dataset.act)}return}
+    const el=e.target.closest(".block");
+    if(el&&$("#page").contains(el)){state.selected=el.dataset.block;renderInspector();renderPage()}
+  };
 }
 function blockAction(id,act){
   const found=findBlock(id);if(!found)return;
@@ -310,7 +333,7 @@ function colorField(label,id,value){
  return `<label>${label}</label><div class="color-row"><input id="${id}" type="color" value="${esc(value||"#ffffff")}"><input id="${id}Text" value="${esc(value||"#ffffff")}"></div>`;
 }
 function bindCommonBlock(b){
- const ids=["text","name","nameColor","textColor","bubbleColor","direction","shape","size","showName","align","boxColor","title","imageSide","media","mediaKind","bgColor","color"];
+ const ids=["text","name","nameColor","textColor","bubbleColor","direction","shape","size","fontWeight","showName","align","boxColor","title","imageSide","media","mediaKind","bgColor","color","expressionId"];
  ids.forEach(k=>{const el=$("#f_"+k);if(!el)return;el.oninput=el.onchange=()=>{let v=el.type==="checkbox"?el.checked:el.value;b[k]=v;save();renderPage()}})
  $$("#inspectorBody input[type=color]").forEach(el=>{el.oninput=()=>{const key=el.id.replace("f_","");b[key]=el.value;const tx=$("#"+el.id+"Text");if(tx)tx.value=el.value;renderPage();save()}});
  $$("#inspectorBody input[id$=Text]").forEach(el=>el.oninput=()=>{const key=el.id.replace("Text","").replace("f_","");b[key]=el.value;const c=$("#f_"+key);if(c)c.value=el.value;renderPage();save()});
@@ -322,14 +345,17 @@ function renderInspector(){
  if(b.type==="bubble"){
    h+=inputField("キャラクター名","f_name",b.name)+
       colorField("名前色","f_nameColor",b.nameColor)+colorField("吹き出し色","f_bubbleColor",b.bubbleColor)+colorField("本文色","f_textColor",b.textColor)+
+      `<label>表情差分（${esc(state.characters[b.name]?.name||b.name||"キャラ")}）</label><select id="f_expressionId"><option value="">通常</option>${(state.characters[b.name]?.expressions||[]).map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("")}</select>`+
       `<label>吹き出し形</label><select id="f_shape"><option value="normal">通常角丸</option><option value="thought">心情（丸）</option><option value="radio">ラジオ（四角）</option><option value="loud">大声（トゲトゲ）</option></select>`+
       `<label>文字サイズ</label><select id="f_size"><option value="h1">見出し1</option><option value="h2">見出し2</option><option value="h3">見出し3</option><option value="normal">通常</option><option value="small">小さい</option></select>`+
+      `<label>フォントの太さ</label><select id="f_fontWeight"><option value="400">通常</option><option value="500">やや太め</option><option value="700">太字</option><option value="900">極太</option></select>`+
       `<label>向き</label><select id="f_direction"><option value="left">左</option><option value="right">右</option></select>`+
       `<label class="check"><input id="f_showName" type="checkbox"> 名前を表示</label>`+
       `<label>本文</label><textarea id="f_text">${esc(b.text)}</textarea>`+
       `<div class="panel" style="margin-top:10px"><button id="convertNarration">地の文に変換</button><button id="convertTextbox">テキストボックスに変換</button></div>`;
  }else if(b.type==="narration"){
    h+=`<label>文字サイズ</label><select id="f_size"><option value="h1">見出し1</option><option value="h2">見出し2</option><option value="h3">見出し3</option><option value="normal">通常</option><option value="small">小さい</option></select>
+   <label>フォントの太さ</label><select id="f_fontWeight"><option value="400">通常</option><option value="500">やや太め</option><option value="700">太字</option><option value="900">極太</option></select>
    <label>揃え</label><select id="f_align"><option value="left">左</option><option value="center">中央</option><option value="right">右</option></select>
    <label class="check"><input id="f_showName" type="checkbox"> 名前を表示</label>${inputField("名前","f_name",b.name)}
    ${colorField("本文色","f_textColor",b.textColor)}<label>本文</label><textarea id="f_text">${esc(b.text)}</textarea>
@@ -348,7 +374,7 @@ function renderInspector(){
    h+=colorField("線の色","f_color",b.color||state.settings.baseText);
  }
  body.innerHTML=h;
- if($("#f_shape"))$("#f_shape").value=b.shape;if($("#f_size"))$("#f_size").value=b.size;if($("#f_direction"))$("#f_direction").value=b.direction;
+ if($("#f_shape"))$("#f_shape").value=b.shape;if($("#f_size"))$("#f_size").value=b.size;if($("#f_fontWeight"))$("#f_fontWeight").value=b.fontWeight||"400";if($("#f_expressionId"))$("#f_expressionId").value=b.expressionId||"";if($("#f_direction"))$("#f_direction").value=b.direction;
  if($("#f_showName"))$("#f_showName").checked=b.showName;if($("#f_align"))$("#f_align").value=b.align;if($("#f_imageSide"))$("#f_imageSide").value=b.imageSide;
  if($("#f_mediaKind"))$("#f_mediaKind").value=b.mediaKind;
  bindCommonBlock(b);
@@ -357,30 +383,34 @@ function renderInspector(){
 }
 function charEditor(id){
  const c=Object.values(state.characters).find(x=>x.id===id);if(!c)return;
+ c.expressions=c.expressions||[];c.iconBg=c.iconBg||"#aaaaaa";
  $("#inspector").classList.add("open");
- $("#inspectorBody").innerHTML=`${inputField("名前","c_name",c.name)}${colorField("名前色","c_nameColor",c.nameColor)}${colorField("本文色","c_textColor",c.textColor)}
+ $("#inspectorBody").innerHTML=`${inputField("名前","c_name",c.name)}${colorField("名前色","c_nameColor",c.nameColor)}${colorField("本文色","c_textColor",c.textColor)}${colorField("アイコン背景色","c_iconBg",c.iconBg)}
  <label>アイコン（1:1推奨）</label><input id="c_file" type="file" accept="image/*">
- <label class="check"><input id="c_narration" type="checkbox"> このキャラを地の文扱い</label>
- <div class="panel"><b>表情差分</b><div id="exprList" class="list"></div><input id="exprFile" type="file" accept="image/*" multiple></div>`;
- $("#c_narration").checked=c.narration;renderExpr(c);
- $("#c_name").oninput=e=>{const old=c.name;c.name=e.target.value;if(old!==c.name){Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===old)b.name=c.name}))}renderChars();renderPage();save()};
- $("#c_nameColor").oninput=e=>{c.nameColor=e.target.value;renderPage();save()};$("#c_nameColorText").oninput=e=>{c.nameColor=e.target.value;$("#c_nameColor").value=c.nameColor;renderPage();save()};
- $("#c_textColor").oninput=e=>{c.textColor=e.target.value;renderPage();save()};$("#c_textColorText").oninput=e=>{c.textColor=e.target.value;$("#c_textColor").value=c.textColor;renderPage();save()};
- $("#c_narration").onchange=e=>{c.narration=e.target.checked;renderPage();save()};
+ <div class="panel"><b>表情差分</b><div id="exprList" class="list"></div><input id="exprFile" type="file" accept="image/*" multiple></div>
+ <div class="panel"><button id="mergeChars">このキャラクターを別キャラと結合</button><button id="deleteChar" class="danger">このキャラクターを削除</button></div>`;
+ renderExpr(c);
+ $("#c_name").oninput=e=>{const old=c.name,n=e.target.value.trim();if(!n)return;if(n!==old&&state.characters[n]){alert("同名のキャラクターが既に存在します。");e.target.value=old;return}c.name=n;if(old!==n){delete state.characters[old];state.characters[n]=c;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===old)b.name=n}))}renderChars();renderPage();save()};
+ ["c_nameColor","c_textColor","c_iconBg"].forEach(id=>{$("#"+id).oninput=e=>{c[id.replace("c_","")]=e.target.value;const tx=$("#"+id+"Text");if(tx)tx.value=e.target.value;renderPage();save()};$("#"+id+"Text").oninput=e=>{c[id.replace("c_","")]=e.target.value;$("#"+id).value=e.target.value;renderPage();save()}});
  $("#c_file").onchange=async e=>{if(e.target.files[0]){c.icon=await fileData(e.target.files[0]);renderPage();save()}};
  $("#exprFile").onchange=async e=>{for(const f of e.target.files)c.expressions.push({id:uid(),name:f.name,data:await fileData(f)});renderExpr(c);save()};
+ $("#mergeChars").onclick=()=>mergeCharacter(c.id);$("#deleteChar").onclick=()=>deleteCharacter(c.id);
 }
-function renderExpr(c){$("#exprList").innerHTML=c.expressions.map(x=>`<div class="list-item"><span>${esc(x.name)}</span><button data-ex="${x.id}">削除</button></div>`).join("")||'<span class="small">なし</span>';$$("#exprList [data-ex]").forEach(b=>b.onclick=()=>{c.expressions=c.expressions.filter(x=>x.id!==b.dataset.ex);renderExpr(c);save()})}
+function renderExpr(c){$("#exprList").innerHTML=c.expressions.map(x=>`<div class="list-item"><input data-exname="${x.id}" value="${esc(x.name)}"><button data-ex="${x.id}">削除</button></div>`).join("")||'<span class="small">なし</span>';
+ $$("#exprList [data-exname]").forEach(e=>e.oninput=()=>{const x=c.expressions.find(y=>y.id===e.dataset.exname);if(x){x.name=e.value;save()}});
+ $$("#exprList [data-ex]").forEach(b=>b.onclick=()=>{c.expressions=c.expressions.filter(x=>x.id!==b.dataset.ex);renderExpr(c);save()})}
+function mergeCharacter(id){const src=Object.values(state.characters).find(x=>x.id===id);if(!src)return;const others=Object.values(state.characters).filter(x=>x.id!==id);if(!others.length){alert("結合先のキャラクターがありません。");return}const menu=others.map((x,i)=>`${i+1}: ${x.name}`).join("\n");const n=Number(prompt("結合先を選択：\n"+menu));const dst=others[n-1];if(!dst)return;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name}));dst.expressions=[...(dst.expressions||[]),...(src.expressions||[])];delete state.characters[src.name];render();charEditor(dst.id)}
+function deleteCharacter(id){const c=Object.values(state.characters).find(x=>x.id===id);if(!c)return;if(!confirm(`「${c.name}」を削除しますか？\n既存ブロックのキャラクター名は残ります。`))return;delete state.characters[c.name];render()}
 async function fileData(f){return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)})}
 
 function openSettings(){
  $("#inspector").classList.add("open");const s=state.settings;
- $("#inspectorBody").innerHTML=`${inputField("タイトル","s_title",s.title)}${colorField("タイトル色","s_titleColor",s.titleColor)}
+ $("#inspectorBody").innerHTML=`${inputField("タイトル","s_title",s.title)}${colorField("タイトル文字色","s_titleColor",s.titleColor)}${colorField("タイトル区切り線色","s_titleLineColor",s.titleLineColor||s.titleColor)}
  ${colorField("HTML/ページ背景","s_pageBg",s.pageBg)}${colorField("ログ領域背景","s_logBg",s.logBg)}${colorField("区切り線色","s_separatorColor",s.separatorColor||"#333333")}${colorField("基本文字色","s_baseText",s.baseText)}${colorField("基本吹き出し色","s_baseBubble",s.baseBubble)}
  <label>フォント</label><input id="s_font" value="${esc(s.font)}">
  <div class="panel"><b>ダイス結果色</b>${colorField("system","s_system",s.colors.system)}${colorField("成功","s_success",s.colors.success)}${colorField("クリティカル/スペシャル","s_critical",s.colors.critical)}${colorField("失敗","s_failure",s.colors.failure)}${colorField("ファンブル","s_fumble",s.colors.fumble)}</div>
  <label>ヘッダー画像</label><input id="s_file" type="file" accept="image/*">`;
- const map={title:"title",titleColor:"titleColor",pageBg:"pageBg",logBg:"logBg",baseText:"baseText",baseBubble:"baseBubble",separatorColor:"separatorColor",font:"font"};
+ const map={title:"title",titleColor:"titleColor",titleLineColor:"titleLineColor",pageBg:"pageBg",logBg:"logBg",baseText:"baseText",baseBubble:"baseBubble",separatorColor:"separatorColor",font:"font"};
  Object.entries(map).forEach(([id,k])=>{const e=$("#s_"+id);if(e)e.oninput=()=>{s[k]=e.value;renderPage();save()}});
  ["system","success","critical","failure","fumble"].forEach(k=>{$("#s_"+k).oninput=e=>{s.colors[k]=e.target.value;renderPage();save()};$("#s_"+k+"Text").oninput=e=>{s.colors[k]=e.target.value;$("#s_"+k).value=e.target.value;renderPage();save()}});
  $("#s_file").onchange=async e=>{if(e.target.files[0]){s.headerImage=await fileData(e.target.files[0]);renderPage();save()}};
@@ -448,27 +478,43 @@ async function importFiles(files){
 }
 function exportHTML(){
   const s=state.settings;
-  const tabs=`<button class="tab active" data-tab="__ALL__">ALL</button>`+
-    state.tabs.map(t=>`<button class="tab" data-tab="${esc(t.id)}">${esc(t.name)}</button>`).join("");
-  const allBlocks=state.tabs.flatMap(t=>t.blocks.map(b=>({...b,_tabId:t.id})))
-    .sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
-  const blocks=`<section class="logtab" id="tab___ALL__">${allBlocks.map(b=>exportBlock(b)).join("")}</section>`+
-    state.tabs.map(t=>`<section class="logtab" id="tab_${esc(t.id)}">${t.blocks.map(b=>exportBlock(b)).join("")}</section>`).join("");
+  const assets=new Map(), usedNames=new Set();
+  function assetPath(data, fallback){
+    if(!data||typeof data!=="string"||!data.startsWith("data:"))return data||"";
+    if(assets.has(data))return assets.get(data);
+    const m=data.match(/^data:([^;,]+)/), mime=m?.[1]||"application/octet-stream";
+    const ext={"image/png":"png","image/jpeg":"jpg","image/webp":"webp","image/gif":"gif","image/apng":"apng","audio/mpeg":"mp3","audio/ogg":"ogg","audio/wav":"wav","video/mp4":"mp4","video/quicktime":"mov"}[mime]||"bin";
+    let base=safeFileName(fallback||"asset").replace(/\.[^.]+$/,""), name=`assets/${base}.${ext}`, n=2;
+    while(usedNames.has(name)){name=`assets/${base}_${n++}.${ext}`}
+    usedNames.add(name);assets.set(data,name);return name;
+  }
+  state.tabs.forEach(t=>t.blocks.forEach((b,i)=>{if(b.media)assetPath(b.media,b.text||`media_${i}`);if(b.image)assetPath(b.image,`image_${i}`);const c=state.characters[b.name];c?.expressions?.forEach((x,j)=>assetPath(x.data,`${c.name}_expression_${j}`));if(b.icon)assetPath(b.icon,`${b.name||"character"}_icon`)}));
+  const tabs=`<button class="tab active" data-tab="__ALL__">ALL</button>`+state.tabs.map(t=>`<button class="tab" data-tab="${esc(t.id)}">${esc(t.name)}</button>`).join("");
+  const allBlocks=state.tabs.flatMap(t=>t.blocks.map(b=>({...b,_tabId:t.id}))).sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
+  const blocks=`<section class="logtab" id="tab___ALL__">${allBlocks.map(b=>exportBlock(b,assetPath)).join("")}</section>`+state.tabs.map(t=>`<section class="logtab" id="tab_${esc(t.id)}">${t.blocks.map(b=>exportBlock(b,assetPath)).join("")}</section>`).join("");
   const fontFace='@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap");';
   const doc=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(s.title)}</title><style>
   ${fontFace}
-  *{box-sizing:border-box}body{margin:0;background:${s.rootBg};color:${s.baseText};font-family:${s.font||'"Zen Kaku Gothic New",sans-serif'}}.wrap{max-width:960px;margin:auto;background:${s.logBg};min-height:100vh;padding:40px 48px 70px}.title{text-align:center;font-size:38px;font-weight:800;padding-bottom:18px;border-bottom:4px solid ${s.titleColor};color:${s.titleColor};margin-bottom:30px}.header{display:block;max-width:100%;max-height:420px;margin:0 auto 28px}.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:25px}.tab{border:0;padding:8px 12px;background:#ddd;color:#333}.tab.active{background:#555;color:#fff}.logtab{display:none}.logtab.active{display:block}.speech{display:flex;gap:14px;margin:18px 0;align-items:flex-start}.speech.right{flex-direction:row-reverse}.avatar{width:56px;height:56px;object-fit:cover;background:#aaa;flex:none}.speaker{font-weight:800;font-size:18px;margin-bottom:5px}.content{min-width:0;flex:1}.bubble{padding:12px 18px;min-height:1.65em;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;position:relative}.normal{border-radius:20px}.thought{border-radius:28px}.radio{border-radius:0}.loud{clip-path:polygon(0 9%,4% 0,8% 8%,12% 0,16% 8%,20% 0,24% 8%,28% 0,32% 8%,36% 0,40% 8%,44% 0,48% 8%,52% 0,56% 8%,60% 0,64% 8%,68% 0,72% 8%,76% 0,80% 8%,84% 0,88% 8%,92% 0,96% 8%,100% 0,98% 12%,100% 20%,98% 28%,100% 36%,98% 44%,100% 52%,98% 60%,100% 68%,98% 76%,100% 84%,98% 92%,100% 100%,96% 92%,92% 100%,88% 92%,84% 100%,80% 92%,76% 100%,72% 92%,68% 100%,64% 92%,60% 100%,56% 92%,52% 100%,48% 92%,44% 100%,40% 92%,36% 100%,32% 92%,28% 100%,24% 92%,20% 100%,16% 92%,12% 100%,8% 92%,4% 100%,2% 92%,0 84%,2% 76%,0 68%,2% 60%,0 52%,2% 44%,0 36%,2% 28%,0 20%,2% 12%);padding:18px 22px}.narration{white-space:pre-wrap;line-height:1.7;margin:18px 0}.textbox{padding:18px;background:#aaa;color:#fff;display:flex;gap:18px;align-items:center;margin:18px 0}.textbox.reverse{flex-direction:row-reverse}.textbox-main{flex:1}.textbox-title{font-size:24px;font-weight:900;margin-bottom:8px}.textbox-text{white-space:pre-wrap;line-height:1.65}.textbox img{width:38%;max-height:260px;object-fit:contain}.media img,.media video{display:block;max-width:100%;max-height:600px;margin:auto}.media audio{width:100%}.bgm{display:flex;gap:12px;align-items:center;padding:10px 14px;margin:18px 0}.bgm audio{flex:1}.sep{height:4px;margin:28px 0;background:${s.separatorColor||s.baseText}}
-  </style></head><body><main class="wrap"><div class="title">${esc(s.title)}</div>${s.headerImage?`<img class="header" src="${esc(s.headerImage)}">`:""}<div class="tabs">${tabs}</div>${blocks}</main><script>
+  *{box-sizing:border-box}body{margin:0;background:${s.rootBg};color:${s.baseText};font-family:${s.font||'"Zen Kaku Gothic New",sans-serif'}}.wrap{max-width:960px;margin:auto;background:${s.logBg};min-height:100vh;padding:40px 48px 70px}.title{text-align:center;font-size:38px;font-weight:800;padding-bottom:18px;border-bottom:4px solid ${s.titleLineColor||s.titleColor};color:${s.titleColor};margin-bottom:30px}.header{display:block;max-width:100%;max-height:420px;margin:16px auto 18px}.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:25px}.tab{border:0;padding:8px 12px;background:#ddd;color:#333}.tab.active{background:#555;color:#fff}.logtab{display:none}.logtab.active{display:block}.speech{display:flex;gap:14px;margin:18px 0;align-items:flex-start}.speech.right{flex-direction:row-reverse}.avatar{width:56px;height:56px;object-fit:cover;background:#aaa;flex:none}.speaker{font-weight:800;font-size:18px;margin-bottom:5px}.content{min-width:0;flex:1}.bubble{padding:12px 18px;min-height:1.65em;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;position:relative}.bubble.normal{border-radius:20px}.bubble.thought{border-radius:28px}.bubble.radio{border-radius:0}.bubble.loud{clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 35%,97% 52%,100% 69%,97% 86%,100% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 52%,3% 34%,0 18%);padding:18px 22px}.narration{white-space:pre-wrap;line-height:1.7;margin:18px 0}.textbox{padding:18px;display:flex;gap:18px;align-items:center;margin:18px 0}.textbox.reverse{flex-direction:row-reverse}.textbox-main{flex:1}.textbox-title{font-size:24px;font-weight:900;margin-bottom:8px}.textbox-text{white-space:pre-wrap;line-height:1.65}.textbox img{width:38%;max-height:260px;object-fit:contain}.media img,.media video{display:block;max-width:100%;max-height:600px;margin:auto}.media audio{width:100%}.bgm{display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 14px}.bgm audio{flex:0 1 70%;max-width:560px;min-width:180px}.sep{height:4px;margin:28px 0;background:${s.separatorColor||s.baseText}}
+  </style></head><body><main class="wrap"><div class="title">${esc(s.title)}${s.headerImage?`<img class="header" src="${assetPath(s.headerImage,"header")}">`:""}</div><div class="tabs">${tabs}</div>${blocks}</main><script>
   const ts=[...document.querySelectorAll(".tab")],ls=[...document.querySelectorAll(".logtab")];function show(id){ts.forEach(x=>x.classList.toggle("active",x.dataset.tab===id));ls.forEach(x=>x.classList.toggle("active",x.id==="tab_"+id))}ts.forEach(x=>x.onclick=()=>show(x.dataset.tab));show("__ALL__");
   <\/script></body></html>`;
-  const blob=new Blob([doc],{type:"text/html;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(s.title||"cocofolia-log")+".html";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+  if(assets.size){downloadZip(doc,assets,(s.title||"cocofolia-log")+".zip")}else downloadBlob(doc,"text/html;charset=utf-8",(s.title||"cocofolia-log")+".html");
 }
-function exportBlock(b){
- if(b.type==="bubble"){const c=state.characters[b.name]||{},icon=b.icon||c.icon;return `<div class="speech ${b.direction==="right"?"right":""}">${icon?`<img class="avatar" src="${esc(icon)}">`:`<div class="avatar"></div>`}<div class="content">${b.showName?`<div class="speaker" style="color:${esc(b.nameColor)}">${esc(b.name)}</div>`:""}<div class="bubble ${esc(b.shape)}" style="background:${esc(b.bubbleColor)};color:${esc(b.textColor)};font-size:${fontSize(b.size)}">${esc(b.text)}</div></div></div>`}
- if(b.type==="narration")return `<div class="narration" style="color:${esc(b.textColor)};font-size:${fontSize(b.size)};text-align:${esc(b.align)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
- if(b.type==="textbox")return `<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(b.boxColor)};color:${esc(b.textColor)}"><div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>${b.image?`<img src="${esc(b.image)}">`:""}</div>`;
- if(b.type==="bgm")return `<div class="bgm" style="background:${esc(b.bgColor||"#333333")};color:${esc(b.textColor||"#eeeeee")}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(b.media||"")}"></audio></div>`;
- if(b.type==="media"){return b.mediaKind==="video"?`<div class="media"><video controls src="${esc(b.media)}"></video></div>`:b.mediaKind==="audio"?`<div class="media"><audio controls src="${esc(b.media)}"></audio></div>`:`<div class="media"><img src="${esc(b.media)}"></div>`}
+function dataUrlBytes(data){const m=data.match(/^data:([^;,]+)?(;base64)?,(.*)$/s);if(!m)return new TextEncoder().encode(data);const raw=decodeURIComponent(m[3]);if(m[2]){const bin=atob(m[3]);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out}return new TextEncoder().encode(raw)}
+function crc32(bytes){let c=0xffffffff;for(const b of bytes){c^=b;for(let k=0;k<8;k++)c=(c>>>1)^(0xedb88320&-(c&1))}return (c^0xffffffff)>>>0}
+function u16(n){return new Uint8Array([n&255,(n>>>8)&255])}function u32(n){return new Uint8Array([n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255])}
+function concatBytes(parts){const len=parts.reduce((n,x)=>n+x.length,0),out=new Uint8Array(len);let p=0;for(const x of parts){out.set(x,p);p+=x.length}return out}
+function zipStore(entries){const local=[],central=[];let offset=0;const enc=new TextEncoder();for(const e of entries){const name=enc.encode(e.name),data=e.data,crc=crc32(data),lh=concatBytes([new Uint8Array([80,75,3,4,20,0,0,0,0,0,0,0,0,0]),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),name,data]);local.push(lh);central.push(concatBytes([new Uint8Array([80,75,1,2,20,0,20,0,0,0,0,0,0,0]),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),name]));offset+=lh.length}const cd=central.reduce((n,x)=>n+x.length,0);return concatBytes([...local,...central,[new Uint8Array([80,75,5,6,0,0,0,0,entries.length&255,(entries.length>>>8)&255,cd&255,(cd>>>8)&255,(cd>>>16)&255,(cd>>>24)&255,offset&255,(offset>>>8)&255,(offset>>>16)&255,(offset>>>24)&255,0,0,0,0])][0]])}
+function downloadBlob(data,type,name){const blob=new Blob([data],{type}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+function downloadZip(doc,assets,name){const entries=[{name:"index.html",data:new TextEncoder().encode(doc)}];for(const [data,path] of assets)entries.push({name:path,data:dataUrlBytes(data)});const zip=zipStore(entries);downloadBlob(zip,"application/zip",name)}
+function exportBlock(b,assetPath){
+ const s=state.settings;
+ if(b.type==="bubble"){const {c,icon}=charForBlock(b),nameColor=effectiveBlock(b,"nameColor",effectiveChar(c,"nameColor",s.baseText)),textColor=effectiveBlock(b,"textColor",effectiveChar(c,"textColor",s.baseText)),bubbleColor=effectiveBlock(b,"bubbleColor",s.baseBubble);const iconSrc=icon?(icon.startsWith("data:")?assetPath(icon,`${b.name||"character"}_icon`):icon):"";return `<div class="speech ${b.direction==="right"?"right":""}">${iconSrc?`<img class="avatar" style="background:${esc(c.iconBg||"#aaa")}" src="${esc(iconSrc)}">`:`<div class="avatar" style="background:${esc(c.iconBg||"#aaa")}"></div>`}<div class="content">${b.showName?`<div class="speaker" style="color:${esc(nameColor)}">${esc(b.name)}</div>`:""}<div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="--bubble:${esc(bubbleColor)};background:${esc(bubbleColor)};color:${esc(textColor)};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${esc(b.text)}</div></div></div>`}
+ if(b.type==="narration")return `<div class="narration" style="color:${esc(effectiveBlock(b,"textColor",s.baseText))};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")};text-align:${esc(b.align)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
+ if(b.type==="textbox"){const img=b.image?(b.image.startsWith("data:")?assetPath(b.image,`${b.title||"textbox"}_image`):b.image):"";return `<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(effectiveBlock(b,"boxColor","#aaa"))};color:${esc(effectiveBlock(b,"textColor",s.baseText))}"><div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>${img?`<img src="${esc(img)}">`:""}</div>`}
+ if(b.type==="bgm"){const media=b.media?(b.media.startsWith("data:")?assetPath(b.media,b.text||"bgm"):b.media):"";return `<div class="bgm" style="background:${esc(b.bgColor||"#333")};color:${esc(b.textColor||"#eee")}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(media)}"></audio></div>`}
+ if(b.type==="media"){const media=b.media?(b.media.startsWith("data:")?assetPath(b.media,b.text||"media"):b.media):"";return b.mediaKind==="video"?`<div class="media"><video controls src="${esc(media)}"></video></div>`:b.mediaKind==="audio"?`<div class="media"><audio controls src="${esc(media)}"></audio></div>`:`<div class="media"><img src="${esc(media)}"></div>`}
  return `<div class="sep" style="background:${esc(b.color||s.separatorColor||s.baseText)}"></div>`;
 }
 $("#fileInput").onchange=e=>importFiles(e.target.files);
@@ -499,6 +545,7 @@ $("#deleteSelected").onclick=()=>{
 };
 $$("[data-add]").forEach(b=>b.onclick=()=>addBlock(b.dataset.add));
 $("#addChar").onclick=()=>{const n=prompt("キャラクター名");if(!n)return;charFor(n,"#333333");render();charEditor(state.characters[n].id)};
+$("#mergeCharsSelected").onclick=mergeSelectedCharacters;$("#deleteCharsSelected").onclick=deleteSelectedCharacters;
 $("#settingsBtn").onclick=openSettings;$("#exportBtn").onclick=exportHTML;$("#inspectorBtn").onclick=()=>$("#inspector").classList.toggle("open");
 $("#backupExport").onclick=()=>{const blob=new Blob([JSON.stringify(state)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cocofolia-log-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("#backupImport").onclick=()=>$("#backupInput").click();
