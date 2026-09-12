@@ -404,7 +404,24 @@ function insertBlockAfter(id,type){
   if(type==="media-image")n.mediaKind="image";
   if(type==="media-video")n.mediaKind="video";
   n.type=type.startsWith("media")?"media":type;
+  // ALL表示は作成時刻順に並ぶため、配列上の挿入位置だけでなくcreatedAtも
+  // 直前・直後の要素の間になるよう補間し、ALLでも選択した吹き出しのすぐ下に表示されるようにする。
+  const prevAt=Number(t.blocks[i]?.createdAt)||0;
+  const nextBlock=t.blocks[i+1];
+  const nextAt=nextBlock?Number(nextBlock.createdAt):null;
+  n.createdAt=(nextAt!=null&&nextAt>prevAt)?prevAt+(nextAt-prevAt)/2:prevAt+1;
   t.blocks.splice(i+1,0,n);state.selected=n.id;state.activeTab=t.id;
+  render();
+}
+// 要素の所属タブを変更する（タブ間の移動、ALL専用領域への移動も可能）。
+function moveBlockToTab(blockId,targetId){
+  const found=findBlock(blockId);if(!found)return;
+  const {block:b,tab:src,index:i}=found;
+  const dst=targetId==="__ALL__"?state.allOnly:state.tabs.find(t=>t.id===targetId);
+  if(!dst||dst===src)return;
+  src.blocks.splice(i,1);
+  dst.blocks.push(b);
+  state.selected=b.id;state.activeTab=dst.id;
   render();
 }
 function closeInsertMenu(){const m=document.getElementById("insertMenu");if(m)m.remove();document.removeEventListener("mousedown",onInsertMenuOutside,true)}
@@ -477,6 +494,10 @@ function renderInspector(){
  const body=$("#inspectorBody"),found=findBlock(state.selected),b=found?.block;
  if(!b){body.innerHTML=`<div class="panel"><b>全体設定</b><p class="small">要素をクリックすると個別編集できます。</p></div>`;return}
  let h=`<div class="panel"><div class="small">種類</div><b>${esc(b.type)}</b></div>`;
+ h+=`<div class="panel"><label>所属タブ</label><select id="f_moveTab">
+   <option value="__ALL__" ${found.tab.id==="__ALL__"?"selected":""}>ALL専用（どのタブにも属さない）</option>
+   ${state.tabs.map(t=>`<option value="${esc(t.id)}" ${found.tab.id===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}
+ </select></div>`;
  if(b.type==="bubble"){
    h+=inputField("キャラクター名","f_name",b.name)+
       colorField("名前色","f_nameColor",b.nameColor)+colorField("吹き出し色","f_bubbleColor",b.bubbleColor)+colorField("本文色","f_textColor",b.textColor)+
@@ -517,6 +538,7 @@ function renderInspector(){
  if($("#f_showName"))$("#f_showName").checked=b.showName;if($("#f_align"))$("#f_align").value=b.align;if($("#f_imageSide"))$("#f_imageSide").value=b.imageSide;
  if($("#f_mediaKind"))$("#f_mediaKind").value=b.mediaKind;
  bindCommonBlock(b);
+ const moveSel=$("#f_moveTab");if(moveSel)moveSel.onchange=()=>moveBlockToTab(b.id,moveSel.value);
  if(b.type==="bubble"||b.type==="narration"||b.type==="textbox")bindTemplatePanel(b.type,b);
  ["convertNarration","convertTextbox","convertBubble"].forEach(id=>{const el=$("#"+id);if(el)el.onclick=()=>{const newType=id==="convertNarration"?"narration":id==="convertBubble"?"bubble":"textbox";convertBlockType(b,newType);render()}});
  const mp=$("#mediaPicker");if(mp)mp.onchange=async()=>{const f=mp.files[0];if(f){b.media=await fileData(f);b.mediaKind=detectMediaKind(f);if(b.type==="textbox")b.image=b.media;render()}};
