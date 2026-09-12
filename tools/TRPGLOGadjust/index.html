@@ -185,25 +185,28 @@ function detectRollResult(text){
   if(!m)return null;
   return /失敗/.test(m[1])?"failure":"success";
 }
-let state={settings:defaultSettings,characters:{},tabs:[],activeTab:null,lastSingleTab:null,selected:null,media:{},templates:{bubble:[],narration:[],textbox:[]}};
+let state={settings:defaultSettings,characters:{},tabs:[],allOnly:{id:"__ALL__",blocks:[]},activeTab:null,lastSingleTab:null,selected:null,media:{},templates:{bubble:[],narration:[],textbox:[]}};
 
 function newTab(name="ログ"){
   const t={id:uid(),name,blocks:[]}; state.tabs.push(t); state.activeTab=t.id; state.lastSingleTab=t.id; return t;
 }
 function getTab(){return state.tabs.find(t=>t.id===state.activeTab)||state.tabs[0]}
 function isAllTab(){return state.activeTab==="__ALL__"}
-// ALL表示中に要素を追加した場合の追加先タブ（直前に開いていた個別タブ、無ければ最後のタブ）。
+// ALL表示中に要素を追加した場合、個別タブではなくALL専用の領域(state.allOnly)に追加する。
+// これはどの個別タブにも属さず、ALL（全タブ表示）にのみ表示・出力される。
 function editTargetTab(){
   if(!isAllTab())return getTab();
-  return state.tabs.find(t=>t.id===state.lastSingleTab)||state.tabs[state.tabs.length-1]||state.tabs[0];
+  return state.allOnly;
 }
 function getDisplayBlocks(){
   if(!isAllTab()){const t=getTab();return t?(t.blocks.map(b=>({block:b,tabId:t.id}))):[]}
   return state.tabs.flatMap(t=>t.blocks.map(b=>({block:b,tabId:t.id})))
+    .concat(state.allOnly.blocks.map(b=>({block:b,tabId:"__ALL__"})))
     .sort((a,b)=>(Number(a.block.createdAt)||0)-(Number(b.block.createdAt)||0));
 }
 function findBlock(id){
   for(const t of state.tabs){const b=t.blocks.find(x=>x.id===id);if(b)return {block:b,tab:t,index:t.blocks.indexOf(b)}}
+  const b=state.allOnly.blocks.find(x=>x.id===id);if(b)return {block:b,tab:state.allOnly,index:state.allOnly.blocks.indexOf(b)};
   return null;
 }
 function charFor(name,color,icon){
@@ -229,6 +232,8 @@ function load(){
       state.characters=state.characters||{};Object.values(state.characters).forEach(c=>{c.expressions=c.expressions||[];c.iconBg=c.iconBg||state.settings.baseIconBg});
       state.tabs=state.tabs||[];state.tabs.forEach(t=>t.blocks.forEach(b=>{b.fontWeight=b.fontWeight||"400"}));
       if(!state.tabs.length)newTab();
+      state.allOnly=state.allOnly||{id:"__ALL__",blocks:[]};state.allOnly.id="__ALL__";state.allOnly.blocks=state.allOnly.blocks||[];
+      state.allOnly.blocks.forEach(b=>{b.fontWeight=b.fontWeight||"400"});
       if(!state.tabs.some(t=>t.id===state.lastSingleTab))state.lastSingleTab=state.tabs[0]?.id||null;
       state.templates=state.templates||{bubble:[],narration:[],textbox:[]};
       return true
@@ -250,11 +255,13 @@ function effectiveChar(c,key,fallback){
 // 一緒に追従させる（name指定時はそのキャラクターの名前のブロックのみ対象、blockType指定時はその種類のブロックのみ対象）。
 function syncColorField(field,oldVal,newVal,name,blockType){
   if(!oldVal||!newVal||oldVal===newVal)return;
-  state.tabs.forEach(t=>t.blocks.forEach(b=>{
+  const apply=b=>{
     if(blockType&&b.type!==blockType)return;
     if(name!=null&&b.name!==name)return;
     if(b[field]===oldVal)b[field]=newVal;
-  }));
+  };
+  state.tabs.forEach(t=>t.blocks.forEach(apply));
+  state.allOnly.blocks.forEach(apply);
 }
 // テキストボックス⇔地の文/吹き出し の相互変換。
 // ・地の文/吹き出し → テキストボックス：名前をタイトルへ移し、名前色は引き継がない（本文色は基準本文色にリセット）。
@@ -318,7 +325,7 @@ function renderChars(){
 }
 function checkedCharIds(){return $$("#charList .char-check:checked").map(x=>x.dataset.charCheck)}
 function mergeSelectedCharacters(){const ids=checkedCharIds();if(ids.length!==2){alert("結合するキャラクターを2人選択してください。");return}mergeCharacterPair(ids[0],ids[1])}
-function mergeCharacterPair(aid,bid){const src=Object.values(state.characters).find(x=>x.id===aid),dst=Object.values(state.characters).find(x=>x.id===bid);if(!src||!dst)return;if(!confirm(`「${src.name}」を「${dst.name}」に結合しますか？`))return;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name}));dst.expressions=[...(dst.expressions||[]),...(src.expressions||[])];delete state.characters[src.name];render();charEditor(dst.id)}
+function mergeCharacterPair(aid,bid){const src=Object.values(state.characters).find(x=>x.id===aid),dst=Object.values(state.characters).find(x=>x.id===bid);if(!src||!dst)return;if(!confirm(`「${src.name}」を「${dst.name}」に結合しますか？`))return;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name}));state.allOnly.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name});dst.expressions=[...(dst.expressions||[]),...(src.expressions||[])];delete state.characters[src.name];render();charEditor(dst.id)}
 function deleteSelectedCharacters(){const ids=checkedCharIds();if(!ids.length){alert("削除するキャラクターを選択してください。");return}if(!confirm(`選択した ${ids.length} 人のキャラクターを削除しますか？\n既存ブロックのキャラクター名は残ります。`))return;ids.forEach(id=>{const c=Object.values(state.characters).find(x=>x.id===id);if(c)delete state.characters[c.name]});state.selected=null;render()}
 function render(){
   if(!isAllTab()&&getTab())state.lastSingleTab=getTab().id;
@@ -521,6 +528,11 @@ function stripBracketsForChar(name,openCh,closeCh){
       b.text=b.text.split(openCh).join("").split(closeCh).join("");
     }
   }));
+  state.allOnly.blocks.forEach(b=>{
+    if(b.type==="bubble"&&b.name===name&&typeof b.text==="string"){
+      b.text=b.text.split(openCh).join("").split(closeCh).join("");
+    }
+  });
 }
 function charEditor(id){
  const c=Object.values(state.characters).find(x=>x.id===id);if(!c)return;
@@ -554,7 +566,7 @@ function charEditor(id){
 function renderExpr(c){$("#exprList").innerHTML=c.expressions.map(x=>`<div class="list-item"><input data-exname="${x.id}" value="${esc(x.name)}"><button data-ex="${x.id}">削除</button></div>`).join("")||'<span class="small">なし</span>';
  $$("#exprList [data-exname]").forEach(e=>e.oninput=()=>{const x=c.expressions.find(y=>y.id===e.dataset.exname);if(x){x.name=e.value;save()}});
  $$("#exprList [data-ex]").forEach(b=>b.onclick=()=>{c.expressions=c.expressions.filter(x=>x.id!==b.dataset.ex);renderExpr(c);save()})}
-function mergeCharacter(id){const src=Object.values(state.characters).find(x=>x.id===id);if(!src)return;const others=Object.values(state.characters).filter(x=>x.id!==id);if(!others.length){alert("結合先のキャラクターがありません。");return}const menu=others.map((x,i)=>`${i+1}: ${x.name}`).join("\n");const n=Number(prompt("結合先を選択：\n"+menu));const dst=others[n-1];if(!dst)return;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name}));dst.expressions=[...(dst.expressions||[]),...(src.expressions||[])];delete state.characters[src.name];render();charEditor(dst.id)}
+function mergeCharacter(id){const src=Object.values(state.characters).find(x=>x.id===id);if(!src)return;const others=Object.values(state.characters).filter(x=>x.id!==id);if(!others.length){alert("結合先のキャラクターがありません。");return}const menu=others.map((x,i)=>`${i+1}: ${x.name}`).join("\n");const n=Number(prompt("結合先を選択：\n"+menu));const dst=others[n-1];if(!dst)return;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name}));state.allOnly.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name});dst.expressions=[...(dst.expressions||[]),...(src.expressions||[])];delete state.characters[src.name];render();charEditor(dst.id)}
 function deleteCharacter(id){const c=Object.values(state.characters).find(x=>x.id===id);if(!c)return;if(!confirm(`「${c.name}」を削除しますか？\n既存ブロックのキャラクター名は残ります。`))return;delete state.characters[c.name];render()}
 async function fileData(f){return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)})}
 // .mov 等はOSによってfile.typeが空/不正確になることがあるため、拡張子でも判定する。
@@ -732,7 +744,7 @@ function exportHTML(){
   }
   state.tabs.forEach(t=>t.blocks.forEach((b,i)=>{if(b.media)assetPath(b.media,b.text||`media_${i}`);if(b.image)assetPath(b.image,`image_${i}`);const c=state.characters[b.name];c?.expressions?.forEach((x,j)=>assetPath(x.data,`${c.name}_expression_${j}`));if(b.icon)assetPath(b.icon,`${b.name||"character"}_icon`)}));
   const tabs=`<button class="tab active" data-tab="__ALL__">ALL</button>`+state.tabs.map(t=>`<button class="tab" data-tab="${esc(t.id)}">${esc(t.name)}</button>`).join("");
-  const allBlocks=state.tabs.flatMap(t=>t.blocks.map(b=>({...b,_tabId:t.id}))).sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
+  const allBlocks=state.tabs.flatMap(t=>t.blocks.map(b=>({...b,_tabId:t.id}))).concat(state.allOnly.blocks.map(b=>({...b,_tabId:"__ALL__"}))).sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
   const blocks=`<section class="logtab" id="tab___ALL__">${allBlocks.map(b=>exportBlock(b,assetPath)).join("")}</section>`+state.tabs.map(t=>`<section class="logtab" id="tab_${esc(t.id)}">${t.blocks.map(b=>exportBlock(b,assetPath)).join("")}</section>`).join("");
   const fontFace='@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap");';
   const doc=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(s.title)}</title><style>
@@ -864,7 +876,7 @@ $("#settingsBtn").onclick=openSettings;$("#exportBtn").onclick=exportHTML;$("#in
 $("#backupExport").onclick=()=>{const blob=new Blob([JSON.stringify(state)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cocofolia-log-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("#backupImport").onclick=()=>$("#backupInput").click();
 $("#backupInput").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{state=JSON.parse(await f.text());render()}catch(x){alert("バックアップの読み込みに失敗しました。")}};
-$("#reset").onclick=()=>{if(confirm("保存データをすべて消去しますか？")){localStorage.removeItem("cocofolia_formatter_v1");state={settings:clone(defaultSettings),characters:{},tabs:[],activeTab:null,lastSingleTab:null,selected:null,media:{},templates:{bubble:[],narration:[],textbox:[]}};newTab();render()}};
+$("#reset").onclick=()=>{if(confirm("保存データをすべて消去しますか？")){localStorage.removeItem("cocofolia_formatter_v1");state={settings:clone(defaultSettings),characters:{},tabs:[],allOnly:{id:"__ALL__",blocks:[]},activeTab:null,lastSingleTab:null,selected:null,media:{},templates:{bubble:[],narration:[],textbox:[]}};newTab();render()}};
 load();render();
 </script>
 </body>
