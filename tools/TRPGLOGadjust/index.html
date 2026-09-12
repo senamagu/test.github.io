@@ -35,7 +35,7 @@ h1,h2,h3{margin:0}
 .tab{white-space:nowrap}
 .tab.active{background:#4b6d9e;border-color:#7195ca}
 .preview-wrap{flex:1;min-height:0;overflow:auto;padding:28px;background:#151619;-webkit-overflow-scrolling:touch}
-.page{max-width:900px;margin:0 auto;background:var(--page-bg);color:var(--page-text);padding:42px 48px 70px;min-height:100%;font-family:"Zen Kaku Gothic New",sans-serif}
+.page{max-width:900px;margin:0 auto;background:var(--page-bg);color:var(--page-text);padding:42px 48px 70px;min-height:100%;font-family:"Zen Kaku Gothic New",sans-serif;border-radius:18px}
 .preview-title{text-align:center;font-size:38px;font-weight:800;padding:4px 0 18px;border-bottom:4px solid currentColor;margin-bottom:34px}.preview-header-img{display:block;max-width:100%;max-height:420px;object-fit:contain;margin:16px auto 18px}
 .block{position:relative;margin:18px 0}
 .block.selected{outline:2px solid var(--accent);outline-offset:5px}
@@ -54,9 +54,9 @@ h1,h2,h3{margin:0}
 .bubble.normal{border-radius:20px}
 .bubble.thought{border-radius:28px}.bubble.thought.left-tail:before,.bubble.thought.right-tail:before{width:12px;height:12px;border:0;border-radius:50%;top:23px}.bubble.thought.left-tail:before{left:-20px;background:var(--bubble)}.bubble.thought.right-tail:before{right:-20px;background:var(--bubble)}
 .bubble.radio{border-radius:0}.bubble.radio.left-tail:before,.bubble.radio.right-tail:before{border:0;width:12px;height:12px;top:16px;background:var(--bubble)}.bubble.radio.left-tail:before{left:-12px}.bubble.radio.right-tail:before{right:-12px}
-.bubble.loud{padding:18px 22px;clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 35%,97% 52%,100% 69%,97% 86%,100% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 52%,3% 34%,0 18%)}
-.bubble.loud.left-tail{clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 35%,97% 52%,100% 69%,97% 86%,100% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 60%,-18px 50%,0 40%,3% 34%,0 18%)}
-.bubble.loud.right-tail{clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 40%,calc(100% + 18px) 50%,100% 60%,97% 69%,100% 86%,97% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 52%,3% 34%,0 18%)}
+.bubble.loud{padding:18px 22px;clip-path:polygon(50.00% 0.00%,60.71% 13.54%,77.03% 7.94%,78.72% 25.12%,95.48% 29.23%,87.61% 44.59%,99.49% 57.12%,84.57% 65.79%,87.79% 82.74%,70.54% 81.97%,64.09% 97.97%,50.00% 88.00%,35.91% 97.97%,29.46% 81.97%,12.21% 82.74%,15.43% 65.79%,0.51% 57.12%,12.39% 44.59%,4.52% 29.23%,21.28% 25.12%,22.97% 7.94%,39.29% 13.54%)}
+.bubble.loud.left-tail{clip-path:polygon(50.00% 0.00%,60.71% 13.54%,77.03% 7.94%,78.72% 25.12%,95.48% 29.23%,87.61% 44.59%,99.49% 57.12%,84.57% 65.79%,87.79% 82.74%,70.54% 81.97%,64.09% 97.97%,50.00% 88.00%,35.91% 97.97%,29.46% 81.97%,12.21% 82.74%,15.43% 65.79%,-17.49% 57.12%,12.39% 44.59%,4.52% 29.23%,21.28% 25.12%,22.97% 7.94%,39.29% 13.54%)}
+.bubble.loud.right-tail{clip-path:polygon(50.00% 0.00%,60.71% 13.54%,77.03% 7.94%,78.72% 25.12%,95.48% 29.23%,87.61% 44.59%,117.49% 57.12%,84.57% 65.79%,87.79% 82.74%,70.54% 81.97%,64.09% 97.97%,50.00% 88.00%,35.91% 97.97%,29.46% 81.97%,12.21% 82.74%,15.43% 65.79%,0.51% 57.12%,12.39% 44.59%,4.52% 29.23%,21.28% 25.12%,22.97% 7.94%,39.29% 13.54%)}
 .bubble.right-tail{margin-right:18px}
 .bubble.left-tail{margin-left:18px}
 .narration{white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
@@ -167,7 +167,13 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&
 const clone=o=>JSON.parse(JSON.stringify(o));
 const defaultSettings={
   title:"タイトル",titleColor:"#333333",titleLineColor:"#333333",headerImage:null,
-  pageBg:"#eeeeee",rootBg:"#777777",logBg:"#eeeeee",baseText:"#333333",baseBubble:"#ffffff",separatorColor:"#333333",
+  pageBg:"#eeeeee",rootBg:"#777777",logBg:"#eeeeee",
+  baseText:"#333333",baseBubble:"#ffffff",
+  baseNarrationText:"#333333",
+  baseBoxColor:"#aaaaaa",baseBoxText:"#ffffff",
+  baseBgmBg:"#333333",baseBgmText:"#eeeeee",
+  baseIconBg:"#aaaaaa",
+  separatorColor:"#333333",
   font:'"Zen Kaku Gothic New",sans-serif',
   colors:{system:"#666666",success:"#00a9b3",failure:"#c74720"}
 };
@@ -179,13 +185,18 @@ function detectRollResult(text){
   if(!m)return null;
   return /失敗/.test(m[1])?"failure":"success";
 }
-let state={settings:defaultSettings,characters:{},tabs:[],activeTab:null,selected:null,media:{}};
+let state={settings:defaultSettings,characters:{},tabs:[],activeTab:null,lastSingleTab:null,selected:null,media:{},templates:{bubble:[],narration:[],textbox:[]}};
 
 function newTab(name="ログ"){
-  const t={id:uid(),name,blocks:[]}; state.tabs.push(t); state.activeTab=t.id; return t;
+  const t={id:uid(),name,blocks:[]}; state.tabs.push(t); state.activeTab=t.id; state.lastSingleTab=t.id; return t;
 }
 function getTab(){return state.tabs.find(t=>t.id===state.activeTab)||state.tabs[0]}
 function isAllTab(){return state.activeTab==="__ALL__"}
+// ALL表示中に要素を追加した場合の追加先タブ（直前に開いていた個別タブ、無ければ最後のタブ）。
+function editTargetTab(){
+  if(!isAllTab())return getTab();
+  return state.tabs.find(t=>t.id===state.lastSingleTab)||state.tabs[state.tabs.length-1]||state.tabs[0];
+}
 function getDisplayBlocks(){
   if(!isAllTab()){const t=getTab();return t?(t.blocks.map(b=>({block:b,tabId:t.id}))):[]}
   return state.tabs.flatMap(t=>t.blocks.map(b=>({block:b,tabId:t.id})))
@@ -198,12 +209,14 @@ function findBlock(id){
 function charFor(name,color,icon){
   const key=String(name||"").trim();
   if(!key||key==="system"||key==="　") return null;
-  if(!state.characters[key]) state.characters[key]={id:uid(),name:key,nameColor:color||"#333333",textColor:state.settings.baseText,icon:icon||null,iconBg:"#aaaaaa",narration:false,expressions:[]};
+  if(!state.characters[key]) state.characters[key]={id:uid(),name:key,nameColor:color||"#333333",textColor:state.settings.baseText,icon:icon||null,iconBg:state.settings.baseIconBg,narration:false,expressions:[]};
   else if(icon&&!state.characters[key].icon) state.characters[key].icon=icon;
   return state.characters[key];
 }
 function makeBlock(type,data={}){
-  return Object.assign({id:uid(),type,createdAt:Date.now(),text:"",name:"",nameColor:"#333333",textColor:state.settings.baseText,bubbleColor:state.settings.baseBubble,direction:"left",shape:"normal",size:"normal",fontWeight:"400",showName:true,align:"left",boxColor:"#aaaaaa",title:"",image:null,media:null,mediaKind:"image",imageSide:"right",srcTab:null},data);
+  const s=state.settings;
+  const textColor=type==="textbox"?s.baseBoxText:type==="narration"?s.baseNarrationText:type==="bgm"?s.baseBgmText:s.baseText;
+  return Object.assign({id:uid(),type,createdAt:Date.now(),text:"",name:"",nameColor:"#333333",textColor,bubbleColor:s.baseBubble,direction:"left",shape:"normal",size:"normal",fontWeight:"400",showName:true,align:"left",boxColor:s.baseBoxColor,bgColor:s.baseBgmBg,title:"",image:null,media:null,mediaKind:"image",imageSide:"right",srcTab:null},data);
 }
 function save(){try{localStorage.setItem("cocofolia_formatter_v1",JSON.stringify(state))}catch(e){console.warn(e)}}
 function load(){
@@ -213,9 +226,11 @@ function load(){
       state=JSON.parse(x);
       state.settings=Object.assign(clone(defaultSettings),state.settings||{});
       state.settings.colors=Object.assign(clone(defaultSettings.colors),state.settings.colors||{});
-      state.characters=state.characters||{};Object.values(state.characters).forEach(c=>{c.expressions=c.expressions||[];c.iconBg=c.iconBg||"#aaaaaa"});
+      state.characters=state.characters||{};Object.values(state.characters).forEach(c=>{c.expressions=c.expressions||[];c.iconBg=c.iconBg||state.settings.baseIconBg});
       state.tabs=state.tabs||[];state.tabs.forEach(t=>t.blocks.forEach(b=>{b.fontWeight=b.fontWeight||"400"}));
       if(!state.tabs.length)newTab();
+      if(!state.tabs.some(t=>t.id===state.lastSingleTab))state.lastSingleTab=state.tabs[0]?.id||null;
+      state.templates=state.templates||{bubble:[],narration:[],textbox:[]};
       return true
     }
   }catch(e){}
@@ -224,7 +239,7 @@ function load(){
 function sizeClass(s){return ({h1:"h1",h2:"h2",h3:"h3",normal:"normal",small:"small"})[s]||"normal"}
 function fontSize(s){return ({h1:"2.1em",h2:"1.7em",h3:"1.35em",normal:"1em",small:".78em"})[s]||"1em"}
 function effectiveBlock(b,key,fallback){
-  const defs={nameColor:"#333333",textColor:defaultSettings.baseText,bubbleColor:defaultSettings.baseBubble,boxColor:"#aaaaaa"};
+  const defs={nameColor:"#333333",textColor:defaultSettings.baseText,bubbleColor:defaultSettings.baseBubble};
   return b[key]===defs[key] ? (fallback??b[key]) : b[key];
 }
 function effectiveChar(c,key,fallback){
@@ -232,13 +247,35 @@ function effectiveChar(c,key,fallback){
   return (v==="#333333" || v==null) ? (fallback??v) : v;
 }
 // 全体設定・キャラクター設定の色を変更した際、既存ブロックの色が変更前の値と一致していれば
-// 一緒に追従させる（name指定時はそのキャラクターの名前のブロックのみ対象）。
-function syncColorField(field,oldVal,newVal,name){
+// 一緒に追従させる（name指定時はそのキャラクターの名前のブロックのみ対象、blockType指定時はその種類のブロックのみ対象）。
+function syncColorField(field,oldVal,newVal,name,blockType){
   if(!oldVal||!newVal||oldVal===newVal)return;
   state.tabs.forEach(t=>t.blocks.forEach(b=>{
+    if(blockType&&b.type!==blockType)return;
     if(name!=null&&b.name!==name)return;
     if(b[field]===oldVal)b[field]=newVal;
   }));
+}
+// テキストボックス⇔地の文/吹き出し の相互変換。
+// ・地の文/吹き出し → テキストボックス：名前をタイトルへ移し、名前色は引き継がない（本文色は基準本文色にリセット）。
+// ・テキストボックス → 地の文/吹き出し：タイトルを名前へ戻し、画像は消す。
+// アイコン背景色の全体設定変更を、個別設定していないキャラクター（値が一致するキャラクター）に反映する。
+function syncCharIconBg(oldVal,newVal){
+  if(!oldVal||!newVal||oldVal===newVal)return;
+  Object.values(state.characters).forEach(c=>{if(c.iconBg===oldVal)c.iconBg=newVal});
+}
+function convertBlockType(b,newType){
+  if(newType==="textbox"&&b.type!=="textbox"){
+    b.title=b.name||b.title||"";
+    b.name="";
+    b.textColor=state.settings.baseBoxText;
+    b.boxColor=b.boxColor&&b.boxColor!=="#333333"?b.boxColor:state.settings.baseBoxColor;
+  }else if(b.type==="textbox"&&newType!=="textbox"){
+    b.name=b.title||b.name||"";
+    b.image=null;
+    b.textColor=newType==="narration"?state.settings.baseNarrationText:state.settings.baseText;
+  }
+  b.type=newType;
 }
 function charForBlock(b){
   const c=state.characters[b.name]||{};
@@ -251,12 +288,28 @@ function renderTabs(){
   const allActive=isAllTab();
   $("#tabs").innerHTML=`<button class="tab ${allActive?"active":""}" data-tab="__ALL__">ALL</button>`+
     state.tabs.map(t=>`<button class="tab ${t.id===state.activeTab?"active":""}" data-tab="${t.id}">${esc(t.name)}</button>`).join("");
-  $("#tabList").innerHTML=state.tabs.map(t=>`<div class="list-item">
+  $("#tabList").innerHTML=state.tabs.map((t,i)=>`<div class="list-item">
     <input type="checkbox" class="tab-check" data-tab-check="${t.id}" style="width:auto">
-    <span>${esc(t.name)}</span><button data-tab="${t.id}">開く</button>
+    <input data-tab-rename="${t.id}" value="${esc(t.name)}" style="flex:1;min-width:0">
+    <button data-tab-up="${t.id}" ${i===0?"disabled":""}>↑</button>
+    <button data-tab-down="${t.id}" ${i===state.tabs.length-1?"disabled":""}>↓</button>
+    <button data-tab="${t.id}">開く</button>
   </div>`).join("");
   $$("#tabs [data-tab],#tabList [data-tab]").forEach(b=>b.onclick=()=>{
-    state.activeTab=b.dataset.tab;state.selected=null;render()
+    state.activeTab=b.dataset.tab;if(!isAllTab())state.lastSingleTab=state.activeTab;state.selected=null;render()
+  });
+  $$("#tabList [data-tab-rename]").forEach(el=>el.oninput=()=>{
+    const t=state.tabs.find(x=>x.id===el.dataset.tabRename);if(!t)return;
+    t.name=el.value;
+    if(t.id===state.activeTab)$("#activeName").textContent=t.name;
+    const topBtn=$(`#tabs button[data-tab="${t.id}"]`);if(topBtn)topBtn.textContent=t.name;
+    save();
+  });
+  $$("#tabList [data-tab-up]").forEach(b=>b.onclick=()=>{
+    const i=state.tabs.findIndex(x=>x.id===b.dataset.tabUp);if(i>0){[state.tabs[i-1],state.tabs[i]]=[state.tabs[i],state.tabs[i-1]];render()}
+  });
+  $$("#tabList [data-tab-down]").forEach(b=>b.onclick=()=>{
+    const i=state.tabs.findIndex(x=>x.id===b.dataset.tabDown);if(i>=0&&i<state.tabs.length-1){[state.tabs[i+1],state.tabs[i]]=[state.tabs[i],state.tabs[i+1]];render()}
   });
 }
 function renderChars(){
@@ -268,8 +321,9 @@ function mergeSelectedCharacters(){const ids=checkedCharIds();if(ids.length!==2)
 function mergeCharacterPair(aid,bid){const src=Object.values(state.characters).find(x=>x.id===aid),dst=Object.values(state.characters).find(x=>x.id===bid);if(!src||!dst)return;if(!confirm(`「${src.name}」を「${dst.name}」に結合しますか？`))return;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===src.name)b.name=dst.name}));dst.expressions=[...(dst.expressions||[]),...(src.expressions||[])];delete state.characters[src.name];render();charEditor(dst.id)}
 function deleteSelectedCharacters(){const ids=checkedCharIds();if(!ids.length){alert("削除するキャラクターを選択してください。");return}if(!confirm(`選択した ${ids.length} 人のキャラクターを削除しますか？\n既存ブロックのキャラクター名は残ります。`))return;ids.forEach(id=>{const c=Object.values(state.characters).find(x=>x.id===id);if(c)delete state.characters[c.name]});state.selected=null;render()}
 function render(){
+  if(!isAllTab()&&getTab())state.lastSingleTab=getTab().id;
   renderTabs();renderChars();
-  const t=getTab();$("#activeName").textContent=t?t.name:"プレビュー";
+  $("#activeName").textContent=isAllTab()?"ALL（全タブ表示）":(getTab()?getTab().name:"プレビュー");
   renderPage();
   renderInspector();
   save();
@@ -293,17 +347,17 @@ function renderPage(){
       const textColor=effectiveBlock(b,"textColor",effectiveChar(c,"textColor",s.baseText));
       const bubbleColor=effectiveBlock(b,"bubbleColor",s.baseBubble);
       content=`<div class="speech-row ${b.direction==="right"?"right":""}">
-        ${icon?`<img class="avatar" style="background:${esc(c.iconBg||"#aaaaaa")}" src="${esc(icon)}">`:`<div class="avatar" style="background:${esc(c.iconBg||"#aaaaaa")}"></div>`}
+        ${icon?`<img class="avatar" style="background:${esc(c.iconBg||s.baseIconBg)}" src="${esc(icon)}">`:`<div class="avatar" style="background:${esc(c.iconBg||s.baseIconBg)}"></div>`}
         <div class="speech-content">${b.showName?`<div class="speaker" style="color:${esc(nameColor)}">${esc(b.name)}</div>`:""}
         <div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="--bubble:${esc(bubbleColor)};background:${esc(bubbleColor)};color:${esc(textColor)};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${esc(b.text)}</div></div></div>`;
     }else if(b.type==="narration"){
-      content=`<div class="narration ${b.align}" style="color:${esc(effectiveBlock(b,"textColor",s.baseText))};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
+      content=`<div class="narration ${b.align}" style="color:${esc(b.textColor||s.baseNarrationText)};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
     }else if(b.type==="textbox"){
-      content=`<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(effectiveBlock(b,"boxColor","#aaaaaa"))};color:${esc(effectiveBlock(b,"textColor",s.baseText))}">
+      content=`<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(b.boxColor||s.baseBoxColor)};color:${esc(b.textColor||s.baseBoxText)}">
         <div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>
         ${b.image?`<img src="${esc(b.image)}">`:""}</div>`;
     }else if(b.type==="bgm"){
-      content=`<div class="bgm" style="background:${esc(b.bgColor||"#333333")};color:${esc(b.textColor||"#eeeeee")}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(b.media||"")}"></audio></div>`;
+      content=`<div class="bgm" style="background:${esc(b.bgColor||s.baseBgmBg)};color:${esc(b.textColor||s.baseBgmText)}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(b.media||"")}"></audio></div>`;
     }else if(b.type==="media"){
       if(b.mediaKind==="audio") content=`<div class="media"><audio controls src="${esc(b.media||"")}"></audio></div>`;
       else if(b.mediaKind==="video") content=`<div class="media"><video controls src="${esc(b.media||"")}"></video></div>`;
@@ -375,6 +429,43 @@ function bindCommonBlock(b){
  $$("#inspectorBody input[type=color]").forEach(el=>{el.oninput=()=>{const key=el.id.replace("f_","");b[key]=el.value;const tx=$("#"+el.id+"Text");if(tx)tx.value=el.value;renderPage();save()}});
  $$("#inspectorBody input[id$=Text]").forEach(el=>el.oninput=()=>{const key=el.id.replace("Text","").replace("f_","");b[key]=el.value;const c=$("#f_"+key);if(c)c.value=el.value;renderPage();save()});
 }
+function templateFieldsFor(type){
+  if(type==="bubble")return ["size","textColor","fontWeight","direction","shape","bubbleColor","nameColor","showName"];
+  if(type==="narration")return ["size","textColor","fontWeight","align","showName"];
+  if(type==="textbox")return ["boxColor","textColor","imageSide"];
+  return [];
+}
+function templatePanelHtml(type){
+  return `<div class="panel" style="margin-top:10px"><b>テンプレート</b><div id="tplList" class="list" style="margin:8px 0"></div>
+  <div class="row"><input id="tplName" placeholder="テンプレート名"><button id="tplSave">現在の形式を保存</button></div></div>`;
+}
+function renderTemplateList(type,b){
+  const el=$("#tplList");if(!el)return;
+  const list=state.templates[type]||[];
+  el.innerHTML=list.map(t=>`<div class="list-item"><span>${esc(t.name)}</span><button data-tpl-apply="${t.id}">適用</button><button data-tpl-del="${t.id}" class="danger">削除</button></div>`).join("")||'<span class="small">保存されたテンプレートはありません。</span>';
+  $$("#tplList [data-tpl-apply]").forEach(btn=>btn.onclick=()=>{
+    const tpl=list.find(t=>t.id===btn.dataset.tplApply);if(!tpl)return;
+    Object.assign(b,tpl.style);render();
+  });
+  $$("#tplList [data-tpl-del]").forEach(btn=>btn.onclick=()=>{
+    if(!confirm("このテンプレートを削除しますか？"))return;
+    state.templates[type]=(state.templates[type]||[]).filter(t=>t.id!==btn.dataset.tplDel);
+    save();renderTemplateList(type,b);
+  });
+}
+function bindTemplatePanel(type,b){
+  if(!$("#tplList"))return;
+  renderTemplateList(type,b);
+  $("#tplSave").onclick=()=>{
+    const nameEl=$("#tplName"),name=nameEl.value.trim();
+    if(!name){alert("テンプレート名を入力してください。");return}
+    const fields=templateFieldsFor(type),style={};
+    fields.forEach(f=>style[f]=b[f]);
+    state.templates[type]=state.templates[type]||[];
+    state.templates[type].push({id:uid(),name,style});
+    nameEl.value="";save();renderTemplateList(type,b);
+  };
+}
 function renderInspector(){
  const body=$("#inspectorBody"),found=findBlock(state.selected),b=found?.block;
  if(!b){body.innerHTML=`<div class="panel"><b>全体設定</b><p class="small">要素をクリックすると個別編集できます。</p></div>`;return}
@@ -389,19 +480,23 @@ function renderInspector(){
       `<label>向き</label><select id="f_direction"><option value="left">左</option><option value="right">右</option></select>`+
       `<label class="check"><input id="f_showName" type="checkbox"> 名前を表示</label>`+
       `<label>本文</label><textarea id="f_text">${esc(b.text)}</textarea>`+
-      `<div class="panel" style="margin-top:10px"><button id="convertNarration">地の文に変換</button><button id="convertTextbox">テキストボックスに変換</button></div>`;
+      `<div class="panel" style="margin-top:10px"><button id="convertNarration">地の文に変換</button><button id="convertTextbox">テキストボックスに変換</button></div>`+
+      templatePanelHtml("bubble");
  }else if(b.type==="narration"){
    h+=`<label>文字サイズ</label><select id="f_size"><option value="h1">見出し1</option><option value="h2">見出し2</option><option value="h3">見出し3</option><option value="normal">通常</option><option value="small">小さい</option></select>
    <label>フォントの太さ</label><select id="f_fontWeight"><option value="400">通常</option><option value="500">やや太め</option><option value="700">太字</option><option value="900">極太</option></select>
    <label>揃え</label><select id="f_align"><option value="left">左</option><option value="center">中央</option><option value="right">右</option></select>
    <label class="check"><input id="f_showName" type="checkbox"> 名前を表示</label>${inputField("名前","f_name",b.name)}
    ${colorField("本文色","f_textColor",b.textColor)}<label>本文</label><textarea id="f_text">${esc(b.text)}</textarea>
-   <div class="panel"><button id="convertBubble">吹き出しに変換</button><button id="convertTextbox">テキストボックスに変換</button></div>`;
+   <div class="panel"><button id="convertBubble">吹き出しに変換</button><button id="convertTextbox">テキストボックスに変換</button></div>`+
+   templatePanelHtml("narration");
  }else if(b.type==="textbox"){
    h+=colorField("ボックス色","f_boxColor",b.boxColor)+colorField("本文色","f_textColor",b.textColor)+inputField("タイトル（空欄可）","f_title",b.title)+
    `<label>画像位置</label><select id="f_imageSide"><option value="right">←テキスト / 画像→</option><option value="left">←画像 / テキスト→</option></select>
    <label>本文</label><textarea id="f_text">${esc(b.text)}</textarea>
-   <label>画像</label><input id="mediaPicker" type="file" accept="image/*">`;
+   <label>画像</label><input id="mediaPicker" type="file" accept="image/*">
+   <div class="panel" style="margin-top:10px"><button id="convertNarration">地の文に変換</button><button id="convertBubble">吹き出しに変換</button></div>`+
+   templatePanelHtml("textbox");
  }else if(b.type==="bgm"){
    h+=inputField("表示名","f_text",b.text)+colorField("背景色","f_bgColor",b.bgColor||"#333333")+colorField("文字・再生バー色","f_textColor",b.textColor||"#eeeeee")+
    `<label>音声ファイル</label><input id="mediaPicker" type="file" accept=".mp3,.ogg,.wav,audio/*">`;
@@ -415,18 +510,36 @@ function renderInspector(){
  if($("#f_showName"))$("#f_showName").checked=b.showName;if($("#f_align"))$("#f_align").value=b.align;if($("#f_imageSide"))$("#f_imageSide").value=b.imageSide;
  if($("#f_mediaKind"))$("#f_mediaKind").value=b.mediaKind;
  bindCommonBlock(b);
- ["convertNarration","convertTextbox","convertBubble"].forEach(id=>{const el=$("#"+id);if(el)el.onclick=()=>{if(id==="convertNarration")b.type="narration";if(id==="convertBubble")b.type="bubble";if(id==="convertTextbox")b.type="textbox";render()}});
+ if(b.type==="bubble"||b.type==="narration"||b.type==="textbox")bindTemplatePanel(b.type,b);
+ ["convertNarration","convertTextbox","convertBubble"].forEach(id=>{const el=$("#"+id);if(el)el.onclick=()=>{const newType=id==="convertNarration"?"narration":id==="convertBubble"?"bubble":"textbox";convertBlockType(b,newType);render()}});
  const mp=$("#mediaPicker");if(mp)mp.onchange=async()=>{const f=mp.files[0];if(f){b.media=await fileData(f);b.mediaKind=detectMediaKind(f);if(b.type==="textbox")b.image=b.media;render()}};
+}
+// 指定キャラクターの吹き出し本文から、指定した括弧記号をすべて取り除く（一括・元に戻せない）。
+function stripBracketsForChar(name,openCh,closeCh){
+  state.tabs.forEach(t=>t.blocks.forEach(b=>{
+    if(b.type==="bubble"&&b.name===name&&typeof b.text==="string"){
+      b.text=b.text.split(openCh).join("").split(closeCh).join("");
+    }
+  }));
 }
 function charEditor(id){
  const c=Object.values(state.characters).find(x=>x.id===id);if(!c)return;
- c.expressions=c.expressions||[];c.iconBg=c.iconBg||"#aaaaaa";
+ c.expressions=c.expressions||[];c.iconBg=c.iconBg||state.settings.baseIconBg;
  $("#inspector").classList.add("open");
  $("#inspectorBody").innerHTML=`${inputField("名前","c_name",c.name)}${colorField("名前色","c_nameColor",c.nameColor)}${colorField("本文色","c_textColor",c.textColor)}${colorField("アイコン背景色","c_iconBg",c.iconBg)}
  <label>アイコン（1:1推奨）</label><input id="c_file" type="file" accept="image/*">
  <div class="panel"><b>表情差分</b><div id="exprList" class="list"></div><input id="exprFile" type="file" accept="image/*" multiple></div>
+ <div class="panel"><b>カギ括弧一括削除</b><div class="small" style="margin-bottom:6px">このキャラクターの吹き出し本文から、選んだ記号を一括で削除します（元に戻せません）。</div>
+ <div class="row"><button data-bracket="『』">『』を削除</button><button data-bracket="「」">「」を削除</button><button data-bracket="()">()を削除</button></div></div>
  <div class="panel"><button id="mergeChars">このキャラクターを別キャラと結合</button><button id="deleteChar" class="danger">このキャラクターを削除</button></div>`;
  renderExpr(c);
+ $$("#inspectorBody [data-bracket]").forEach(btn=>btn.onclick=()=>{
+   const label=btn.dataset.bracket, pair={"『』":["『","』"],"「」":["「","」"],"()":["(",")"]}[label];
+   if(!pair)return;
+   if(!confirm(`「${c.name}」の吹き出し本文から ${label} を一括削除します。よろしいですか？（元に戻せません）`))return;
+   stripBracketsForChar(c.name,pair[0],pair[1]);
+   renderPage();save();
+ });
  $("#c_name").oninput=e=>{const old=c.name,n=e.target.value.trim();if(!n)return;if(n!==old&&state.characters[n]){alert("同名のキャラクターが既に存在します。");e.target.value=old;return}c.name=n;if(old!==n){delete state.characters[old];state.characters[n]=c;Object.values(state.tabs).forEach(t=>t.blocks.forEach(b=>{if(b.name===old)b.name=n}))}renderChars();renderPage();save()};
  ["c_nameColor","c_textColor","c_iconBg"].forEach(id=>{
    const key=id.replace("c_","");
@@ -455,21 +568,37 @@ function detectMediaKind(f){
 function openSettings(){
  $("#inspector").classList.add("open");const s=state.settings;
  $("#inspectorBody").innerHTML=`${inputField("タイトル","s_title",s.title)}${colorField("タイトル文字色","s_titleColor",s.titleColor)}${colorField("タイトル区切り線色","s_titleLineColor",s.titleLineColor||s.titleColor)}
- ${colorField("HTML/ページ背景","s_pageBg",s.pageBg)}${colorField("ログ領域背景","s_logBg",s.logBg)}${colorField("区切り線色","s_separatorColor",s.separatorColor||"#333333")}${colorField("基本文字色","s_baseText",s.baseText)}${colorField("基本吹き出し色","s_baseBubble",s.baseBubble)}
+ ${colorField("HTML/ページ背景","s_pageBg",s.pageBg)}${colorField("ログ領域背景","s_logBg",s.logBg)}${colorField("区切り線色","s_separatorColor",s.separatorColor||"#333333")}
  <label>フォント</label><input id="s_font" value="${esc(s.font)}">
+ <div class="panel"><b>吹き出し・地の文</b>${colorField("基本文字色（吹き出し）","s_baseText",s.baseText)}${colorField("基本吹き出し色","s_baseBubble",s.baseBubble)}${colorField("地の文の基本テキスト色","s_baseNarrationText",s.baseNarrationText)}</div>
+ <div class="panel"><b>テキストボックス</b>${colorField("基本ボックス色","s_baseBoxColor",s.baseBoxColor)}${colorField("基本本文色","s_baseBoxText",s.baseBoxText)}</div>
+ <div class="panel"><b>BGM</b>${colorField("基本背景色","s_baseBgmBg",s.baseBgmBg)}${colorField("基本文字・再生バー色","s_baseBgmText",s.baseBgmText)}</div>
+ <div class="panel"><b>アイコン</b><div class="small" style="margin-bottom:6px">キャラクター個別に設定していない場合、ここで一括で変更できます。</div>${colorField("基本アイコン背景色","s_baseIconBg",s.baseIconBg)}</div>
  <div class="panel"><b>ダイス結果色</b><div class="small" style="margin-bottom:6px">成功・スペシャル・決定的成功は成功色に、失敗・致命的失敗は失敗色に統一されます。</div>${colorField("system","s_system",s.colors.system)}${colorField("成功系（成功/スペシャル/決定的成功）","s_success",s.colors.success)}${colorField("失敗系（失敗/致命的失敗）","s_failure",s.colors.failure)}</div>
  <label>ヘッダー画像</label><input id="s_file" type="file" accept="image/*">`;
  const map={title:"title",titleColor:"titleColor",titleLineColor:"titleLineColor",pageBg:"pageBg",logBg:"logBg",separatorColor:"separatorColor",font:"font"};
  Object.entries(map).forEach(([id,k])=>{const e=$("#s_"+id);if(e)e.oninput=()=>{s[k]=e.value;renderPage();save()}});
- $("#s_baseText").oninput=()=>{const old=s.baseText;s.baseText=$("#s_baseText").value;syncColorField("textColor",old,s.baseText,null);renderPage();save()};
- $("#s_baseTextText").oninput=()=>{const old=s.baseText;s.baseText=$("#s_baseTextText").value;$("#s_baseText").value=s.baseText;syncColorField("textColor",old,s.baseText,null);renderPage();save()};
- $("#s_baseBubble").oninput=()=>{const old=s.baseBubble;s.baseBubble=$("#s_baseBubble").value;syncColorField("bubbleColor",old,s.baseBubble,null);renderPage();save()};
- $("#s_baseBubbleText").oninput=()=>{const old=s.baseBubble;s.baseBubble=$("#s_baseBubbleText").value;$("#s_baseBubble").value=s.baseBubble;syncColorField("bubbleColor",old,s.baseBubble,null);renderPage();save()};
+ // 色設定：変更前の値と一致する既存ブロック／キャラクターへ追従させる（種類指定でその要素種別のみ対象）。
+ function bindColor(id,key,field,blockType){
+   const apply=v=>{const old=s[key];s[key]=v;const el=$("#s_"+id),tx=$("#s_"+id+"Text");if(el)el.value=v;if(tx)tx.value=v;if(field)syncColorField(field,old,v,null,blockType);renderPage();save()};
+   $("#s_"+id).oninput=e=>apply(e.target.value);
+   $("#s_"+id+"Text").oninput=e=>apply(e.target.value);
+ }
+ bindColor("baseText","baseText","textColor","bubble");
+ bindColor("baseBubble","baseBubble","bubbleColor","bubble");
+ bindColor("baseNarrationText","baseNarrationText","textColor","narration");
+ bindColor("baseBoxColor","baseBoxColor","boxColor","textbox");
+ bindColor("baseBoxText","baseBoxText","textColor","textbox");
+ bindColor("baseBgmBg","baseBgmBg","bgColor","bgm");
+ bindColor("baseBgmText","baseBgmText","textColor","bgm");
+ // アイコン基本背景色：ブロックではなくキャラクターのiconBgに追従させる。
+ $("#s_baseIconBg").oninput=e=>{const old=s.baseIconBg;s.baseIconBg=e.target.value;$("#s_baseIconBgText").value=e.target.value;syncCharIconBg(old,s.baseIconBg);renderPage();save()};
+ $("#s_baseIconBgText").oninput=e=>{const old=s.baseIconBg;s.baseIconBg=e.target.value;$("#s_baseIconBg").value=e.target.value;syncCharIconBg(old,s.baseIconBg);renderPage();save()};
  ["system","success","failure"].forEach(k=>{$("#s_"+k).oninput=e=>{s.colors[k]=e.target.value;renderPage();save()};$("#s_"+k+"Text").oninput=e=>{s.colors[k]=e.target.value;$("#s_"+k).value=e.target.value;renderPage();save()}});
  $("#s_file").onchange=async e=>{if(e.target.files[0]){s.headerImage=await fileData(e.target.files[0]);renderPage();save()}};
 }
 function addBlock(type){
- const t=getTab();let b=makeBlock(type);
+ const t=editTargetTab();if(!t)return;let b=makeBlock(type);
  if(type==="bubble"){b.name=Object.keys(state.characters)[0]||"新キャラクター";charFor(b.name,"#333333");}
  if(type==="narration")b.text="新しい地の文";
  if(type==="textbox")b.text="ボックス本文";
@@ -510,9 +639,41 @@ function parseOld(doc,name){
  });
  for(const [ch,blocks] of groups){const t=newTab(name+(groups.size>1?" / "+ch:""));t.blocks=blocks}
 }
+// avatar-image-N の背景画像(data URL)を抽出する。
+// 正規表現だけに頼ると、改行やコメント、複数セレクタなどCSSの書式差異で取りこぼし／
+// 途中で切れて壊れたデータURLを拾ってしまうことがある（読込→書き出し後に画像が壊れる原因）。
+// 実際に<style>をDOMへ挿入しCSSOM経由で読み取ることで確実に抽出する。
+function extractAvatarMap(doc){
+  const avatarMap={};
+  [...doc.querySelectorAll("style")].forEach(st=>{
+    let usedCssom=false;
+    try{
+      const tempStyle=document.createElement("style");
+      tempStyle.textContent=st.textContent;
+      document.head.appendChild(tempStyle);
+      const sheet=tempStyle.sheet;
+      if(sheet){
+        [...sheet.cssRules].forEach(rule=>{
+          const sel=rule.selectorText||"";
+          const m=sel.match(/\.avatar-image-(\d+)/);
+          if(m&&rule.style){
+            const bg=rule.style.backgroundImage||"";
+            const um=bg.match(/url\(["']?(data:[^"')]+)["']?\)/);
+            if(um){avatarMap[m[1]]=um[1];usedCssom=true}
+          }
+        });
+      }
+      document.head.removeChild(tempStyle);
+    }catch(e){/* CSSOMで読めない場合は下の正規表現フォールバックに任せる */}
+    if(!usedCssom){
+      const re=/\.avatar-image-(\d+)[^{]*\{[^}]*background-image:\s*url\(["']?(data:[^)"']+)["']?\)/g;let m;
+      while((m=re.exec(st.textContent)))if(!avatarMap[m[1]])avatarMap[m[1]]=m[2];
+    }
+  });
+  return avatarMap;
+}
 function parseNew(doc,name){
- const avatarMap={};
- [...doc.querySelectorAll("style")].forEach(st=>{const re=/\.avatar-image-(\d+)[^{]*\{[^}]*background-image:\s*url\(["']?(data:[^)"']+)["']?\)/g;let m;while((m=re.exec(st.textContent)))avatarMap[m[1]]=m[2]});
+ const avatarMap=extractAvatarMap(doc);
  const groups=new Map();
  // systemログ（HP/SAN増減など）には<time>が無いため、直前に見つかった実際のタイムスタンプを
  // 基準に僅かに加算して並び順を維持する（無いと index=0発進になり最上部に集まってしまう）。
@@ -549,9 +710,9 @@ function parseNew(doc,name){
 }
 async function importFiles(files){
  for(const f of files){
-   if(/\.(png|jpe?g|webp|gif|apng)$/i.test(f.name)){const b=makeBlock("media",{media:await fileData(f),mediaKind:"image",text:f.name});getTab().blocks.push(b);continue}
-   if(/\.(mp4|mov|webm|mkv|m4v)$/i.test(f.name)){const b=makeBlock("media",{media:await fileData(f),mediaKind:"video",text:f.name});getTab().blocks.push(b);continue}
-   if(/\.(wav|mp3|ogg|m4a|aac)$/i.test(f.name)){const b=makeBlock("bgm",{media:await fileData(f),text:f.name});getTab().blocks.push(b);continue}
+   if(/\.(png|jpe?g|webp|gif|apng)$/i.test(f.name)){const b=makeBlock("media",{media:await fileData(f),mediaKind:"image",text:f.name});editTargetTab().blocks.push(b);continue}
+   if(/\.(mp4|mov|webm|mkv|m4v)$/i.test(f.name)){const b=makeBlock("media",{media:await fileData(f),mediaKind:"video",text:f.name});editTargetTab().blocks.push(b);continue}
+   if(/\.(wav|mp3|ogg|m4a|aac)$/i.test(f.name)){const b=makeBlock("bgm",{media:await fileData(f),text:f.name});editTargetTab().blocks.push(b);continue}
    const text=await f.text();
    try{if(/\.json$/i.test(f.name))await importJSON(text,f.name.replace(/\.[^.]+$/,""));else{const doc=new DOMParser().parseFromString(text,"text/html");if(doc.querySelector("article.message"))parseNew(doc,f.name.replace(/\.[^.]+$/,""));else parseOld(doc,f.name.replace(/\.[^.]+$/,""))}}catch(e){alert(f.name+" の読み込みに失敗しました。\n"+e.message)}
  }
@@ -576,7 +737,17 @@ function exportHTML(){
   const fontFace='@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap");';
   const doc=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(s.title)}</title><style>
   ${fontFace}
-  *{box-sizing:border-box}body{margin:0;background:${s.rootBg};color:${s.baseText};font-family:${s.font||'"Zen Kaku Gothic New",sans-serif'}}.wrap{max-width:960px;margin:auto;background:${s.logBg};min-height:100vh;padding:40px 48px 70px}.title{text-align:center;font-size:38px;font-weight:800;padding-bottom:18px;border-bottom:4px solid ${s.titleLineColor||s.titleColor};color:${s.titleColor};margin-bottom:30px}.header{display:block;max-width:100%;max-height:420px;margin:16px auto 18px}.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:25px}.tab{border:0;padding:8px 12px;background:#ddd;color:#333}.tab.active{background:#555;color:#fff}.logtab{display:none}.logtab.active{display:block}.speech{display:flex;gap:14px;margin:18px 0;align-items:flex-start}.speech.right{flex-direction:row-reverse}.avatar{width:56px;height:56px;object-fit:cover;background:#aaa;flex:none}.speaker{font-weight:800;font-size:18px;margin-bottom:5px}.content{min-width:0;flex:1}.bubble{padding:12px 18px;min-height:1.65em;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;position:relative}.bubble.normal{border-radius:20px}.bubble.thought{border-radius:28px}.bubble.radio{border-radius:0}.bubble.loud{clip-path:polygon(0 12%,8% 0,16% 9%,25% 0,34% 9%,43% 0,52% 9%,61% 0,70% 9%,79% 0,88% 9%,100% 0,97% 18%,100% 35%,97% 52%,100% 69%,97% 86%,100% 100%,88% 91%,79% 100%,70% 91%,61% 100%,52% 91%,43% 100%,34% 91%,25% 100%,16% 91%,8% 100%,0 88%,3% 70%,0 52%,3% 34%,0 18%);padding:18px 22px}.narration{white-space:pre-wrap;line-height:1.7;margin:18px 0}.textbox{padding:18px;display:flex;gap:18px;align-items:center;margin:18px 0}.textbox.reverse{flex-direction:row-reverse}.textbox-main{flex:1}.textbox-title{font-size:24px;font-weight:900;margin-bottom:8px}.textbox-text{white-space:pre-wrap;line-height:1.65}.textbox img{width:38%;max-height:260px;object-fit:contain}.media img,.media video{display:block;max-width:100%;max-height:600px;margin:auto}.media audio{width:100%}.bgm{display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 14px}.bgm audio{flex:0 1 70%;max-width:560px;min-width:180px}.sep{height:4px;margin:28px 0;background:${s.separatorColor||s.baseText}}
+  *{box-sizing:border-box}body{margin:0;background:${s.rootBg};color:${s.baseText};font-family:${s.font||'"Zen Kaku Gothic New",sans-serif'}}.wrap{max-width:960px;margin:auto;background:${s.logBg};min-height:100vh;padding:40px 48px 70px;border-radius:18px}.title{text-align:center;font-size:38px;font-weight:800;padding-bottom:18px;border-bottom:4px solid ${s.titleLineColor||s.titleColor};color:${s.titleColor};margin-bottom:30px}.header{display:block;max-width:100%;max-height:420px;margin:16px auto 18px}.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:25px}.tab{border:0;padding:8px 12px;background:#ddd;color:#333}.tab.active{background:#555;color:#fff}.logtab{display:none}.logtab.active{display:block}.speech{display:flex;gap:14px;margin:18px 0;align-items:flex-start}.speech.right{flex-direction:row-reverse}.avatar{width:56px;height:56px;object-fit:cover;background:#aaa;flex:none}.speaker{font-weight:800;font-size:18px;margin-bottom:5px}.content{min-width:0;flex:1}.bubble{position:relative;padding:12px 18px;min-height:1.65em;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+  .bubble.left-tail:before,.bubble.right-tail:before{content:"";position:absolute;top:16px;border:10px solid transparent}
+  .bubble.left-tail:before{left:-18px;border-right-color:var(--bubble)}
+  .bubble.right-tail:before{right:-18px;border-left-color:var(--bubble)}
+  .bubble.right-tail{margin-right:18px}.bubble.left-tail{margin-left:18px}
+  .bubble.normal{border-radius:20px}.bubble.thought{border-radius:28px}.bubble.thought.left-tail:before,.bubble.thought.right-tail:before{width:12px;height:12px;border:0;border-radius:50%;top:23px}.bubble.thought.left-tail:before{left:-20px;background:var(--bubble)}.bubble.thought.right-tail:before{right:-20px;background:var(--bubble)}
+  .bubble.radio{border-radius:0}.bubble.radio.left-tail:before,.bubble.radio.right-tail:before{border:0;width:12px;height:12px;top:16px;background:var(--bubble)}.bubble.radio.left-tail:before{left:-12px}.bubble.radio.right-tail:before{right:-12px}
+  .bubble.loud{padding:18px 22px;clip-path:polygon(50.00% 0.00%,60.71% 13.54%,77.03% 7.94%,78.72% 25.12%,95.48% 29.23%,87.61% 44.59%,99.49% 57.12%,84.57% 65.79%,87.79% 82.74%,70.54% 81.97%,64.09% 97.97%,50.00% 88.00%,35.91% 97.97%,29.46% 81.97%,12.21% 82.74%,15.43% 65.79%,0.51% 57.12%,12.39% 44.59%,4.52% 29.23%,21.28% 25.12%,22.97% 7.94%,39.29% 13.54%)}
+  .bubble.loud.left-tail{clip-path:polygon(50.00% 0.00%,60.71% 13.54%,77.03% 7.94%,78.72% 25.12%,95.48% 29.23%,87.61% 44.59%,99.49% 57.12%,84.57% 65.79%,87.79% 82.74%,70.54% 81.97%,64.09% 97.97%,50.00% 88.00%,35.91% 97.97%,29.46% 81.97%,12.21% 82.74%,15.43% 65.79%,-17.49% 57.12%,12.39% 44.59%,4.52% 29.23%,21.28% 25.12%,22.97% 7.94%,39.29% 13.54%)}
+  .bubble.loud.right-tail{clip-path:polygon(50.00% 0.00%,60.71% 13.54%,77.03% 7.94%,78.72% 25.12%,95.48% 29.23%,87.61% 44.59%,117.49% 57.12%,84.57% 65.79%,87.79% 82.74%,70.54% 81.97%,64.09% 97.97%,50.00% 88.00%,35.91% 97.97%,29.46% 81.97%,12.21% 82.74%,15.43% 65.79%,0.51% 57.12%,12.39% 44.59%,4.52% 29.23%,21.28% 25.12%,22.97% 7.94%,39.29% 13.54%)}
+  .narration{white-space:pre-wrap;line-height:1.7;margin:18px 0;overflow-wrap:anywhere}.narration.center{text-align:center}.narration.right{text-align:right}.textbox{padding:18px;display:flex;gap:18px;align-items:center;margin:18px 0}.textbox.reverse{flex-direction:row-reverse}.textbox-main{flex:1;min-width:0}.textbox-title{font-size:24px;font-weight:900;margin-bottom:8px}.textbox-text{white-space:pre-wrap;line-height:1.65}.textbox img{width:38%;max-width:300px;max-height:260px;object-fit:contain}.media img,.media video{display:block;max-width:100%;max-height:600px;margin:auto}.media audio{width:100%}.bgm{display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 14px}.bgm audio{flex:0 1 70%;max-width:560px;min-width:180px}.sep{height:4px;margin:28px 0;background:${s.separatorColor||s.baseText}}
   </style></head><body><main class="wrap"><div class="title">${esc(s.title)}${s.headerImage?`<img class="header" src="${assetPath(s.headerImage,"header")}">`:""}</div><div class="tabs">${tabs}</div>${blocks}</main><script>
   const ts=[...document.querySelectorAll(".tab")],ls=[...document.querySelectorAll(".logtab")];function show(id){ts.forEach(x=>x.classList.toggle("active",x.dataset.tab===id));ls.forEach(x=>x.classList.toggle("active",x.id==="tab_"+id))}ts.forEach(x=>x.onclick=()=>show(x.dataset.tab));show("__ALL__");
   <\/script></body></html>`;
@@ -595,12 +766,13 @@ function zipStore(entries){
   const enc=new TextEncoder();
   const localParts=[],centralParts=[];
   let offset=0;
+  const UTF8_FLAG=0x0800; // ファイル名がUTF-8であることを示すフラグ（日本語ファイル名の文字化け防止）
   for(const e of entries){
     const name=enc.encode(e.name),data=e.data,crc=crc32(data);
     const lfh=concatBytes([
       u32(0x04034b50), // local file header signature
       u16(20),         // version needed to extract
-      u16(0),          // general purpose bit flag
+      u16(UTF8_FLAG),  // general purpose bit flag（UTF-8ファイル名フラグ）
       u16(0),          // compression method (0=store)
       u16(0),          // last mod file time
       u16(0),          // last mod file date
@@ -616,7 +788,7 @@ function zipStore(entries){
       u32(0x02014b50), // central directory file header signature
       u16(20),         // version made by
       u16(20),         // version needed to extract
-      u16(0),          // general purpose bit flag
+      u16(UTF8_FLAG),  // general purpose bit flag（UTF-8ファイル名フラグ）
       u16(0),          // compression method
       u16(0),          // last mod file time
       u16(0),          // last mod file date
@@ -652,10 +824,10 @@ function downloadBlob(data,type,name){const blob=new Blob([data],{type}),a=docum
 function downloadZip(doc,assets,name){const entries=[{name:"index.html",data:new TextEncoder().encode(doc)}];for(const [data,path] of assets)entries.push({name:path,data:dataUrlBytes(data)});const zip=zipStore(entries);downloadBlob(zip,"application/zip",name)}
 function exportBlock(b,assetPath){
  const s=state.settings;
- if(b.type==="bubble"){const {c,icon}=charForBlock(b),nameColor=effectiveBlock(b,"nameColor",effectiveChar(c,"nameColor",s.baseText)),textColor=effectiveBlock(b,"textColor",effectiveChar(c,"textColor",s.baseText)),bubbleColor=effectiveBlock(b,"bubbleColor",s.baseBubble);const iconSrc=icon?(icon.startsWith("data:")?assetPath(icon,`${b.name||"character"}_icon`):icon):"";return `<div class="speech ${b.direction==="right"?"right":""}">${iconSrc?`<img class="avatar" style="background:${esc(c.iconBg||"#aaa")}" src="${esc(iconSrc)}">`:`<div class="avatar" style="background:${esc(c.iconBg||"#aaa")}"></div>`}<div class="content">${b.showName?`<div class="speaker" style="color:${esc(nameColor)}">${esc(b.name)}</div>`:""}<div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="--bubble:${esc(bubbleColor)};background:${esc(bubbleColor)};color:${esc(textColor)};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${esc(b.text)}</div></div></div>`}
- if(b.type==="narration")return `<div class="narration" style="color:${esc(effectiveBlock(b,"textColor",s.baseText))};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")};text-align:${esc(b.align)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
- if(b.type==="textbox"){const img=b.image?(b.image.startsWith("data:")?assetPath(b.image,`${b.title||"textbox"}_image`):b.image):"";return `<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(effectiveBlock(b,"boxColor","#aaa"))};color:${esc(effectiveBlock(b,"textColor",s.baseText))}"><div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>${img?`<img src="${esc(img)}">`:""}</div>`}
- if(b.type==="bgm"){const media=b.media?(b.media.startsWith("data:")?assetPath(b.media,b.text||"bgm"):b.media):"";return `<div class="bgm" style="background:${esc(b.bgColor||"#333")};color:${esc(b.textColor||"#eee")}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(media)}"></audio></div>`}
+ if(b.type==="bubble"){const {c,icon}=charForBlock(b),nameColor=effectiveBlock(b,"nameColor",effectiveChar(c,"nameColor",s.baseText)),textColor=effectiveBlock(b,"textColor",effectiveChar(c,"textColor",s.baseText)),bubbleColor=effectiveBlock(b,"bubbleColor",s.baseBubble),iconBg=c.iconBg||s.baseIconBg;const iconSrc=icon?(icon.startsWith("data:")?assetPath(icon,`${b.name||"character"}_icon`):icon):"";return `<div class="speech ${b.direction==="right"?"right":""}">${iconSrc?`<img class="avatar" style="background:${esc(iconBg)}" src="${esc(iconSrc)}">`:`<div class="avatar" style="background:${esc(iconBg)}"></div>`}<div class="content">${b.showName?`<div class="speaker" style="color:${esc(nameColor)}">${esc(b.name)}</div>`:""}<div class="bubble ${esc(b.shape)} ${b.direction==="right"?"right-tail":"left-tail"}" style="--bubble:${esc(bubbleColor)};background:${esc(bubbleColor)};color:${esc(textColor)};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")}">${esc(b.text)}</div></div></div>`}
+ if(b.type==="narration")return `<div class="narration" style="color:${esc(b.textColor||s.baseNarrationText)};font-size:${fontSize(b.size)};font-weight:${esc(b.fontWeight||"400")};text-align:${esc(b.align)}">${b.showName&&b.name?`<strong>${esc(b.name)}：</strong>`:""}${esc(b.text)}</div>`;
+ if(b.type==="textbox"){const img=b.image?(b.image.startsWith("data:")?assetPath(b.image,`${b.title||"textbox"}_image`):b.image):"";return `<div class="textbox ${b.imageSide==="left"?"reverse":""}" style="background:${esc(b.boxColor||s.baseBoxColor)};color:${esc(b.textColor||s.baseBoxText)}"><div class="textbox-main">${b.title?`<div class="textbox-title">${esc(b.title)}</div>`:""}<div class="textbox-text">${esc(b.text)}</div></div>${img?`<img src="${esc(img)}">`:""}</div>`}
+ if(b.type==="bgm"){const media=b.media?(b.media.startsWith("data:")?assetPath(b.media,b.text||"bgm"):b.media):"";return `<div class="bgm" style="background:${esc(b.bgColor||s.baseBgmBg)};color:${esc(b.textColor||s.baseBgmText)}"><span>${esc(b.text||"BGM")}</span><audio controls src="${esc(media)}"></audio></div>`}
  if(b.type==="media"){const media=b.media?(b.media.startsWith("data:")?assetPath(b.media,b.text||"media"):b.media):"";return b.mediaKind==="video"?`<div class="media"><video controls src="${esc(media)}"></video></div>`:b.mediaKind==="audio"?`<div class="media"><audio controls src="${esc(media)}"></audio></div>`:`<div class="media"><img src="${esc(media)}"></div>`}
  return `<div class="sep" style="background:${esc(b.color||s.separatorColor||s.baseText)}"></div>`;
 }
@@ -692,7 +864,7 @@ $("#settingsBtn").onclick=openSettings;$("#exportBtn").onclick=exportHTML;$("#in
 $("#backupExport").onclick=()=>{const blob=new Blob([JSON.stringify(state)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cocofolia-log-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("#backupImport").onclick=()=>$("#backupInput").click();
 $("#backupInput").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{state=JSON.parse(await f.text());render()}catch(x){alert("バックアップの読み込みに失敗しました。")}};
-$("#reset").onclick=()=>{if(confirm("保存データをすべて消去しますか？")){localStorage.removeItem("cocofolia_formatter_v1");state={settings:clone(defaultSettings),characters:{},tabs:[],activeTab:null,selected:null,media:{}};newTab();render()}};
+$("#reset").onclick=()=>{if(confirm("保存データをすべて消去しますか？")){localStorage.removeItem("cocofolia_formatter_v1");state={settings:clone(defaultSettings),characters:{},tabs:[],activeTab:null,lastSingleTab:null,selected:null,media:{},templates:{bubble:[],narration:[],textbox:[]}};newTab();render()}};
 load();render();
 </script>
 </body>
