@@ -39,11 +39,15 @@ button:hover{filter:brightness(.97)}
 .user-name{font-weight:900}
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 #cssOutput{min-height:360px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5}
-.image-tools{display:grid;grid-template-columns:1fr 180px;gap:12px}
-@media(max-width:760px){.image-tools{grid-template-columns:1fr}}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,1fr);gap:14px;align-items:start}
+.workspace-left,.workspace-right{min-width:0}
+.workspace-right{position:sticky;top:14px}
+.image-panel{margin-bottom:0}
+@media(max-width:760px){.workspace{grid-template-columns:1fr}.workspace-right{position:static}}
+
 .drop{border:1px dashed #adb8b5;padding:16px;text-align:center;color:var(--sub);margin-bottom:10px}
 .canvas-wrap{height:360px;overflow:hidden;background:#e7ebea;position:relative;border:1px solid var(--line)}
-#pickerCanvas{width:100%;height:100%;display:block;cursor:crosshair}
+#pickerCanvas{width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;user-select:none;-webkit-user-select:none}
 .zoom{display:flex;gap:6px;align-items:center;margin-top:8px}
 .zoom input{width:80px}
 .hidden{display:none!important}
@@ -64,8 +68,6 @@ button:hover{filter:brightness(.97)}
   <button class="tab" data-type="stand">駒</button>
 </div>
 
-<div id="main"></div>
-
 <div class="panel">
   <h2>Discordユーザー登録</h2>
   <div class="help">表示名はこの画面で分かりやすくするための名前です。生成されるCSSにはDiscord IDだけが入ります。</div>
@@ -84,10 +86,10 @@ button:hover{filter:brightness(.97)}
   </div>
 </div>
 
-<div class="panel">
-  <h2>参考画像・スポイト</h2>
-  <div class="image-tools">
-    <div>
+<div class="workspace">
+  <div class="workspace-left">
+    <div class="panel">
+      <h2>参考画像</h2>
       <div class="drop" id="dropArea">画像をここへドラッグ＆ドロップ<br>またはファイルを選択</div>
       <input type="file" id="imageFile" accept="image/*">
       <div class="zoom">
@@ -97,9 +99,16 @@ button:hover{filter:brightness(.97)}
         <span id="zoomLabel">100%</span>
         <button id="resetView">位置リセット</button>
       </div>
-      <p class="small">画像はキャンバス上でドラッグして移動できます。クリックした場所の色を、現在選択中のカラーへ入れます。</p>
+      <p class="small">画像上をドラッグして移動できます。画像をタップ/クリックすると、その場所の色を現在選択中のカラーへ入れます。</p>
     </div>
-    <div class="canvas-wrap"><canvas id="pickerCanvas"></canvas></div>
+    <div id="main"></div>
+  </div>
+  <div class="workspace-right">
+    <div class="panel image-panel">
+      <h2>スポイト</h2>
+      <div class="canvas-wrap"><canvas id="pickerCanvas"></canvas></div>
+      <p class="small">スマホ・iPadでは1本指で移動、2本指で拡大縮小できます。</p>
+    </div>
   </div>
 </div>
 
@@ -457,17 +466,100 @@ $("#imageFile").onchange=e=>loadImage(e.target.files[0]);
 $("#dropArea").ondragover=e=>{e.preventDefault();$("#dropArea").style.borderColor="var(--accent)"};
 $("#dropArea").ondragleave=()=>$("#dropArea").style.borderColor="";
 $("#dropArea").ondrop=e=>{e.preventDefault();$("#dropArea").style.borderColor="";loadImage(e.dataTransfer.files[0])};
-canvas.onmousedown=e=>{dragging=true;sx=e.offsetX-ox;sy=e.offsetY-oy};
-window.onmouseup=()=>dragging=false;
-canvas.onmousemove=e=>{if(dragging){ox=e.offsetX-sx;oy=e.offsetY-sy;draw()}};
-canvas.onclick=e=>{
- if(!img)return;
- const x=Math.floor((e.offsetX-ox)/scale),y=Math.floor((e.offsetY-oy)/scale);
- if(x<0||y<0||x>=img.width||y>=img.height)return;
- const temp=document.createElement("canvas");temp.width=img.width;temp.height=img.height;const tc=temp.getContext("2d");tc.drawImage(img,0,0);
- const d=tc.getImageData(x,y,1,1).data,c="#"+[d[0],d[1],d[2]].map(n=>n.toString(16).padStart(2,"0")).join("").toUpperCase();
- state.colors[selectedColorKey]=c;save();render();
-};
+let pointers=new Map();
+let pinchStartDistance=0, pinchStartScale=1;
+let pinchStartCenter={x:0,y:0}, pinchStartOffset={x:0,y:0};
+
+function pointerPos(e){
+  const r=canvas.getBoundingClientRect();
+  return {x:e.clientX-r.left,y:e.clientY-r.top};
+}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function center(a,b){return {x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
+
+canvas.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  canvas.setPointerCapture(e.pointerId);
+  const p=pointerPos(e);
+  pointers.set(e.pointerId,p);
+
+  if(pointers.size===1){
+    dragging=true;
+    sx=p.x-ox; sy=p.y-oy;
+  }else if(pointers.size===2){
+    dragging=false;
+    const pts=[...pointers.values()];
+    pinchStartDistance=distance(pts[0],pts[1]);
+    pinchStartScale=scale;
+    pinchStartCenter=center(pts[0],pts[1]);
+    pinchStartOffset={x:ox,y:oy};
+  }
+});
+
+canvas.addEventListener("pointermove",e=>{
+  if(!pointers.has(e.pointerId))return;
+  e.preventDefault();
+  pointers.set(e.pointerId,pointerPos(e));
+
+  if(pointers.size===1 && dragging){
+    const p=[...pointers.values()][0];
+    ox=p.x-sx; oy=p.y-sy; draw();
+  }else if(pointers.size===2){
+    const pts=[...pointers.values()];
+    const d=distance(pts[0],pts[1]);
+    if(!pinchStartDistance)return;
+
+    const factor=d/pinchStartDistance;
+    const oldScale=scale;
+    scale=Math.max(.25,Math.min(5,pinchStartScale*factor));
+
+    // ピンチの中心位置を固定して拡大縮小
+    const c=center(pts[0],pts[1]);
+    const imageX=(pinchStartCenter.x-pinchStartOffset.x)/oldScale;
+    const imageY=(pinchStartCenter.y-pinchStartOffset.y)/oldScale;
+    ox=c.x-imageX*scale;
+    oy=c.y-imageY*scale;
+
+    $("#zoomRange").value=Math.round(scale*100);
+    $("#zoomLabel").textContent=Math.round(scale*100)+"%";
+    draw();
+  }
+});
+
+canvas.addEventListener("pointerup",e=>{
+  const wasSingle=pointers.size===1;
+  const p=pointers.get(e.pointerId);
+  pointers.delete(e.pointerId);
+
+  if(pointers.size===0){
+    dragging=false;
+    if(wasSingle && p){
+      // タップ判定。移動中の誤スポイトを避けるため大きな移動は除外。
+      const moved=Math.hypot((p.x-sx), (p.y-sy));
+      if(moved<8 && img){
+        const x=Math.floor((p.x-ox)/scale),y=Math.floor((p.y-oy)/scale);
+        if(x>=0&&y>=0&&x<img.width&&y<img.height){
+          const temp=document.createElement("canvas");
+          temp.width=img.width;temp.height=img.height;
+          const tc=temp.getContext("2d");
+          tc.drawImage(img,0,0);
+          const d=tc.getImageData(x,y,1,1).data;
+          const c="#"+[d[0],d[1],d[2]].map(n=>n.toString(16).padStart(2,"0")).join("").toUpperCase();
+          state.colors[selectedColorKey]=c;
+          save();render();
+        }
+      }
+    }
+  }else if(pointers.size===1){
+    const p2=[...pointers.values()][0];
+    dragging=true;sx=p2.x-ox;sy=p2.y-oy;
+  }
+});
+
+canvas.addEventListener("pointercancel",e=>{
+  pointers.delete(e.pointerId);
+  if(pointers.size===0)dragging=false;
+});
 
 $("#downloadHtml").onclick=()=>{
  const blob=new Blob([document.documentElement.outerHTML],{type:"text/html;charset=utf-8"});
