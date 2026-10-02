@@ -70,13 +70,11 @@ button:hover{filter:brightness(.97)}
 
 <div class="panel">
   <h2>Discordユーザー登録</h2>
-  <div class="help">表示名はこの画面で分かりやすくするための名前です。生成されるCSSにはDiscord IDだけが入ります。</div>
+  <div class="help">表示名はこの画面で分かりやすくするための名前です。生成されるCSSにはDiscord IDだけが入ります。駒の画像URLは駒タブ側で入力し、保存されません。</div>
   <div class="grid" style="margin-top:12px">
     <div>
       <div class="field"><label>表示名</label><input id="userName" placeholder="まぐ"></div>
       <div class="field"><label>DiscordユーザーID</label><input id="userId" inputmode="numeric" placeholder="123456789012345678"></div>
-      <div class="field"><label>立ち絵画像URL（駒用）</label><input id="userStandUrl" placeholder="https://..."></div>
-      <div class="field"><label>口パク画像URL（駒用・任意）</label><input id="userMouthUrl" placeholder="https://..."></div>
       <div class="actions">
         <button class="primary" id="saveUser">登録 / 更新</button>
         <button id="clearUser">入力クリア</button>
@@ -336,6 +334,7 @@ let state = JSON.parse(localStorage.getItem("cssEasyCopyState")||"null") || {
  users:[],
  selectedUser:null
 };
+state.users = state.users.map(u=>({name:u.name,id:u.id}));
 let currentType="balloon", selectedColorKey="nameText", editingUser=-1;
 
 const $=s=>document.querySelector(s);
@@ -374,16 +373,52 @@ function renderColors(p){
  const note=document.createElement("p");note.className="small";note.textContent="※ 吹き出しとチャットは対応する色を共有しています。";
  if(currentType!=="status")p.appendChild(note);
 }
+let standUrls = {stand:"", mouth:""};
+
 function renderStand(p){
  p.innerHTML="<h2>駒</h2>";
- const f=document.createElement("div");f.className="field";
- f.innerHTML="<label>Discordユーザー</label><select id='standUser'><option value=''>選択してください</option>"+state.users.map((u,i)=>`<option value="${i}" ${state.selectedUser===i?"selected":""}>${esc(u.name)}（${esc(u.id)}）</option>`).join("")+"</select>";
+
+ const f=document.createElement("div");
+ f.className="field";
+ f.innerHTML="<label>Discordユーザー</label><select id='standUser'><option value=''>選択してください</option>"+
+   state.users.map((u,i)=>`<option value="${i}" ${state.selectedUser===i?"selected":""}>${esc(u.name)}（${esc(u.id)}）</option>`).join("")+
+   "</select>";
  p.appendChild(f);
+
  const selected=state.users[state.selectedUser];
- const info=document.createElement("div");info.className="help";
- info.innerHTML=selected?`ID：${esc(selected.id)}<br>立ち絵：${esc(selected.standUrl||"未登録")}<br>口パク：${esc(selected.mouthUrl||"未登録")}`:"Discordユーザー登録からユーザーを登録してください。";
+
+ const info=document.createElement("div");
+ info.className="help";
+ info.innerHTML=selected
+   ? `Discord ID：${esc(selected.id)}<br>表示名：${esc(selected.name)}`
+   : "Discordユーザー登録からユーザーを登録してください。";
  p.appendChild(info);
- p.querySelector("#standUser").addEventListener("change",e=>{state.selectedUser=e.target.value===""?null:Number(e.target.value);save();render()});
+
+ if(selected){
+   const urlBox=document.createElement("div");
+   urlBox.style.marginTop="12px";
+   urlBox.innerHTML=`
+     <div class="field">
+       <label>立ち絵画像URL</label>
+       <input id="standImageUrl" type="text" placeholder="https://..." value="${esc(standUrls.stand)}">
+     </div>
+     <div class="field">
+       <label>口パク画像URL（任意）</label>
+       <input id="mouthImageUrl" type="text" placeholder="https://..." value="${esc(standUrls.mouth)}">
+     </div>
+     <p class="small">画像URLは保存されません。現在入力しているURLをそのままCSSへ差し込みます。</p>`;
+   p.appendChild(urlBox);
+
+   $("#standImageUrl").addEventListener("input",e=>standUrls.stand=e.target.value);
+   $("#mouthImageUrl").addEventListener("input",e=>standUrls.mouth=e.target.value);
+ }
+
+ p.querySelector("#standUser").addEventListener("change",e=>{
+   state.selectedUser=e.target.value===""?null:Number(e.target.value);
+   standUrls={stand:"",mouth:""};
+   save();
+   render();
+ });
 }
 function renderUsers(){
  const box=$("#userList");box.innerHTML="";
@@ -398,13 +433,13 @@ function renderUsers(){
 }
 function editUser(i){
  const u=state.users[i];editingUser=i;
- $("#userName").value=u.name;$("#userId").value=u.id;$("#userStandUrl").value=u.standUrl||"";$("#userMouthUrl").value=u.mouthUrl||"";
+ $("#userName").value=u.name;$("#userId").value=u.id;
 }
-function clearUser(){editingUser=-1;["userName","userId","userStandUrl","userMouthUrl"].forEach(id=>$("#"+id).value="")}
+function clearUser(){editingUser=-1;["userName","userId"].forEach(id=>$("#"+id).value="")}
 $("#saveUser").onclick=()=>{
  const name=$("#userName").value.trim(),id=$("#userId").value.trim();
  if(!name||!id){alert("表示名とDiscordユーザーIDを入力してください。");return}
- const u={name,id,standUrl:$("#userStandUrl").value.trim(),mouthUrl:$("#userMouthUrl").value.trim()};
+ const u={name,id};
  if(editingUser>=0)state.users[editingUser]=u;else state.users.push(u);
  save();clearUser();renderUsers();render();
 };
@@ -414,7 +449,9 @@ function replaceTemplate(){
  if(currentType==="stand"){
    const u=state.users[state.selectedUser];
    if(!u)return css.replaceAll("〈discordユーザーID〉","").replaceAll("『画像URL』","");
-   css=css.replaceAll("〈discordユーザーID〉",u.id).replace('『画像URL』',u.standUrl||"").replace('url("");',`url("${u.mouthUrl||""}");`);
+   css=css.replaceAll("〈discordユーザーID〉",u.id)
+     .replace('『画像URL』',standUrls.stand||"")
+     .replace('url("");',`url("${standUrls.mouth||""}");`);
    return css;
  }
  const map=currentType==="balloon"
