@@ -916,5 +916,23 @@
     "image": "",
     "docUrl": "",
     "shareQuote": ""
+  },
+  {
+    "id": "trpg_052",
+    "name": "西京 伽奈",
+    "yomi": "サイキョウ カナ",
+    "series": "TRPG探索者",
+    "genre": "人間",
+    "gender": "female",
+    "genderlabel": "",
+    "age": 52,
+    "heightCm": 169,
+    "birthday": "",
+    "personality": "",
+    "color": "#C3BA11",
+    "colorTag": "黄色",
+    "image": "",
+    "docUrl": "",
+    "shareQuote": ""
   }
 ]
