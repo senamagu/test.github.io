@@ -55,6 +55,8 @@ button:hover{filter:brightness(.97)}
 .modal-box{background:#fff;max-width:850px;width:100%;max-height:90vh;padding:18px;display:flex;flex-direction:column}
 .modal-box textarea{min-height:55vh}
 .help{background:#f7faf9;border-left:4px solid var(--accent);padding:10px 12px;font-size:13px;line-height:1.6}
+
+.preview-shell{max-width:1100px;margin:0 auto 18px;padding:0 24px}.preview-layout{display:grid;grid-template-columns:290px 1fr;gap:14px}.preview-stage{background:#1c2226;padding:10px;overflow:hidden}.preview-stage canvas{display:block;width:100%;aspect-ratio:16/9;touch-action:none;cursor:grab}.preview-controls .field{margin-bottom:8px}.preview-controls input,.preview-controls select,.preview-controls textarea{padding:6px}.preview-controls .actions{margin-bottom:12px}.preview-item{border:1px solid #d9dfdd;padding:9px;margin:8px 0}.preview-item.active{border:2px solid #3d7c8d}.preview-item button{padding:4px 8px}.preview-note{font-size:12px;color:#667}.preview-shell.hidden{display:none!important}@media(max-width:760px){.preview-layout{grid-template-columns:1fr}.preview-shell{padding:0 14px}}
 </style>
 </head>
 <body>
@@ -66,9 +68,11 @@ button:hover{filter:brightness(.97)}
   <button class="tab" data-type="chat">チャット</button>
   <button class="tab" data-type="status">ステータス</button>
   <button class="tab" data-type="stand">駒</button>
+<button class="tab" data-type="preview">プレビュー</button>
 </div>
 
-<div class="panel">
+<section id="previewShell" class="preview-shell hidden"><div class="panel"><h2>16:9 プレビュー・画像出力</h2><div class="preview-layout"><div class="preview-controls"><div class="field"><label>背景色</label><input type="color" id="pvBg" value="#26323a"></div><div class="field"><label>追加する素材</label><div class="actions"><button data-add="chat">チャット追加</button><button data-add="balloon">吹き出し追加</button><button data-add="status">ステータス追加</button><button data-add="image">画像追加</button></div></div><div id="pvItems"></div><div id="pvEditor"></div></div><div><div class="preview-stage"><canvas id="pvCanvas" width="1280" height="720"></canvas></div><p class="preview-note">素材をクリックして選択、ドラッグで移動。座標は1280×720基準。背景色と素材の色は既存CSS設定を参照する。</p><div class="actions"><button class="primary" id="pvFull">全体をPNG出力 (16:9)</button><button id="pvTransparent">選択素材を透過PNG出力</button><button id="pvAllTransparent">全素材を透過PNG出力</button></div></div></div></div></section>
+<div id="regularContent"><div class="panel">
   <h2>Discordユーザー登録</h2>
   <div class="help">表示名はこの画面で分かりやすくするための名前です。生成されるCSSにはDiscord IDだけが入ります。駒の画像URLは駒タブ側で入力し、保存されません。</div>
   <div class="grid" style="margin-top:12px">
@@ -117,6 +121,7 @@ button:hover{filter:brightness(.97)}
     <button id="showCss">CSSを見る</button>
     <button id="downloadHtml">このページをHTML保存</button>
   </div>
+</div>
 </div>
 </div>
 
@@ -490,7 +495,7 @@ $("#closeModal").onclick=()=>$("#modal").classList.add("hidden");
 
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");
- currentType=t.dataset.type;render();
+ currentType=t.dataset.type;if(currentType!=="preview")render();
 });
 render();renderUsers();
 
@@ -621,6 +626,52 @@ $("#downloadHtml").onclick=()=>{
  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="css-easy-copy.html";a.click();URL.revokeObjectURL(a.href);
 };
 resizeCanvas();
+
+// Preview workspace: independently rendered on a canvas so PNG exports include local assets.
+const pv={items:[{id:1,type:'chat',x:55,y:60,scale:1,text:'こんにちは！ サンプルのチャットログです。',name:'探索者',style:'normal'},{id:2,type:'status',x:920,y:40,scale:1}],next:3,selected:1,bg:'#26323a',images:{}};
+const pc=document.getElementById('pvCanvas'),px=pc.getContext('2d');
+function pvItem(){return pv.items.find(i=>i.id===pv.selected)}
+function pvColor(key,fallback){return state.colors[key]||fallback}
+function pvDrawItem(ctx,i){
+ ctx.save();ctx.translate(i.x,i.y);ctx.scale(i.scale||1,i.scale||1);
+ if(i.type==='image'){
+  let im=pv.images[i.id];if(im){ctx.drawImage(im,0,0,im.width,im.height);i.w=im.width;i.h=im.height}else{i.w=240;i.h=150;ctx.fillStyle='#ffffff44';ctx.fillRect(0,0,i.w,i.h);ctx.fillStyle='white';ctx.font='22px sans-serif';ctx.fillText('画像未設定',20,75)}
+ }else if(i.type==='status'){
+  i.w=300;i.h=260;ctx.fillStyle=pvColor('statusBg','#000');ctx.globalAlpha=.7;ctx.fillRect(0,0,300,260);ctx.globalAlpha=1;
+  ctx.font='bold 23px sans-serif';ctx.fillStyle=pvColor('statusName','#fff');ctx.fillText(i.name||'探索者',14,32);
+  [['HP',10,10],['MP',5,15],['SAN',55,70],['サンプル',0,0]].forEach(([name,n,max],j)=>{
+   const y=55+j*50,ratio=max?Math.min(1,n/max):0;ctx.font='bold 19px sans-serif';ctx.fillStyle=(ratio<.5&&max)?pvColor('statusPinch','#f55'):pvColor('statusName','#fff');ctx.fillText(`${name} ${n}/${max}`,14,y);ctx.fillStyle='#7778';ctx.fillRect(14,y+9,272,13);ctx.fillStyle=pvColor('statusBar','#aaa');ctx.fillRect(14,y+9,272*ratio,13);
+  });
+ }else{
+  let txt=i.text||'サンプルテキスト',lines=wrapPV(ctx,txt,i.type==='balloon'?680:400);
+  if(i.type==='balloon'){
+   i.w=760;i.h=Math.max(120,78+lines.length*36);ctx.fillStyle='#ffffff20';ctx.fillRect(0,0,i.w,i.h);ctx.fillStyle=pvColor('nameText','#fff');ctx.font='bold 25px sans-serif';ctx.fillText(i.name||'探索者',22,35);ctx.font='bold 29px sans-serif';ctx.fillStyle=pvStyleColor(i);lines.forEach((line,j)=>ctx.fillText(line,22,78+j*36));
+  }else{
+   i.w=465;i.h=Math.max(102,60+lines.length*28);ctx.fillStyle='#0009';ctx.beginPath();ctx.roundRect(0,0,i.w,i.h,8);ctx.fill();ctx.fillStyle=pvColor('normal','#aaa');ctx.font='15px sans-serif';ctx.fillText(i.time||'12:34',16,22);ctx.fillStyle=pvColor('nameText','#fff');ctx.font='bold 20px sans-serif';ctx.fillText(i.name||'探索者',75,22);ctx.fillStyle=pvStyleColor(i);ctx.font='bold 20px sans-serif';lines.forEach((line,j)=>ctx.fillText(line,16,57+j*28));
+  }
+ }
+ ctx.restore();
+}
+function pvStyleColor(i){return pvColor(i.style==='success'?'success':i.style==='fail'?'fail':'nameText','#fff')}
+function wrapPV(ctx,text,width){ctx.font='bold 20px sans-serif';let out=[];String(text).split('\n').forEach(part=>{let row='';for(let ch of part){if(ctx.measureText(row+ch).width>width&&row){out.push(row);row=''}row+=ch}out.push(row)});return out.slice(0,20)}
+function pvDraw(){px.clearRect(0,0,1280,720);px.fillStyle=pv.bg;px.fillRect(0,0,1280,720);pv.items.forEach(i=>pvDrawItem(px,i));const i=pvItem();if(i){px.save();px.strokeStyle='#4ee2c9';px.setLineDash([8,5]);px.lineWidth=2;px.strokeRect(i.x-3,i.y-3,(i.w||200)*i.scale+6,(i.h||100)*i.scale+6);px.restore()}}
+function pvList(){const list=document.getElementById('pvItems');list.innerHTML=pv.items.map(i=>`<div class="preview-item ${i.id===pv.selected?'active':''}"><button data-pick="${i.id}">${{chat:'チャット',balloon:'吹き出し',status:'ステータス',image:'画像'}[i.type]} #${i.id}</button> <button data-up="${i.id}">↑</button> <button data-down="${i.id}">↓</button> <button data-remove="${i.id}">削除</button></div>`).join('');list.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{pv.selected=+b.dataset.pick;pvList();pvEdit();pvDraw()});list.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{pv.items=pv.items.filter(i=>i.id!==+b.dataset.remove);pv.selected=pv.items.at(-1)?.id||null;pvList();pvEdit();pvDraw()});for(let dir of ['up','down'])list.querySelectorAll('[data-'+dir+']').forEach(b=>b.onclick=()=>{let a=pv.items.findIndex(i=>i.id===+b.dataset[dir]),j=a+(dir==='up'?1:-1);if(j>=0&&j<pv.items.length){[pv.items[a],pv.items[j]]=[pv.items[j],pv.items[a]];pvList();pvDraw()}})}
+function pvEdit(){let i=pvItem(),el=document.getElementById('pvEditor');if(!i){el.innerHTML='素材を追加してね';return}let field=(label,key,val,type='text')=>`<div class="field"><label>${label}</label><input data-prop="${key}" type="${type}" value="${String(val??'').replaceAll('&','&amp;').replaceAll('"','&quot;')}"></div>`;
+ el.innerHTML=`<h3>素材 #${i.id} の調整</h3><div class="grid">${field('X','x',i.x,'number')}${field('Y','y',i.y,'number')}</div>${field('拡大率 (%)','scale',Math.round(i.scale*100),'number')}`+(i.type==='image'?'<div class="field"><label>画像を読み込む</label><input type="file" id="pvImage" accept="image/*"></div>':field('表示名','name',i.name||'探索者')+(i.type==='chat'||i.type==='balloon'?`<div class="field"><label>サンプル文章</label><textarea id="pvText" rows="3"></textarea></div><div class="field"><label>文字の種類</label><select id="pvStyle"><option value="normal">通常</option><option value="success">成功</option><option value="fail">失敗</option></select></div>`:''));
+ el.querySelectorAll('[data-prop]').forEach(inp=>inp.oninput=()=>{i[inp.dataset.prop]=['x','y'].includes(inp.dataset.prop)?Number(inp.value):inp.dataset.prop==='scale'?Math.max(.05,Number(inp.value)/100):inp.value;pvDraw()});if(el.querySelector('#pvText')){el.querySelector('#pvText').value=i.text||'';el.querySelector('#pvText').oninput=e=>{i.text=e.target.value;pvDraw()};el.querySelector('#pvStyle').value=i.style||'normal';el.querySelector('#pvStyle').onchange=e=>{i.style=e.target.value;pvDraw()}}
+ if(el.querySelector('#pvImage'))el.querySelector('#pvImage').onchange=e=>{let file=e.target.files[0];if(!file)return;let url=URL.createObjectURL(file),im=new Image();im.onload=()=>{pv.images[i.id]=im;i.w=im.width;i.h=im.height;pvDraw();URL.revokeObjectURL(url)};im.src=url};
+}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{let type=b.dataset.add,id=pv.next++;pv.items.push({id,type,x:80,y:80+pv.items.length*25,scale:1,text:'新しいサンプルテキスト',name:'探索者',style:'normal'});pv.selected=id;pvList();pvEdit();pvDraw()});
+document.getElementById('pvBg').oninput=e=>{pv.bg=e.target.value;pvDraw()};
+let dragPV=null;pc.addEventListener('pointerdown',e=>{let r=pc.getBoundingClientRect(),x=(e.clientX-r.left)*1280/r.width,y=(e.clientY-r.top)*720/r.height;let hit=[...pv.items].reverse().find(i=>x>=i.x&&y>=i.y&&x<=i.x+(i.w||200)*i.scale&&y<=i.y+(i.h||100)*i.scale);if(hit){pv.selected=hit.id;dragPV={id:hit.id,dx:x-hit.x,dy:y-hit.y};pc.setPointerCapture(e.pointerId);pvList();pvEdit();pvDraw()}});pc.addEventListener('pointermove',e=>{if(!dragPV)return;let r=pc.getBoundingClientRect(),i=pvItem();i.x=Math.round((e.clientX-r.left)*1280/r.width-dragPV.dx);i.y=Math.round((e.clientY-r.top)*720/r.height-dragPV.dy);pvEdit();pvDraw()});pc.addEventListener('pointerup',()=>dragPV=null);pc.addEventListener('pointercancel',()=>dragPV=null);
+function pvExport(mode){let c=document.createElement('canvas');c.width=1280;c.height=720;let x=c.getContext('2d');if(mode==='full'){x.fillStyle=pv.bg;x.fillRect(0,0,1280,720)}let items=mode==='single'?(pvItem()?[pvItem()]:[]):pv.items;items.forEach(i=>pvDrawItem(x,i));if(mode==='single'&&!items.length)return alert('素材を選択してね');if(mode==='single'){let i=items[0],w=Math.max(1,Math.ceil(i.w*i.scale)),h=Math.max(1,Math.ceil(i.h*i.scale)),cut=document.createElement('canvas');cut.width=w;cut.height=h;cut.getContext('2d').drawImage(c,i.x,i.y,w,h,0,0,w,h);c=cut}c.toBlob(blob=>{if(!blob)return;let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=mode==='full'?'preview-16x9.png':mode==='single'?'preview-selected-transparent.png':'preview-all-transparent.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png')}
+document.getElementById('pvFull').onclick=()=>pvExport('full');document.getElementById('pvTransparent').onclick=()=>pvExport('single');document.getElementById('pvAllTransparent').onclick=()=>pvExport('all');
+// Integrate the preview with existing tab and color picker events.
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{let show=t.dataset.type==='preview';document.getElementById('previewShell').classList.toggle('hidden',!show);document.getElementById('regularContent').classList.toggle('hidden',show);if(show){pvDraw()}}));
+const pvOldRender=render;render=function(){if(currentType==='preview')return;pvOldRender();pvDraw()};
+document.addEventListener('input',e=>{if(e.target.matches('[data-color],[data-picker]'))requestAnimationFrame(pvDraw)});
+pvList();pvEdit();pvDraw();
+
 </script>
 </body>
 </html>
