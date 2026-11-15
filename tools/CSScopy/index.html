@@ -1,13 +1,732 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ココフォリア見た目調整メーカー</title><style>@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap');*{box-sizing:border-box}body{margin:0;background:#f3f6f5;color:#283638;font-family:'Zen Kaku Gothic New',sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:1px solid #cdd9d8;background:white;padding:9px 12px;border-radius:8px}button.active,.primary{background:#367e88;color:white;border-color:#367e88}.app{max-width:1320px;margin:auto;padding:20px}h1{font-size:23px;margin:0 0 7px}.hint{font-size:13px;color:#667;line-height:1.7}.tabs,.actions{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}.layout{display:grid;grid-template-columns:minmax(280px,410px) minmax(0,1fr);gap:16px;align-items:start}.panel{background:white;border:1px solid #d8e1e0;border-radius:12px;padding:16px;margin-bottom:12px}.panel h2{font-size:16px;margin:0 0 12px}.field{margin-bottom:12px}.field label{font-size:13px;font-weight:700;display:flex;justify-content:space-between;gap:6px;margin-bottom:5px}.field input:not([type=checkbox]):not([type=color]):not([type=range]),textarea,select{width:100%;border:1px solid #cdd9d8;border-radius:6px;padding:8px;background:white}.field input[type=range]{width:100%}.field input[type=color]{width:56px;height:36px;padding:2px;border:1px solid #cdd9d8;background:white}.colorline{display:flex;align-items:center;gap:10px}.colorline input[type=text]{max-width:125px}.preview-shell{position:sticky;top:12px}.stage-outer{background:repeating-conic-gradient(#ddd 0% 25%,#f8f8f8 0% 50%) 0 0/20px 20px;border:1px solid #cad2d1;border-radius:9px;overflow:hidden}.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;touch-action:none}.object{position:absolute;top:0;left:0;transform-origin:top left;white-space:normal}.balloon{min-width:200px;max-width:100%;padding:0;color:#202020}.balloon-name{font-size:15px;margin-bottom:10px}.balloon-body{font-weight:700;line-height:1.5;overflow-wrap:anywhere}.chat{min-width:200px;max-width:100%;padding:0}.chat-entry{margin-bottom:16px}.chat-meta{font-size:11px;margin-bottom:4px;display:flex;gap:5px;align-items:baseline;flex-wrap:wrap}.chat-name{font-weight:900}.chat-time{color:#999}.chat-body{line-height:1.5;overflow-wrap:anywhere}.status{min-width:160px}.stat-row{position:relative;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;isolation:isolate;font-weight:900;white-space:nowrap}.stat-track{position:absolute;z-index:-1;left:0;right:0;top:50%;background:#30383a88}.stat-fill{height:100%;background:#a7afb0}.stat-value{margin-left:8px}.status-text{position:relative;z-index:1}.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.note{padding:10px;background:#f1f7f6;border-radius:8px;font-size:12px;line-height:1.7}.output{width:100%;height:160px;border:1px solid #cdd9d8;border-radius:8px;padding:10px;font-size:12px}.hidden{display:none!important}@media(max-width:800px){.layout{grid-template-columns:1fr}.preview-shell{position:static}.app{padding:12px}}.mode-tabs{display:flex;gap:8px;margin:16px 0 10px}.mode-tabs button{min-width:110px}.preview-mode .layout{display:block}.preview-mode .layout>div:first-child{display:none}.preview-mode .preview-shell{position:static;max-width:1200px;margin:auto}.preview-mode .stage{max-height:none}.preview-mode .stage-outer{max-width:1100px;margin:auto}.preview-mode .preview-shell .panel{padding:20px}.preview-mode .preview-shell h2::after{content:' — 編集中の設定を反映';font-size:12px;font-weight:400;color:#718080}.preview-mode #previewHint{display:block}.preview-mode .stage{cursor:grab}.preview-mode .stage:active{cursor:grabbing}#previewHint{display:none}.mode-tabs button.active{background:#367e88;color:#fff;border-color:#367e88}</style></head><body><main class="app"><h1>ココフォリア見た目調整メーカー</h1><div class="hint">数値を動かして理想の配置を作り、「指定文をコピー」でそのままChatGPTに送れる。「編集」で数値を調整し、「プレビュー」で大きく確認できる。ココフォリア本体のCSSを直接変更するツールではないよ。</div><nav class="mode-tabs" aria-label="画面切り替え"><button id="editMode" class="active" type="button">編集</button><button id="previewMode" type="button">プレビュー</button></nav><nav class="tabs" id="tabs"><button data-type="balloon">吹き出し</button><button data-type="chat">チャットログ</button><button data-type="status">ステータス</button></nav><div class="layout"><div><section class="panel"><h2>配置・大きさ</h2><div class="control-grid" id="common"></div></section><section class="panel" id="specific"></section><section class="panel"><h2>指定内容を共有</h2><div class="actions"><button class="primary" id="copy">指定文をコピー</button><button id="save">設定JSON保存</button><button id="reset">この種類を初期化</button></div><textarea class="output" id="output" readonly></textarea><div class="hint">自動保存はこのブラウザ内だけ。JSONは別の端末でも設定を再現するために使える。</div><input type="file" id="load" accept="application/json,.json"><button id="loadBtn">JSONを読み込む</button></section></div><div class="preview-shell"><section class="panel"><h2>リアルタイムプレビュー（16:9）</h2><p class="hint" id="previewHint">編集タブで調整した内容をそのまま表示しているよ。ここでもドラッグ・ホイールで位置や拡大率を変更できる。</p><div class="stage-outer"><div class="stage" id="stage"><div class="object" id="object"></div></div></div><p class="hint">プレビュー上をドラッグして位置調整できる。PCではホイール、スマホでは2本指ピンチで拡大縮小。背景の市松模様は透明を表すもので、デザインには含まれない。</p><div class="actions"><button id="png">プレビューをPNG出力（1920×1080）</button><button id="transparent">デザイン部分を透過PNG出力</button></div><p class="hint">PNGはブラウザ標準のCanvas描画による参考画像。フォントや文字折り返しが画面プレビューと少し異なる場合がある。</p></section></div></div></main><script>
-const defaults={balloon:{x:80,y:270,width:720,scale:100,name:'探索者',text:'シークレットダイス',fontSize:44,nameSize:17,lineHeight:1.5,color:'#202020',wrap:'manual'},chat:{x:1100,y:50,width:620,scale:100,fontSize:23,metaSize:14,lineHeight:1.5,color:'#242424',nameColor:'#9a61ba',timeColor:'#888888',gap:25,entries:[{name:'探索者',time:'今日 00:00',text:'CCB<=70 【拳銃】\n(1D100<=70) ＞ 40 ＞ 成功',nameColor:'#9a61ba'},{name:'KP',time:'今日 00:01',text:'目星を振ってください。',nameColor:'#43858d'}]},status:{x:70,y:65,width:370,scale:100,fontSize:33,lineHeight:1.1,color:'#ffffff',outline:true,outlineColor:'#242424',outlineWidth:3,barHeight:25,barOffset:5,rowGap:12,barColor:'#343b3e',fillColor:'#a6afb0',pinchColor:'#ed6262',rows:[{name:'HP',now:10,max:10},{name:'MP',now:5,max:15},{name:'SAN',now:55,max:70},{name:'サンプル',now:0,max:0}]}};
-const clone=x=>JSON.parse(JSON.stringify(x));let data;try{data=JSON.parse(localStorage.getItem('cc-design-maker-v1'))||clone(defaults)}catch{data=clone(defaults)}for(const k in defaults)data[k]={...clone(defaults[k]),...(data[k]||{})};let type='balloon';const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const saveLocal=()=>localStorage.setItem('cc-design-maker-v1',JSON.stringify(data));const n=(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0));function field(key,label,kind='range',min=0,max=1000,step=1){let v=data[type][key],id='f_'+key;let control=kind==='color'?`<div class="colorline"><input type="color" id="${id}" value="${esc(v)}"><input type="text" id="${id}_txt" value="${esc(v)}"></div>`:kind==='checkbox'?`<input type="checkbox" id="${id}" ${v?'checked':''}>`:kind==='textarea'?`<textarea id="${id}" rows="4">${esc(v)}</textarea>`:kind==='text'?`<input type="text" id="${id}" value="${esc(v)}">`:`<input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${v}"><input type="number" id="${id}_num" min="${min}" max="${max}" step="${step}" value="${v}" style="width:85px">`;return `<div class="field"><label for="${id}">${label}${kind==='range'?`<span id="${id}_value">${v}</span>`:''}</label>${control}</div>`}
-function wire(container){container.querySelectorAll('[id^="f_"]').forEach(el=>{if(el.id.endsWith('_num')||el.id.endsWith('_txt')||el.id.endsWith('_value'))return;const key=el.id.slice(2),kind=el.type;const apply=v=>{data[type][key]=v;saveLocal();renderPreview();updateOutput();if(kind==='range'){$('#'+el.id+'_num').value=v;$('#'+el.id+'_value').textContent=v}if(kind==='color')$('#'+el.id+'_txt').value=v};el.addEventListener('input',()=>apply(kind==='checkbox'?el.checked:kind==='range'||kind==='number'?Number(el.value):el.value));if(kind==='range')$('#'+el.id+'_num').addEventListener('input',e=>{const v=Number(e.target.value);el.value=v;apply(v)});if(kind==='color')$('#'+el.id+'_txt').addEventListener('change',e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value)){el.value=e.target.value;apply(e.target.value)}})})}
-function renderControls(){const common=$('#common');common.innerHTML=field('x','X座標','range',-500,1920)+field('y','Y座標','range',-500,1080)+field('width','横幅 px','range',120,1400)+field('scale','拡大率 %','range',20,300);const sp=$('#specific');if(type==='balloon')sp.innerHTML='<h2>吹き出し</h2>'+field('name','表示名','text')+field('text','本文（Enterで任意改行）','textarea')+field('fontSize','本文文字サイズ px','range',12,100)+field('nameSize','名前文字サイズ px','range',8,50)+field('lineHeight','行間','range',0.8,2.5,.05)+field('color','本文色','color')+'<p class="note">背景なし・名前色は本文色と共通。本文の改行は入力欄で自由に指定できる。</p>';else if(type==='chat'){sp.innerHTML='<h2>チャットログ</h2>'+field('fontSize','本文文字サイズ px','range',10,75)+field('metaSize','名前・時刻のサイズ px','range',8,40)+field('lineHeight','行間','range',.8,2.5,.05)+field('gap','発言同士の間隔 px','range',0,90)+field('color','本文色','color')+field('timeColor','時刻色','color')+'<div id="entries"></div><button id="addEntry">＋ 発言を追加</button>';renderEntries()}else{sp.innerHTML='<h2>ステータス</h2>'+field('fontSize','文字サイズ px','range',12,70)+field('rowGap','各行の間隔 px','range',0,50)+field('barHeight','バーの縦幅 px','range',2,60)+field('barOffset','文字とバーの重なり位置 px','range',-30,35)+field('color','文字色','color')+field('outline','文字の縁取り ON/OFF','checkbox')+field('outlineColor','縁取り色','color')+field('outlineWidth','縁取り幅 px','range',0,10,.5)+field('barColor','バー背景色','color')+field('fillColor','残量バー色','color')+field('pinchColor','ピンチ時の現在値の色','color')+'<div id="stats"></div>';renderStats()}wire(common);wire(sp)}
-function renderEntries(){const root=$('#entries');if(!root)return;root.innerHTML='<h2 style="margin-top:20px">サンプル発言</h2>'+data.chat.entries.map((e,i)=>`<div class="panel" style="padding:10px;background:#f7faf9"><b>発言 ${i+1}</b><div class="field"><label>名前</label><input data-i="${i}" data-k="name" value="${esc(e.name)}"></div><div class="field"><label>時刻</label><input data-i="${i}" data-k="time" value="${esc(e.time)}"></div><div class="field"><label>名前色</label><input type="color" data-i="${i}" data-k="nameColor" value="${esc(e.nameColor)}"></div><div class="field"><label>本文（Enterで任意改行）</label><textarea rows="3" data-i="${i}" data-k="text">${esc(e.text)}</textarea></div><button data-remove="${i}">削除</button></div>`).join('');root.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{data.chat.entries[+el.dataset.i][el.dataset.k]=el.value;saveLocal();renderPreview();updateOutput()});root.querySelectorAll('[data-remove]').forEach(el=>el.onclick=()=>{data.chat.entries.splice(+el.dataset.remove,1);saveLocal();renderEntries();renderPreview();updateOutput()});$('#addEntry').onclick=()=>{data.chat.entries.push({name:'探索者',time:'今日 00:00',text:'新しい発言',nameColor:'#5588aa'});saveLocal();renderEntries();renderPreview();updateOutput()}}
-function renderStats(){const root=$('#stats');if(!root)return;root.innerHTML='<h2 style="margin-top:20px">ステータスの値</h2>'+data.status.rows.map((r,i)=>`<div class="control-grid" style="grid-template-columns:1.3fr .7fr .7fr;gap:6px;margin-bottom:8px"><input aria-label="ステータス名" data-i="${i}" data-k="name" value="${esc(r.name)}"><input aria-label="現在値" type="number" data-i="${i}" data-k="now" value="${r.now}"><input aria-label="最大値" type="number" data-i="${i}" data-k="max" value="${r.max}"></div>`).join('');root.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{data.status.rows[+el.dataset.i][el.dataset.k]=el.type==='number'?Number(el.value):el.value;saveLocal();renderPreview();updateOutput()})}
-function renderPreview(){const d=data[type],obj=$('#object'),stage=$('#stage');const factor=stage.clientWidth/1920;obj.style.left=d.x*factor+'px';obj.style.top=d.y*factor+'px';obj.style.width=d.width+'px';obj.style.transform=`scale(${factor*d.scale/100})`;obj.className='object '+(type==='balloon'?'balloon':type==='chat'?'chat':'status');if(type==='balloon'){obj.style.color=d.color;obj.innerHTML=`<div class="balloon-name" style="font-size:${d.nameSize}px">${esc(d.name)}</div><div class="balloon-body" style="font-size:${d.fontSize}px;line-height:${d.lineHeight};white-space:pre-wrap">${esc(d.text)}</div>`}else if(type==='chat'){obj.style.color=d.color;obj.innerHTML=d.entries.map(e=>`<div class="chat-entry" style="margin-bottom:${d.gap}px"><div class="chat-meta" style="font-size:${d.metaSize}px"><span class="chat-name" style="color:${esc(e.nameColor)}">${esc(e.name)}</span><span style="color:${d.timeColor}">- ${esc(e.time)}</span></div><div class="chat-body" style="font-size:${d.fontSize}px;line-height:${d.lineHeight};white-space:pre-wrap">${esc(e.text)}</div></div>`).join('')}else{obj.style.color=d.color;const outline=d.outline?`-webkit-text-stroke:${d.outlineWidth}px ${d.outlineColor};paint-order:stroke fill;`:'';obj.innerHTML=d.rows.map(r=>{let ratio=r.max>0?Math.max(0,Math.min(1,r.now/r.max)):0;let pinch=r.max>0&&r.now/r.max<=1/3;return `<div class="stat-row" style="height:${Math.max(d.fontSize+3,d.barHeight)}px;margin-bottom:${d.rowGap}px;font-size:${d.fontSize}px;${outline}"><div class="stat-track" style="height:${d.barHeight}px;transform:translateY(${d.barOffset}px);background:${d.barColor}"><div class="stat-fill" style="width:${ratio*100}%;background:${d.fillColor}"></div></div><span class="status-text">${esc(r.name)}</span><span class="status-text stat-value"><span style="color:${pinch?d.pinchColor:d.color}">${r.now}</span>/${r.max}</span></div>`}).join('')}}
-function updateOutput(){const d=data[type],name={balloon:'吹き出し',chat:'チャットログ',status:'ステータス'}[type];let lines=[`【ココフォリアCSSプレビュー調整指定：${name}】`,'既存のCSS簡単コピーHTMLに次の見た目を反映してほしい。',`配置: X=${d.x}px、Y=${d.y}px、横幅=${d.width}px、拡大率=${d.scale}%`,'背景パネルは不要（透明）。'];if(type==='balloon')lines.push(`名前=${d.name}、名前サイズ=${d.nameSize}px、本文サイズ=${d.fontSize}px、行間=${d.lineHeight}、文字色=${d.color}`,`本文（改行位置を維持）:\n${d.text}`,'名前の色は個別設定不要。');if(type==='chat')lines.push(`本文サイズ=${d.fontSize}px、名前・時刻サイズ=${d.metaSize}px、行間=${d.lineHeight}、発言間隔=${d.gap}px、本文色=${d.color}、時刻色=${d.timeColor}`,'名前→時刻の順で「{名前} - 今日 00:00」と表示。',...d.entries.map((e,i)=>`発言${i+1}: 名前=${e.name}、名前色=${e.nameColor}、時刻=${e.time}\n本文:\n${e.text}`));if(type==='status')lines.push(`文字サイズ=${d.fontSize}px、行間隔=${d.rowGap}px、バー縦幅=${d.barHeight}px、バー重なりオフセット=${d.barOffset}px`,`文字色=${d.color}、縁取り=${d.outline?'ON':'OFF'}、縁取り色=${d.outlineColor}、縁取り幅=${d.outlineWidth}px`,`バー背景=${d.barColor}、残量色=${d.fillColor}、ピンチ現在値色=${d.pinchColor}`,'ピンチ色は現在値の数字だけに適用する。',...d.rows.map(r=>`${r.name}: ${r.now}/${r.max}`));$('#output').value=lines.join('\n')}
-$('#editMode').onclick=()=>{document.body.classList.remove('preview-mode');$('#editMode').classList.add('active');$('#previewMode').classList.remove('active');requestAnimationFrame(renderPreview)};$('#previewMode').onclick=()=>{document.body.classList.add('preview-mode');$('#previewMode').classList.add('active');$('#editMode').classList.remove('active');requestAnimationFrame(renderPreview)};function selectType(t){type=t;document.querySelectorAll('[data-type]').forEach(b=>b.classList.toggle('active',b.dataset.type===t));renderControls();renderPreview();updateOutput()}document.querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>selectType(b.dataset.type));$('#copy').onclick=async()=>{try{await navigator.clipboard.writeText($('#output').value);alert('指定文をコピーしたよ！')}catch{$('#output').select();document.execCommand('copy');alert('指定文を選択したよ。コピーして送ってね')}};$('#save').onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=url;a.download='ccfolia-design-settings.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};$('#loadBtn').onclick=()=>$('#load').click();$('#load').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const v=JSON.parse(await f.text());for(const k in defaults)if(v[k]&&typeof v[k]==='object')data[k]={...clone(defaults[k]),...v[k]};saveLocal();selectType(type)}catch{alert('JSONの読み込みに失敗したよ')}};$('#reset').onclick=()=>{if(confirm('この種類の設定を初期化する？')){data[type]=clone(defaults[type]);saveLocal();selectType(type)}};
-let drag=null,pointers=new Map(),pinch=null;const stage=$('#stage');function point(e){const r=stage.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}stage.onpointerdown=e=>{stage.setPointerCapture(e.pointerId);pointers.set(e.pointerId,point(e));if(pointers.size===1){drag={start:point(e),x:data[type].x,y:data[type].y}}else if(pointers.size===2){const a=[...pointers.values()];pinch={dist:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),scale:data[type].scale};drag=null}};stage.onpointermove=e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,point(e));if(pointers.size===2&&pinch){const a=[...pointers.values()],dist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);data[type].scale=Math.round(n(pinch.scale*dist/Math.max(1,pinch.dist),20,300))}else if(drag&&pointers.size===1){const p=point(e),factor=1920/stage.clientWidth;data[type].x=Math.round(drag.x+(p.x-drag.start.x)*factor);data[type].y=Math.round(drag.y+(p.y-drag.start.y)*factor)}else return;saveLocal();renderPreview();updateOutput();for(const k of ['x','y','scale']){const el=$('#f_'+k);if(el){el.value=data[type][k];$('#f_'+k+'_num').value=data[type][k];$('#f_'+k+'_value').textContent=data[type][k]}}};function end(e){pointers.delete(e.pointerId);if(pointers.size<2)pinch=null;if(!pointers.size)drag=null}stage.onpointerup=end;stage.onpointercancel=end;stage.addEventListener('wheel',e=>{e.preventDefault();data[type].scale=Math.round(n(data[type].scale+(e.deltaY<0?5:-5),20,300));saveLocal();selectType(type)},{passive:false});window.addEventListener('resize',renderPreview);
-function drawCanvas(transparent){const c=document.createElement('canvas');c.width=transparent?Math.ceil(data[type].width*data[type].scale/100)+40:1920;c.height=transparent?Math.max(200,Math.ceil($('#object').getBoundingClientRect().height*1920/stage.clientWidth)+40):1080;const ctx=c.getContext('2d');if(!transparent){ctx.clearRect(0,0,c.width,c.height)}const d=data[type],s=d.scale/100,xx=transparent?20:d.x,yy=transparent?20:d.y;ctx.save();ctx.translate(xx,yy);ctx.scale(s,s);ctx.textBaseline='top';function textLines(text,x,y,size,color,weight,width,lineHeight){ctx.font=`${weight} ${size}px 'Zen Kaku Gothic New',sans-serif`;ctx.fillStyle=color;let cy=y;for(const para of String(text).split('\n')){let line='';for(const ch of para){if(ctx.measureText(line+ch).width>width&&line){ctx.fillText(line,x,cy);cy+=size*lineHeight;line=ch}else line+=ch}ctx.fillText(line,x,cy);cy+=size*lineHeight}return cy}if(type==='balloon'){textLines(d.name,0,0,d.nameSize,d.color,700,d.width,1.3);textLines(d.text,0,d.nameSize+14,d.fontSize,d.color,700,d.width,d.lineHeight)}else if(type==='chat'){let y=0;for(const e of d.entries){ctx.font=`900 ${d.metaSize}px 'Zen Kaku Gothic New'`;ctx.fillStyle=e.nameColor;ctx.fillText(e.name,0,y);const nameWidth=ctx.measureText(e.name).width;ctx.fillStyle=d.timeColor;ctx.fillText(' - '+e.time,nameWidth+5,y);y=textLines(e.text,0,y+d.metaSize+7,d.fontSize,d.color,500,d.width,d.lineHeight)+d.gap}}else{let y=0;for(const r of d.rows){const h=Math.max(d.fontSize+3,d.barHeight);ctx.fillStyle=d.barColor;ctx.fillRect(0,y+h/2-d.barHeight/2+d.barOffset,d.width,d.barHeight);ctx.fillStyle=d.fillColor;ctx.fillRect(0,y+h/2-d.barHeight/2+d.barOffset,d.width*(r.max>0?Math.max(0,Math.min(1,r.now/r.max)):0),d.barHeight);ctx.font=`900 ${d.fontSize}px 'Zen Kaku Gothic New'`;ctx.lineJoin='round';ctx.lineWidth=d.outlineWidth*2;const draw=(t,x,color)=>{if(d.outline&&d.outlineWidth){ctx.strokeStyle=d.outlineColor;ctx.strokeText(t,x,y)}ctx.fillStyle=color;ctx.fillText(t,x,y)};draw(r.name,0,d.color);const tail=`${r.now}/${r.max}`,w=ctx.measureText(tail).width,tx=d.width-w;draw(String(r.now),tx,r.max>0&&r.now/r.max<=1/3?d.pinchColor:d.color);draw('/'+r.max,tx+ctx.measureText(String(r.now)).width,d.color);y+=h+d.rowGap}}ctx.restore();return c}function exportPng(transparent){const c=drawCanvas(transparent);c.toBlob(b=>{if(!b)return alert('画像出力に失敗したよ');const url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download=`${type}-${transparent?'transparent':'1920x1080'}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)},'image/png')}$('#png').onclick=()=>exportPng(false);$('#transparent').onclick=()=>exportPng(true);selectType(type);
-</script></body></html>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CSS簡単コピー</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap');
+*{box-sizing:border-box}
+:root{--bg:#f4f6f5;--panel:#fff;--text:#303535;--sub:#687070;--line:#d9dfdd;--accent:#3d7c8d;--accent2:#34c38e;--danger:#d85c5c}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Zen Kaku Gothic New",sans-serif;font-weight:500}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1100px;margin:auto;padding:24px}
+h1{font-size:26px;font-weight:900;margin:0 0 18px}
+.tabs{display:flex;gap:6px;overflow:auto;margin-bottom:18px}
+.tab{border:1px solid var(--line);background:#fff;padding:10px 18px;font-weight:900;white-space:nowrap}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.panel{background:var(--panel);border:1px solid var(--line);padding:18px;margin-bottom:14px}
+.panel h2{font-size:18px;margin:0 0 14px;font-weight:900}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.app{padding:14px}}
+.row{display:flex;gap:8px;align-items:center}
+.field{margin-bottom:12px}
+label{display:block;font-weight:900;font-size:14px;margin-bottom:5px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#fff;padding:9px 10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.color-row{display:grid;grid-template-columns:minmax(100px,1fr) 130px 42px;gap:8px;align-items:center;margin-bottom:8px}
+.color-row input[type=text]{width:100%}
+.color-picker{width:42px;height:40px;padding:2px}
+.swatch{width:42px;height:40px;border:1px solid var(--line);display:block}
+button{border:1px solid var(--line);background:#fff;padding:9px 13px;font-weight:700}
+button:hover{filter:brightness(.97)}
+.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.green{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.danger{color:var(--danger)}
+.small{font-size:12px;color:var(--sub)}
+.user-card{border:1px solid var(--line);padding:10px;margin-bottom:8px}
+.user-name{font-weight:900}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+#cssOutput{min-height:360px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,1fr);gap:14px;align-items:start}
+.workspace-left,.workspace-right{min-width:0}
+.workspace-right{position:sticky;top:14px}
+.image-panel{margin-bottom:0}
+@media(max-width:760px){.workspace{grid-template-columns:1fr}.workspace-right{position:static}}
+
+.drop{border:1px dashed #adb8b5;padding:16px;text-align:center;color:var(--sub);margin-bottom:10px}
+.canvas-wrap{height:360px;overflow:hidden;background:#e7ebea;position:relative;border:1px solid var(--line)}
+#pickerCanvas{width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;user-select:none;-webkit-user-select:none}
+.zoom{display:flex;gap:6px;align-items:center;margin-top:8px}
+.zoom input{width:80px}
+.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal-box{background:#fff;max-width:850px;width:100%;max-height:90vh;padding:18px;display:flex;flex-direction:column}
+.modal-box textarea{min-height:55vh}
+.help{background:#f7faf9;border-left:4px solid var(--accent);padding:10px 12px;font-size:13px;line-height:1.6}
+
+.preview-shell{max-width:1100px;margin:0 auto 18px;padding:0 24px}.preview-layout{display:grid;grid-template-columns:290px 1fr;gap:14px}.preview-stage{background:#1c2226;padding:10px;overflow:hidden}.preview-stage canvas{display:block;width:100%;aspect-ratio:16/9;touch-action:none;cursor:grab}.preview-controls .field{margin-bottom:8px}.preview-controls input,.preview-controls select,.preview-controls textarea{padding:6px}.preview-controls .actions{margin-bottom:12px}.preview-item{border:1px solid #d9dfdd;padding:9px;margin:8px 0}.preview-item.active{border:2px solid #3d7c8d}.preview-item[draggable="true"]{cursor:grab}.preview-item.dragging{opacity:.4}.preview-item.drag-target{border-top:4px solid #3d7c8d}.drag-handle{font-size:18px;margin-right:8px;color:#667;cursor:grab}.preview-item button{padding:4px 8px}.preview-note{font-size:12px;color:#667}.preview-shell.hidden{display:none!important}@media(max-width:760px){.preview-layout{grid-template-columns:1fr}.preview-shell{padding:0 14px}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>CSS簡単コピー</h1>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-type="balloon">吹き出し</button>
+  <button class="tab" data-type="chat">チャット</button>
+  <button class="tab" data-type="status">ステータス</button>
+  <button class="tab" data-type="stand">駒</button>
+<button class="tab" data-type="preview">プレビュー</button>
+</div>
+
+<section id="previewShell" class="preview-shell hidden"><div class="panel"><h2>16:9 プレビュー・画像出力</h2><p class="small">CSSコピー機能とは独立した配置・素材編集用のプレビュー。文字サイズや余白は指定したデザインを初期値に設定済み。</p><div class="preview-layout"><div class="preview-controls"><div class="field"><label>背景色（任意）</label><input type="color" id="pvBg" value="#26323a"><label style="font-weight:500"><input type="checkbox" id="pvUseBg" style="width:auto"> 背景色を使用</label></div><div class="field"><label>追加する素材</label><div class="actions"><button data-add="chat">チャット追加</button><button data-add="balloon">吹き出し追加</button><button data-add="status">ステータス追加</button><button data-add="image">画像追加</button></div></div><div id="pvItems"></div><div id="pvEditor"></div></div><div><div class="preview-stage"><canvas id="pvCanvas" width="1280" height="720"></canvas></div><p class="preview-note">素材をクリックして選択、ドラッグで移動。座標は1920×1080基準。2本指で選択素材を拡大縮小できる。背景は初期状態で透明。</p><div class="actions"><button class="primary" id="pvFull">全体をPNG出力 (1920×1080)</button><button id="pvTransparent">選択素材を透過PNG出力</button><button id="pvAllTransparent">全素材を透過PNG出力</button></div></div></div></div></section>
+<div id="regularContent"><div class="panel">
+  <h2>Discordユーザー登録</h2>
+  <div class="help">表示名はこの画面で分かりやすくするための名前です。生成されるCSSにはDiscord IDだけが入ります。駒の画像URLは駒タブ側で入力し、保存されません。</div>
+  <div class="grid" style="margin-top:12px">
+    <div>
+      <div class="field"><label>表示名</label><input id="userName" placeholder="まぐ"></div>
+      <div class="field"><label>DiscordユーザーID</label><input id="userId" inputmode="numeric" placeholder="123456789012345678"></div>
+      <div class="actions">
+        <button class="primary" id="saveUser">登録 / 更新</button>
+        <button id="clearUser">入力クリア</button>
+      </div>
+    </div>
+    <div id="userList"></div>
+  </div>
+</div>
+
+<div class="workspace">
+  <div class="workspace-left">
+    <div class="panel">
+      <h2>参考画像</h2>
+      <div class="drop" id="dropArea">画像をここへドラッグ＆ドロップ<br>またはファイルを選択</div>
+      <input type="file" id="imageFile" accept="image/*">
+      <div class="zoom">
+        <button id="zoomOut">−</button>
+        <input id="zoomRange" type="range" min="25" max="500" value="100">
+        <button id="zoomIn">＋</button>
+        <span id="zoomLabel">100%</span>
+        <button id="resetView">位置リセット</button>
+      </div>
+      <p class="small">画像上をドラッグして移動できます。画像をタップ/クリックすると、その場所の色を現在選択中のカラーへ入れます。</p>
+    </div>
+    <div id="main"></div>
+  </div>
+  <div class="workspace-right">
+    <div class="panel image-panel">
+      <h2>スポイト</h2>
+      <div class="canvas-wrap"><canvas id="pickerCanvas"></canvas></div>
+      <p class="small">スマホ・iPadでは1本指で移動、2本指で拡大縮小できます。</p>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="actions">
+    <button class="green" id="copyCss">CSSをコピー</button>
+    <button id="copyTempCss">仮置きCSSをコピー</button>
+    <button id="showCss">CSSを見る</button>
+    <button id="downloadHtml">このページをHTML保存</button>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="modal hidden" id="modal">
+ <div class="modal-box">
+   <h2 style="margin-top:0">生成CSS</h2>
+   <textarea id="cssOutput" readonly></textarea>
+   <div class="actions" style="margin-top:10px"><button class="primary" id="closeModal">閉じる</button></div>
+ </div>
+</div>
+
+<script>
+const TEMPLATES = {
+balloon: `@import url("https://yudukiak.github.io/ccfoliaCSS/CSS/balloon/main.css");
+@import url('https://fonts.googleapis.com/css2?family=New+Tegomin&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
+
+* {  font-family: "Zen Kaku Gothic New", sans-serif !important;
+     font-weight: 700 !important;
+}
+
+:root {
+  --balloon-background-color: rgba(255, 255, 255, 0);
+
+  --dice-display: none;
+  --image-display: none;
+  --skip-display: none;
+  --close-display: none;
+
+  --balloon-width: 900px;
+  --balloon-border-width: 0px;
+  --balloon-border-radius: 0px;
+
+  --font-size-main: 3.5rem;
+  --font-color-name: 《名前・文章》;
+  --font-color-main: 《名前・文章》;
+  --font-color-dice: 《通常》;
+  --font-color-fail: 《失敗》;
+  --font-color-success: 《成功》;
+  --box-shadow 300ms cubic-bezier(0.0, 0, 0.0, 0);
+}
+
+.css-175dgcc {
+    box-shadow: none !important;
+    background-image: none !important;
+}`,
+chat: `@import url("https://yudukiak.github.io/ccfoliaCSS/CSS/chat/main.css");
+@import url("https://yudukiak.github.io/ccfoliaCSS/CSS/chat/option_name.css");
+@import url("https://yudukiak.github.io/ccfoliaCSS/CSS/chat/fix_freeze.css");
+@import url('https://fonts.googleapis.com/css2?family=New+Tegomin&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
+
+* {  font-family: "Zen Kaku Gothic New", sans-serif !important;
+     font-weight: 700 !important;
+}
+
+.MuiListItemText-secondary {
+    color: 《文章》 !important;
+}
+.MuiListItemText-secondary .css-1l6qhgm{
+    color: 《成功》;
+}
+.MuiListItemText-secondary .css-1j13mke {
+    color: 《失敗》;
+}
+
+.MuiListItemText-secondary .css-ucj12 {
+  color: 《時間・通常》;
+}
+
+.MuiTypography-caption {
+  color: 《時間・通常》 !important;
+}
+
+.MuiList-root>div:nth-child(1)>div>div:nth-last-child(-n+3)>div {
+    display: flex !important;
+  --magcolor: rgb(255, 244, 226);
+
+  --border-width: 0px;
+  --border-radius: 4px;
+  --background-color: rgba(0, 0, 0, 0);
+  --width: 450px;
+}
+/* アイコン消去 */
+.MuiListItemAvatar-root {
+    display: none !important;
+}
+
+/* アイコン分の余白を削除 */
+.MuiListItemText-root {
+    margin-left: 0 !important;
+}`,
+status: `@import url("https://yudukiak.github.io/ccfoliaCSS/CSS/status/main.css");
+@import url("https://use.typekit.net/tur0rsk.css");
+
+* {  font-family: "dazzle-unicase", sans-serif !important;
+  font-weight: 700 !important;
+  font-style: normal !important;}
+
+:root{
+ /* ステータスの列数（1 = 縦に1列） */
+  --status-column: 1;
+
+ /* アバターを消す */
+  --avatar-padding: 0;
+  --avatar-display: none;
+
+ /* ステータスの変動バー色変更 */
+  --background-color: 《変動バー色》;
+
+ /* 文字の縁取りの色変更 */
+  --status-font-border-color: rgba(237, 236, 232, 0);
+
+    --status-font-size: 2rem;
+    --status-font-color: var(--font-color, 《名前》);
+    --status-font-secondary-color: var(--font-color-fail, 《ピンチ》);
+}
+
+div:has(> p.MuiTypography-root.MuiTypography-body2)
++ div:has(> div[style*="width:"][style*="%"]),
+div:has(> p.MuiTypography-root.MuiTypography-body2)
++ div:has(> div[style*="width:"][style*="%"]) > div[style*="width:"] {
+  opacity: 1;
+}
+
+div:has(> p.MuiTypography-root.MuiTypography-body2)
++ div:has(> div[style*="width:"][style*="%"]) > div:not([style]) {
+ /* ステータスの背景色変更 */
+  background: 《背景色》 ;
+ /* ステータスの背景不透明度変更 */
+  opacity: 0.7 ;
+}
+
+.MuiTypography-root span {
+    height: auto;
+}
+#root > div {
+  padding: 0;
+}
+
+#root > div > div {
+  margin: 0;
+}
+
+[variant='bar'] > div {
+  margin-left: 0;
+  width: calc(var(--status-width) + var(--add-bar-margin));
+}
+
+[variant='bar'] > div > div:nth-child(2) > div {
+  height: calc(var(--status-height) / 3);
+  margin-left: calc(-1 * var(--add-bar-margin) / 2);
+  margin-top: calc(var(--status-height) / 2);
+}`,
+stand: `:root {
+  /* 画像のみ変更したいときはここのURLを書き換える */
+  /* 〈discordユーザーID〉  */
+  --img-stand-url-〈discordユーザーID〉: url("『画像URL』");
+  --img-mouth-url-〈discordユーザーID〉: url("");
+}
+
+/* ここから下は見た目の変更用CSS */
+body, #root {
+  overflow: hidden !important;
+}
+[class*="Voice_voiceStates__"] {
+  display: flex; 
+  align-items: flex-end; 
+  padding: 16px;
+} 
+[class*="Voice_voiceState__"] {
+  height: auto; 
+  margin-bottom: 0px;
+} 
+[class*="Voice_avatar__"] {
+  filter: brightness(70%);
+} 
+[class*="Voice_avatarSpeaking__"] {
+  position: relative; 
+  filter: brightness(100%); 
+  animation-duration: 750ms;
+}  
+[class*="Voice_name__"] {
+  display: none;
+}
+
+img {
+  display: none;
+}
+
+img[src*="avatars/〈discordユーザーID〉"] {
+  content: var(--img-stand-url-〈discordユーザーID〉);
+  display: block;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  border: none;
+}
+img:not([src*="avatars/〈discordユーザーID〉"]), img:not([src*="avatars/〈discordユーザーID〉"]) + [class*="Voice_user__"] {
+  display: none;
+}`
+};
+
+const COLOR_DEFS = {
+ balloon:[
+  ["名前・文章","nameText"],["通常","normal"],["失敗","fail"],["成功","success"]
+ ],
+ chat:[
+  ["文章","nameText"],["成功","success"],["失敗","fail"],["時間・通常","normal"]
+ ],
+ status:[
+  ["変動バー色","statusBar"],["名前","statusName"],["ピンチ","statusPinch"],["背景色","statusBg"]
+ ]
+};
+
+let state = JSON.parse(localStorage.getItem("cssEasyCopyState")||"null") || {
+ colors:{nameText:"#FFFFFF",normal:"#AAAAAA",fail:"#FF5555",success:"#55CC77",statusBar:"#AAAAAA",statusName:"#FFFFFF",statusPinch:"#FF5555",statusBg:"#000000"},
+ users:[],
+ selectedUser:null
+};
+state.users = state.users.map(u=>({name:u.name,id:u.id}));
+let currentType="balloon", selectedColorKey="nameText", editingUser=-1;
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+function save(){localStorage.setItem("cssEasyCopyState",JSON.stringify(state));}
+function normalizeColor(v){
+ v=String(v||"").trim();
+ if(/^#?[0-9a-fA-F]{6}$/.test(v)) return "#"+v.replace("#","").toUpperCase();
+ const m=v.match(/^rgb\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)$/i) || v.match(/^(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)$/);
+ if(m){
+   const n=m.slice(1).map(Number);
+   if(n.every(x=>x>=0&&x<=255)) return "#"+n.map(x=>x.toString(16).padStart(2,"0")).join("").toUpperCase();
+ }
+ return null;
+}
+function render(){
+ const main=$("#main");
+ main.innerHTML="";
+ const p=document.createElement("div");
+ p.className="panel";
+ main.appendChild(p);
+ if(currentType==="stand"){renderStand(p)} else {renderColors(p)}
+}
+function renderColors(p){
+ p.innerHTML="<h2>"+({balloon:"吹き出しのカラー",chat:"チャットのカラー",status:"ステータスのカラー"}[currentType])+"</h2>";
+ const defs=COLOR_DEFS[currentType];
+ defs.forEach(([label,key])=>{
+   const row=document.createElement("div");row.className="color-row";
+   row.innerHTML=`<label style="margin:0">${label}</label><input type="text" value="${esc(state.colors[key])}" data-color="${key}" title="カラーコード"><input class="color-picker" type="color" value="${state.colors[key]}" data-picker="${key}">`;
+   p.appendChild(row);
+   row.querySelector('[data-color]').addEventListener("focus",()=>selectedColorKey=key);
+   row.querySelector('[data-color]').addEventListener("input",e=>{
+     selectedColorKey=key; const c=normalizeColor(e.target.value); if(c){state.colors[key]=c; save(); row.querySelector('[data-picker]').value=c;}
+   });
+   row.querySelector('[data-picker]').addEventListener("focus",()=>selectedColorKey=key);
+   row.querySelector('[data-picker]').addEventListener("input",e=>{selectedColorKey=key;state.colors[key]=e.target.value.toUpperCase();save();row.querySelector('[data-color]').value=state.colors[key]});
+ });
+ const note=document.createElement("p");note.className="small";note.textContent="※ 吹き出しとチャットは対応する色を共有しています。";
+ if(currentType!=="status")p.appendChild(note);
+}
+let standUrls = {stand:"", mouth:""};
+
+function renderStand(p){
+ p.innerHTML="<h2>駒</h2>";
+
+ const f=document.createElement("div");
+ f.className="field";
+ f.innerHTML="<label>Discordユーザー</label><select id='standUser'><option value=''>選択してください</option>"+
+   state.users.map((u,i)=>`<option value="${i}" ${state.selectedUser===i?"selected":""}>${esc(u.name)}（${esc(u.id)}）</option>`).join("")+
+   "</select>";
+ p.appendChild(f);
+
+ const selected=state.users[state.selectedUser];
+
+ const info=document.createElement("div");
+ info.className="help";
+ info.innerHTML=selected
+   ? `Discord ID：${esc(selected.id)}<br>表示名：${esc(selected.name)}`
+   : "Discordユーザー登録からユーザーを登録してください。";
+ p.appendChild(info);
+
+ if(selected){
+   const urlBox=document.createElement("div");
+   urlBox.style.marginTop="12px";
+   urlBox.innerHTML=`
+     <div class="field">
+       <label>立ち絵画像URL</label>
+       <input id="standImageUrl" type="text" placeholder="https://..." value="${esc(standUrls.stand)}">
+     </div>
+     <div class="field">
+       <label>口パク画像URL（任意）</label>
+       <input id="mouthImageUrl" type="text" placeholder="https://..." value="${esc(standUrls.mouth)}">
+     </div>
+     <p class="small">画像URLは保存されません。現在入力しているURLをそのままCSSへ差し込みます。</p>`;
+   p.appendChild(urlBox);
+
+   $("#standImageUrl").addEventListener("input",e=>standUrls.stand=e.target.value);
+   $("#mouthImageUrl").addEventListener("input",e=>standUrls.mouth=e.target.value);
+ }
+
+ p.querySelector("#standUser").addEventListener("change",e=>{
+   state.selectedUser=e.target.value===""?null:Number(e.target.value);
+   standUrls={stand:"",mouth:""};
+   save();
+   render();
+ });
+}
+function renderUsers(){
+ const box=$("#userList");box.innerHTML="";
+ if(!state.users.length){box.innerHTML='<p class="small">登録されたユーザーはいません。</p>';return}
+ state.users.forEach((u,i)=>{
+   const d=document.createElement("div");d.className="user-card";
+   d.innerHTML=`<div class="user-name">${esc(u.name)}</div><div class="small">ID：${esc(u.id)}</div><div class="actions" style="margin-top:7px"><button data-edit="${i}">編集</button><button class="danger" data-del="${i}">削除</button></div>`;
+   box.appendChild(d);
+ });
+ box.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editUser(Number(b.dataset.edit)));
+ box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{const i=Number(b.dataset.del);if(confirm("このユーザーを削除しますか？")){state.users.splice(i,1);if(state.selectedUser===i)state.selectedUser=null;else if(state.selectedUser>i)state.selectedUser--;save();renderUsers();render();}});
+}
+function editUser(i){
+ const u=state.users[i];editingUser=i;
+ $("#userName").value=u.name;$("#userId").value=u.id;
+}
+function clearUser(){editingUser=-1;["userName","userId"].forEach(id=>$("#"+id).value="")}
+$("#saveUser").onclick=()=>{
+ const name=$("#userName").value.trim(),id=$("#userId").value.trim();
+ if(!name||!id){alert("表示名とDiscordユーザーIDを入力してください。");return}
+ const u={name,id};
+ if(editingUser>=0)state.users[editingUser]=u;else state.users.push(u);
+ save();clearUser();renderUsers();render();
+};
+$("#clearUser").onclick=clearUser;
+function replaceTemplate(){
+ let css=TEMPLATES[currentType];
+ if(currentType==="stand"){
+   const u=state.users[state.selectedUser];
+   if(!u)return css.replaceAll("〈discordユーザーID〉","").replaceAll("『画像URL』","");
+   css=css.replaceAll("〈discordユーザーID〉",u.id)
+     .replace('『画像URL』',standUrls.stand||"")
+     .replace('url("");',`url("${standUrls.mouth||""}");`);
+   return css;
+ }
+ const map=currentType==="balloon"
+ ?{"名前・文章":"nameText","通常":"normal","失敗":"fail","成功":"success"}
+ :currentType==="chat"
+ ?{"文章":"nameText","成功":"success","失败":"fail","失敗":"fail","時間・通常":"normal"}
+ :{"変動バー色":"statusBar","名前":"statusName","ピンチ":"statusPinch","背景色":"statusBg"};
+ Object.entries(map).forEach(([label,key])=>{css=css.replaceAll("《"+label+"》",state.colors[key]||"#000000")});
+ return css;
+}
+function copyCss(){
+ const css=replaceTemplate();
+ navigator.clipboard.writeText(css).then(()=>alert("CSSをコピーしました。")).catch(()=>{ $("#cssOutput").value=css;$("#modal").classList.remove("hidden");$("#cssOutput").select();});
+}
+
+function getTypeName(){
+ return {balloon:"吹き出し",chat:"チャット",status:"ステータス",stand:"駒"}[currentType] || currentType;
+}
+
+function getTemporaryCss(){
+ return "# " + getTypeName() + "\n```\n" + replaceTemplate() + "\n```";
+}
+
+function copyTempCss(){
+ const css=getTemporaryCss();
+ navigator.clipboard.writeText(css).then(()=>alert("仮置きCSSをコピーしました。")).catch(()=>{ $("#cssOutput").value=css;$("#modal").classList.remove("hidden");$("#cssOutput").select();});
+}
+
+$("#copyCss").onclick=copyCss;
+$("#copyTempCss").onclick=copyTempCss;
+$("#showCss").onclick=()=>{$("#cssOutput").value=replaceTemplate();$("#modal").classList.remove("hidden")};
+$("#closeModal").onclick=()=>$("#modal").classList.add("hidden");
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");
+ if(t.dataset.type!=="preview"){currentType=t.dataset.type;render();}
+});
+render();renderUsers();
+
+let img=null, scale=1, ox=0, oy=0, dragging=false, sx=0, sy=0;
+const canvas=$("#pickerCanvas"),ctx=canvas.getContext("2d");
+function resizeCanvas(){const r=canvas.parentElement.getBoundingClientRect(),d=devicePixelRatio||1;canvas.width=r.width*d;canvas.height=r.height*d;canvas.style.width=r.width+"px";canvas.style.height=r.height+"px";draw()}
+window.addEventListener("resize",resizeCanvas);
+function draw(){
+ ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
+ if(!img)return;
+ const d=devicePixelRatio||1;
+ ctx.setTransform(d,0,0,d,0,0);
+ const w=img.width*scale,h=img.height*scale;
+ ctx.drawImage(img,ox,oy,w,h);
+}
+function setZoom(v){scale=Number(v)/100;$("#zoomRange").value=v;$("#zoomLabel").textContent=Math.round(v)+"%";draw()}
+$("#zoomRange").oninput=e=>setZoom(e.target.value);
+$("#zoomIn").onclick=()=>setZoom(Math.min(500,Math.round(scale*100+25)));
+$("#zoomOut").onclick=()=>setZoom(Math.max(25,Math.round(scale*100-25)));
+$("#resetView").onclick=()=>{scale=1;ox=0;oy=0;setZoom(100)};
+function loadImage(file){
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=e=>{const im=new Image();im.onload=()=>{img=im;scale=1;ox=(canvas.clientWidth-im.width)/2;oy=(canvas.clientHeight-im.height)/2;setZoom(100)};im.src=e.target.result};
+ reader.readAsDataURL(file);
+}
+$("#imageFile").onchange=e=>loadImage(e.target.files[0]);
+$("#dropArea").ondragover=e=>{e.preventDefault();$("#dropArea").style.borderColor="var(--accent)"};
+$("#dropArea").ondragleave=()=>$("#dropArea").style.borderColor="";
+$("#dropArea").ondrop=e=>{e.preventDefault();$("#dropArea").style.borderColor="";loadImage(e.dataTransfer.files[0])};
+let pointers=new Map();
+let pinchStartDistance=0, pinchStartScale=1;
+let pinchStartCenter={x:0,y:0}, pinchStartOffset={x:0,y:0};
+
+function pointerPos(e){
+  const r=canvas.getBoundingClientRect();
+  return {x:e.clientX-r.left,y:e.clientY-r.top};
+}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function center(a,b){return {x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
+
+canvas.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  canvas.setPointerCapture(e.pointerId);
+  const p=pointerPos(e);
+  pointers.set(e.pointerId,p);
+
+  if(pointers.size===1){
+    dragging=true;
+    sx=p.x-ox; sy=p.y-oy;
+  }else if(pointers.size===2){
+    dragging=false;
+    const pts=[...pointers.values()];
+    pinchStartDistance=distance(pts[0],pts[1]);
+    pinchStartScale=scale;
+    pinchStartCenter=center(pts[0],pts[1]);
+    pinchStartOffset={x:ox,y:oy};
+  }
+});
+
+canvas.addEventListener("pointermove",e=>{
+  if(!pointers.has(e.pointerId))return;
+  e.preventDefault();
+  pointers.set(e.pointerId,pointerPos(e));
+
+  if(pointers.size===1 && dragging){
+    const p=[...pointers.values()][0];
+    ox=p.x-sx; oy=p.y-sy; draw();
+  }else if(pointers.size===2){
+    const pts=[...pointers.values()];
+    const d=distance(pts[0],pts[1]);
+    if(!pinchStartDistance)return;
+
+    const factor=d/pinchStartDistance;
+    const oldScale=scale;
+    scale=Math.max(.25,Math.min(5,pinchStartScale*factor));
+
+    // ピンチの中心位置を固定して拡大縮小
+    const c=center(pts[0],pts[1]);
+    const imageX=(pinchStartCenter.x-pinchStartOffset.x)/oldScale;
+    const imageY=(pinchStartCenter.y-pinchStartOffset.y)/oldScale;
+    ox=c.x-imageX*scale;
+    oy=c.y-imageY*scale;
+
+    $("#zoomRange").value=Math.round(scale*100);
+    $("#zoomLabel").textContent=Math.round(scale*100)+"%";
+    draw();
+  }
+});
+
+canvas.addEventListener("pointerup",e=>{
+  const wasSingle=pointers.size===1;
+  const p=pointers.get(e.pointerId);
+  pointers.delete(e.pointerId);
+
+  if(pointers.size===0){
+    dragging=false;
+    if(wasSingle && p){
+      // タップ判定。移動中の誤スポイトを避けるため大きな移動は除外。
+      const moved=Math.hypot((p.x-sx), (p.y-sy));
+      if(moved<8 && img){
+        const x=Math.floor((p.x-ox)/scale),y=Math.floor((p.y-oy)/scale);
+        if(x>=0&&y>=0&&x<img.width&&y<img.height){
+          const temp=document.createElement("canvas");
+          temp.width=img.width;temp.height=img.height;
+          const tc=temp.getContext("2d");
+          tc.drawImage(img,0,0);
+          const d=tc.getImageData(x,y,1,1).data;
+          const c="#"+[d[0],d[1],d[2]].map(n=>n.toString(16).padStart(2,"0")).join("").toUpperCase();
+          state.colors[selectedColorKey]=c;
+          save();render();
+        }
+      }
+    }
+  }else if(pointers.size===1){
+    const p2=[...pointers.values()][0];
+    dragging=true;sx=p2.x-ox;sy=p2.y-oy;
+  }
+});
+
+canvas.addEventListener("pointercancel",e=>{
+  pointers.delete(e.pointerId);
+  if(pointers.size===0)dragging=false;
+});
+
+$("#downloadHtml").onclick=()=>{
+ const blob=new Blob([document.documentElement.outerHTML],{type:"text/html;charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="css-easy-copy.html";a.click();URL.revokeObjectURL(a.href);
+};
+resizeCanvas();
+
+// Preview editor: 1920x1080 coordinates, independent canvas rendering.
+const PW=1920,PH=1080;
+const pv={items:[{id:1,type:'chat',x:1240,y:85,scale:1,name:'探索者',nameColor:'#79c9bf',font:'Zen Kaku Gothic New',fontSize:23,metaSize:14,lineHeight:34.5,entryGap:25,boxWidth:410,textOffsetX:0,entries:[{name:'探索者',time:'今日 00:00',text:'CCB<=70 【目星】 (1D100<=70) ＞ 40 ＞ 成功',style:'success',color:'#79c9bf'},{name:'KP',time:'今日 00:01',text:'探索可能箇所：机、扉、本棚',style:'normal',color:'#ffffff'}]},{id:2,type:'status',x:80,y:80,scale:1,name:'探索者',font:'Zen Kaku Gothic New',fontSize:46,boxWidth:370,barHeight:24,overlap:4,rowHeight:63,outlineEnabled:true,outlineWidth:3,stats:[['HP',10,10],['MP',5,15],['SAN',55,70],['サンプル',0,0]]}],next:3,selected:1,bg:'#26323a',useBg:false,images:{}};
+const pc=document.getElementById('pvCanvas'),px=pc.getContext('2d');pc.width=PW;pc.height=PH;
+const FONT='Zen Kaku Gothic New';
+function pvItem(){return pv.items.find(i=>i.id===pv.selected)}
+function pvColor(k,f){return state.colors[k]||f}
+function pvFont(i,size,weight=700){return `${weight} ${size}px "${i.font||FONT}",sans-serif`}
+function pvLines(ctx,str,max){let result=[];for(let paragraph of String(str||'').split('\n')){let line='';for(const c of paragraph){if(line&&ctx.measureText(line+c).width>max){result.push(line);line=''}line+=c}result.push(line)}return result}
+function rounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function pvDrawItem(ctx,i){ctx.save();ctx.translate(i.x,i.y);ctx.scale(i.scale||1,i.scale||1);
+ if(i.type==='image'){let im=pv.images[i.id];if(im){i.w=im.width;i.h=im.height;ctx.drawImage(im,0,0,im.width,im.height)}else{i.w=360;i.h=220;ctx.fillStyle='#ffffff30';ctx.fillRect(0,0,i.w,i.h);ctx.fillStyle='#777';ctx.font=pvFont(i,26);ctx.fillText('画像未設定',20,90)}}
+ else if(i.type==='status'){const stats=i.stats||[['HP',10,10],['MP',5,15],['SAN',55,70],['サンプル',0,0]];let fs=i.fontSize??46,bh=i.barHeight??24,row=i.rowHeight??63,overlap=i.overlap??4;i.w=i.boxWidth||370;i.h=stats.length*row+20;ctx.font=pvFont(i,fs,900);stats.forEach(([label,current,max],j)=>{const y=14+j*row,ratio=max>0?Math.max(0,Math.min(1,current/max)):0;ctx.fillStyle=pvColor('statusBg','#000');ctx.globalAlpha=.5;ctx.fillRect(0,y+fs-overlap,i.w,bh);ctx.globalAlpha=1;ctx.fillStyle=pvColor('statusBar','#aaa');ctx.fillRect(0,y+fs-overlap,i.w*ratio,bh);ctx.lineWidth=i.outlineEnabled===false?0:(i.outlineWidth??3)*2;ctx.lineJoin='round';ctx.strokeStyle=i.outlineColor||'#000b';ctx.fillStyle=pvColor('statusName','#fff');if(i.outlineEnabled!==false)ctx.strokeText(label,6,y+fs);ctx.fillText(label,6,y+fs);let val=String(current),tail='/'+max;let width=ctx.measureText(val+tail).width;let x=i.w-6-width;if(i.outlineEnabled!==false)ctx.strokeText(val+tail,x,y+fs);ctx.fillText(tail,x+ctx.measureText(val).width,y+fs);ctx.fillStyle=max>0&&ratio<=1/3?pvColor('statusPinch','#f55'):pvColor('statusName','#fff');ctx.fillText(val,x,y+fs)})}
+  else if(i.type==='balloon'){
+    let fs=i.fontSize??44,lh=i.lineHeight??1.5,pad=i.padding??0,nameSize=i.nameSize??17;
+    i.w=i.boxWidth??620;
+    ctx.font=pvFont(i,fs,900);
+    let lines=pvLines(ctx,i.text||'サンプルテキスト',Math.max(80,i.w-pad*2));
+    let linePx=fs*lh;
+    i.h=Math.max(55,nameSize*1.5+10+lines.length*linePx);
+    ctx.fillStyle=pvColor('nameText','#444');ctx.font=pvFont(i,nameSize,900);
+    ctx.fillText(i.name||'探索者',pad,nameSize);
+    ctx.fillStyle=i.textColor||pvColor('nameText','#242424');ctx.font=pvFont(i,fs,900);
+    lines.forEach((l,j)=>ctx.fillText(l,pad,nameSize*1.5+10+fs+j*linePx));
+  }
+  else if(i.type==='chat'){
+    i.w=i.boxWidth??410;
+    let fs=i.fontSize??23,lh=i.lineHeight??1.5,meta=i.metaSize??14,gap=i.entryGap??25;
+    let offset=i.textOffsetX??0,entries=i.entries||[],layouts=[],yy=0;
+    entries.forEach(e=>{
+      ctx.font=pvFont(i,fs,900);
+      let lines=pvLines(ctx,e.text||'',Math.max(40,i.w-offset));
+      layouts.push({e,lines,y:yy});
+      yy+=meta*1.5+4+Math.max(1,lines.length)*fs*lh+gap;
+    });
+    i.h=Math.max(65,yy);
+    if(i.panelColor){ctx.fillStyle=i.panelColor;rounded(ctx,0,0,i.w,i.h,12);ctx.fill()}
+    layouts.forEach(({e,lines,y})=>{
+      ctx.font=pvFont(i,meta,900);
+      ctx.fillStyle=e.color||i.nameColor||'#ffffff';let name=e.name||'探索者';
+      ctx.fillText(name,0,y+meta);
+      let nx=ctx.measureText(name).width;
+      ctx.fillStyle=pvColor('normal','#aaa');ctx.fillText(' - '+(e.time||'今日 00:00'),nx,y+meta);
+      ctx.font=pvFont(i,fs,900);
+      ctx.fillStyle=e.style==='success'?pvColor('success','#5c7'):e.style==='fail'?pvColor('fail','#f55'):pvColor('nameText','#fff');
+      lines.forEach((l,j)=>ctx.fillText(l,offset,y+meta*1.5+4+fs+j*fs*lh));
+    });
+  }
+ ctx.restore()}
+function pvDraw(){px.clearRect(0,0,PW,PH);if(pv.useBg){px.fillStyle=pv.bg;px.fillRect(0,0,PW,PH)}pv.items.forEach(i=>pvDrawItem(px,i));let i=pvItem();if(i){px.save();px.strokeStyle='#38d9bd';px.lineWidth=3;px.setLineDash([12,7]);px.strokeRect(i.x-4,i.y-4,(i.w||200)*i.scale+8,(i.h||100)*i.scale+8);px.restore()}}
+function pvList(){
+ let el=document.getElementById('pvItems');
+ el.innerHTML='<p class="small">上が手前。≡をつかんでドラッグで重ね順を変更できるよ。</p>'+[...pv.items].reverse().map(i=>`<div draggable="true" data-layer="${i.id}" class="preview-item ${i.id===pv.selected?'active':''}"><span class="drag-handle">☰</span><button data-pick="${i.id}">${{chat:'チャット',balloon:'吹き出し',status:'ステータス',image:'画像'}[i.type]} #${i.id}</button> <button data-remove="${i.id}">削除</button></div>`).join('');
+ el.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{pv.selected=+b.dataset.pick;pvList();pvEdit();pvDraw()});
+ el.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{pv.items=pv.items.filter(i=>i.id!==+b.dataset.remove);pv.selected=pv.items.at(-1)?.id||null;pvList();pvEdit();pvDraw()});
+ let draggingId=null;
+ el.querySelectorAll('[data-layer]').forEach(node=>{
+ node.addEventListener('dragstart',e=>{draggingId=+node.dataset.layer;node.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(draggingId))});
+ node.addEventListener('dragover',e=>{e.preventDefault();node.classList.add('drag-target')});
+ node.addEventListener('dragleave',()=>node.classList.remove('drag-target'));
+ node.addEventListener('drop',e=>{e.preventDefault();let source=draggingId||Number(e.dataTransfer.getData('text/plain')),target=+node.dataset.layer;let a=pv.items.findIndex(i=>i.id===source),b=pv.items.findIndex(i=>i.id===target);if(a<0||b<0||a===b)return;let [item]=pv.items.splice(a,1);let newIndex=pv.items.findIndex(i=>i.id===target);pv.items.splice(newIndex+(a<b?0:1),0,item);pvList();pvDraw()});
+ node.addEventListener('dragend',()=>{draggingId=null;pvList()});
+ });
+}
+const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fld=(label,key,val,type='text')=>`<div class="field"><label>${label}</label><input data-prop="${key}" type="${type}" value="${safe(val)}"></div>`;
+function pvGetPresets(type){try{return JSON.parse(localStorage.getItem('pvPresets_'+type)||'[]')}catch(e){return []}}
+function pvEdit(){let i=pvItem(),el=document.getElementById('pvEditor');if(!i){el.innerHTML='素材を追加してね';return}let out=`<h3>素材 #${i.id} の調整</h3><div class="grid">${fld('X','x',i.x,'number')}${fld('Y','y',i.y,'number')}</div>${fld('拡大率 (%)','scale',Math.round(i.scale*100),'number')}`;
+ if(i.type==='image')out+=`<div class="field"><label>画像を読み込む</label><input type="file" id="pvImage" accept="image/*"></div><button id="pvFit">画面にフィット (16:9)</button>`;
+ else{out+=`<div class="field"><label>フォント</label><select id="pvFont"><option value="Zen Kaku Gothic New">Zen角ゴシック</option><option value="New Tegomin">New Tegomin</option><option value="serif">明朝体</option><option value="sans-serif">ゴシック体</option></select></div><div class="field"><label>フォントファイル（任意・このセッションのみ）</label><input type="file" id="pvFontFile" accept=".ttf,.otf,.woff,.woff2"></div>`;
+ if(['chat','balloon','status'].includes(i.type)){out+=`<div class="preview-item"><strong>見た目の数値調整メーカー</strong><p class="small">数値を変えるとすぐプレビューに反映。本文の改行はEnterで指定できるよ。</p><div class="grid">${fld('横幅 (px)','boxWidth',i.boxWidth||(i.type==='balloon'?620:i.type==='chat'?410:370),'number')}${fld('文字サイズ (px)','fontSize',i.fontSize||(i.type==='balloon'?44:i.type==='chat'?23:46),'number')}${i.type==='status'?fld('バーの高さ (px)','barHeight',i.barHeight??24,'number')+fld('文字とバーの重なり (px)','overlap',i.overlap??4,'number')+fld('行間 (px)','rowHeight',i.rowHeight??63,'number'):fld('行間 (倍率)','lineHeight',i.lineHeight||(1.5),'number')}${i.type==='chat'?fld('名前・時刻サイズ (px)','metaSize',i.metaSize??14,'number')+fld('発言間隔 (px)','entryGap',i.entryGap??25,'number'):i.type==='balloon'?fld('名前サイズ (px)','nameSize',i.nameSize??17,'number'):''}${i.type==='balloon'?fld('左右余白 (px)','padding',i.padding??0,'number'):i.type==='chat'?fld('本文の横位置 (px)','textOffsetX',i.textOffsetX??0,'number'):''}</div></div>`;} if(i.type==='chat'){out+=`<div class="actions"><button id="pvAddLine">＋ サンプル発言追加</button></div>`+(i.entries||[]).map((e,j)=>`<div class="preview-item"><strong>発言 ${j+1}</strong> <button data-del-entry="${j}">削除</button>${fld('名前','en'+j,safe(e.name))}${fld('時間','et'+j,e.time)}${fld('名前色','ec'+j,e.color||'#ffffff','color')}<label>文章（Enterで改行位置を指定）</label><textarea data-entry-text="${j}" rows="3">${safe(e.text)}</textarea><label>判定</label><select data-entry-style="${j}"><option value="normal">通常</option><option value="success">成功</option><option value="fail">失敗</option></select></div>`).join('')}
+ else if(i.type==='balloon')out+=`${fld('名前','name',i.name||'探索者')}${fld('本文色','textColor',i.textColor||'#242424','color')}<label>サンプル文章（Enterで改行位置を指定）</label><textarea id="pvText" rows="4">${safe(i.text||'サンプルテキスト')}</textarea>`;
+ else if(i.type==='status')out+=`<div class="preview-item"><label><input type="checkbox" id="pvOutline" style="width:auto" ${i.outlineEnabled===false?'':'checked'}> 文字の縁取り</label>${fld('縁取り色','outlineColor',i.outlineColor||'#000000','color')}${fld('縁取り太さ','outlineWidth',i.outlineWidth??3,'number')}</div>`+(i.stats||[]).map((st,j)=>`<div class="preview-item"><strong>ステータス ${j+1}</strong>${fld('名称','sn'+j,st[0])}<div class="grid">${fld('現在値','sv'+j,st[1],'number')}${fld('最大値','sm'+j,st[2],'number')}</div></div>`).join('');
+ if(['chat','status','balloon'].includes(i.type)){let presets=pvGetPresets(i.type);out+=`<div class="preview-item"><strong>デザインプリセット（履歴）</strong><div class="field"><select id="pvPresetSelect">${presets.map((p,j)=>`<option value="${j}">${safe(p.label)} / ${safe(p.date)}</option>`).join('')}</select></div><div class="actions"><button id="pvSavePreset">＋ 現在のデザインを保存</button><button id="pvApplyPreset">選択して適用</button><button id="pvDeletePreset">削除</button></div><p class="small">複数保存可能。ブラウザ内に保存されるよ。</p></div>`;}
+ }el.innerHTML=out;
+ el.querySelectorAll('[data-prop]').forEach(inp=>inp.oninput=()=>{let k=inp.dataset.prop,m=k.match(/^(en|et|ec|sn|sv|sm)(\d+)$/);if(m){let j=+m[2];if(m[1]==='en')i.entries[j].name=inp.value;else if(m[1]==='et')i.entries[j].time=inp.value;else if(m[1]==='ec')i.entries[j].color=inp.value;else{i.stats[j][{sn:0,sv:1,sm:2}[m[1]]]=m[1]==='sn'?inp.value:Number(inp.value)}}else i[k]=['x','y','boxWidth','fontSize','lineHeight','barHeight','overlap','rowHeight','padding','textOffsetX','outlineWidth','metaSize','entryGap','nameSize'].includes(k)?Number(inp.value):k==='scale'?Math.max(.01,Number(inp.value)/100):inp.value;pvDraw()});
+ el.querySelectorAll('[data-entry-text]').forEach(t=>t.oninput=()=>{i.entries[+t.dataset.entryText].text=t.value;pvDraw()});el.querySelectorAll('[data-entry-style]').forEach(t=>{t.value=i.entries[+t.dataset.entryStyle].style||'normal';t.onchange=()=>{i.entries[+t.dataset.entryStyle].style=t.value;pvDraw()}});
+ el.querySelectorAll('[data-del-entry]').forEach(b=>b.onclick=()=>{i.entries.splice(+b.dataset.delEntry,1);pvEdit();pvDraw()});let add=el.querySelector('#pvAddLine');if(add)add.onclick=()=>{i.entries.push({name:'探索者',time:'今日 00:00',text:'新しい発言',style:'normal',color:'#ffffff'});pvEdit();pvDraw()};
+ let outline=el.querySelector('#pvOutline');if(outline)outline.onchange=()=>{i.outlineEnabled=outline.checked;pvDraw()};let txt=el.querySelector('#pvText');if(txt)txt.oninput=()=>{i.text=txt.value;pvDraw()};let font=el.querySelector('#pvFont');if(font){font.value=i.font||FONT;font.onchange=()=>{i.font=font.value;pvDraw()}}let ff=el.querySelector('#pvFontFile');if(ff)ff.onchange=async e=>{let file=e.target.files[0];if(!file)return;try{let family='PreviewFont'+i.id;let face=new FontFace(family,await file.arrayBuffer());await face.load();document.fonts.add(face);i.font=family;pvDraw()}catch(err){alert('フォントを読み込めなかったよ')}};
+ let fit=el.querySelector('#pvFit');if(fit)fit.onclick=()=>{let im=pv.images[i.id];if(!im)return alert('画像を読み込んでね');i.scale=Math.min(PW/im.width,PH/im.height);i.x=Math.round((PW-im.width*i.scale)/2);i.y=Math.round((PH-im.height*i.scale)/2);pvEdit();pvDraw()};
+ let upload=el.querySelector('#pvImage');if(upload)upload.onchange=e=>{let file=e.target.files[0];if(!file)return;let url=URL.createObjectURL(file),im=new Image();im.onload=()=>{pv.images[i.id]=im;i.w=im.width;i.h=im.height;pvDraw();URL.revokeObjectURL(url)};im.src=url};
+ let save=el.querySelector('#pvSavePreset');
+ if(save)save.onclick=()=>{let label=prompt('プリセット名を入力してね',i.type+' '+new Date().toLocaleString('ja-JP'));if(label===null)return;let presets=pvGetPresets(i.type);let props=['font','fontSize','boxWidth','lineHeight','metaSize','entryGap','nameSize','barHeight','overlap','rowHeight','padding','textOffsetX','outlineEnabled','outlineColor','outlineWidth','nameColor','panelColor'];let d={};props.forEach(k=>{if(i[k]!==undefined)d[k]=i[k]});presets.unshift({label:label||'無題',date:new Date().toLocaleString('ja-JP'),data:d});try{localStorage.setItem('pvPresets_'+i.type,JSON.stringify(presets))}catch(e){alert('保存容量が足りないよ');return}pvEdit()};
+ let apply=el.querySelector('#pvApplyPreset');if(apply)apply.onclick=()=>{let select=el.querySelector('#pvPresetSelect'),presets=pvGetPresets(i.type),p=presets[Number(select?.value)];if(!p)return alert('保存したデザインを選んでね');Object.assign(i,structuredClone(p.data));pvEdit();pvDraw()};
+ let del=el.querySelector('#pvDeletePreset');if(del)del.onclick=()=>{let select=el.querySelector('#pvPresetSelect'),presets=pvGetPresets(i.type),n=Number(select?.value);if(!presets[n]||!confirm('このプリセットを削除する？'))return;presets.splice(n,1);localStorage.setItem('pvPresets_'+i.type,JSON.stringify(presets));pvEdit()};
+}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{let type=b.dataset.add,id=pv.next++;let item={id,type,x:100,y:120+pv.items.length*35,scale:1,font:FONT,name:'探索者',text:'サンプルテキスト'};if(type==='chat'){item.fontSize=23;item.metaSize=14;item.lineHeight=1.5;item.entryGap=25;item.boxWidth=410;item.textOffsetX=0}if(type==='balloon'){item.fontSize=44;item.nameSize=17;item.padding=0;item.boxWidth=620;item.lineHeight=1.5}if(type==='status'){item.fontSize=46;item.boxWidth=370;item.barHeight=24;item.overlap=4;item.rowHeight=63;item.outlineEnabled=true;item.outlineWidth=3}if(type==='chat')item.entries=[{name:'探索者',time:'今日 00:00',text:'サンプルテキスト',style:'normal',color:'#ffffff'}];if(type==='status')item.stats=[['HP',10,10],['MP',5,15],['SAN',55,70],['サンプル',0,0]];pv.items.push(item);pv.selected=id;pvList();pvEdit();pvDraw()});
+document.getElementById('pvBg').oninput=e=>{pv.bg=e.target.value;pvDraw()};document.getElementById('pvUseBg').onchange=e=>{pv.useBg=e.target.checked;pvDraw()};
+const pvPointers=new Map();let dragPV=null,pinchPV=null;function posPV(e){let r=pc.getBoundingClientRect();return {x:(e.clientX-r.left)*PW/r.width,y:(e.clientY-r.top)*PH/r.height}};
+pc.addEventListener('pointerdown',e=>{let p=posPV(e);pvPointers.set(e.pointerId,p);pc.setPointerCapture(e.pointerId);if(pvPointers.size===1){let hit=[...pv.items].reverse().find(i=>p.x>=i.x&&p.y>=i.y&&p.x<=i.x+(i.w||200)*i.scale&&p.y<=i.y+(i.h||100)*i.scale);if(hit){pv.selected=hit.id;dragPV={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};pvList();pvEdit();pvDraw()}}else if(pvPointers.size===2){let [a,b]=[...pvPointers.values()];let i=pvItem();if(i)pinchPV={distance:Math.hypot(a.x-b.x,a.y-b.y),scale:i.scale};dragPV=null}});
+pc.addEventListener('pointermove',e=>{if(!pvPointers.has(e.pointerId))return;let p=posPV(e);pvPointers.set(e.pointerId,p);let i=pvItem();if(!i)return;if(pvPointers.size===2&&pinchPV){let [a,b]=[...pvPointers.values()];i.scale=Math.max(.01,Math.min(20,pinchPV.scale*Math.hypot(a.x-b.x,a.y-b.y)/Math.max(1,pinchPV.distance)));pvDraw()}else if(dragPV&&dragPV.id===i.id){i.x=Math.round(p.x-dragPV.dx);i.y=Math.round(p.y-dragPV.dy);pvDraw()}});
+function endPV(e){pvPointers.delete(e.pointerId);if(pvPointers.size<2)pinchPV=null;if(pvPointers.size===0){dragPV=null;pvEdit()}}pc.addEventListener('pointerup',endPV);pc.addEventListener('pointercancel',endPV);
+function pvExport(mode){let c=document.createElement('canvas');c.width=PW;c.height=PH;let x=c.getContext('2d');if(mode==='full'&&pv.useBg){x.fillStyle=pv.bg;x.fillRect(0,0,PW,PH)}let items=mode==='single'?(pvItem()?[pvItem()]:[]):pv.items;if(!items.length)return alert('素材を追加してね');items.forEach(i=>pvDrawItem(x,i));if(mode==='single'){let i=items[0],w=Math.max(1,Math.ceil(i.w*i.scale)),h=Math.max(1,Math.ceil(i.h*i.scale)),cut=document.createElement('canvas');cut.width=w;cut.height=h;cut.getContext('2d').drawImage(c,i.x,i.y,w,h,0,0,w,h);c=cut}c.toBlob(blob=>{if(!blob)return;let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=mode==='full'?'preview-1920x1080.png':mode==='single'?'preview-selected-transparent.png':'preview-all-transparent.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)},'image/png')}
+document.getElementById('pvFull').onclick=()=>pvExport('full');document.getElementById('pvTransparent').onclick=()=>pvExport('single');document.getElementById('pvAllTransparent').onclick=()=>pvExport('all');
+// Integrate the preview with existing tab and color picker events.
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{let show=t.dataset.type==='preview';document.getElementById('previewShell').classList.toggle('hidden',!show);document.getElementById('regularContent').classList.toggle('hidden',show);if(show){pvDraw()}}));
+const pvOldRender=render;render=function(){if(currentType==='preview')return;pvOldRender();pvDraw()};
+document.addEventListener('input',e=>{if(e.target.matches('[data-color],[data-picker]'))requestAnimationFrame(pvDraw)});
+pvList();pvEdit();pvDraw();
+
+</script>
+</body>
+</html>
